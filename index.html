@@ -128,7 +128,7 @@
     firebase.initializeApp(firebaseConfig);
     const dbRef = firebase.database().ref('golaha_data');
 
-    // 2. ADMIN LOGIC (PUBLIC BY DEFAULT)
+    // 2. ADMIN LOGIC
     let isAdmin = new URLSearchParams(window.location.search).get('view') === 'admin';
 
     if(isAdmin) {
@@ -140,13 +140,12 @@
     function secretLogin() {
         let pw = prompt("Admin Password Required:");
         if(pw === "123") {
-            // Adds ?view=admin to the URL to unlock the page for this session
             window.location.search = "?view=admin";
         }
     }
 
     function logout() {
-        window.location.search = ""; // Removes the admin flag and goes back to public view
+        window.location.search = ""; 
     }
 
     // 3. SYSTEM LOGIC
@@ -188,9 +187,14 @@
                 for(let w in db[yr][name][m]) {
                     if(activeFilter==='WEEK' && w !== vW) continue;
                     let d = db[yr][name][m][w];
-                    d.sc.forEach((v,i) => p.s[i] += v);
-                    p.gV += d.gV; p.aV += d.aV; p.gP += d.gP; p.aP += d.aP;
-                    p.t += d.total; p.count++;
+                    
+                    d.sc.forEach((v,i) => p.s[i] += (v || 0));
+                    p.gV += (d.gV || 0); 
+                    p.aV += (d.aV || 0); 
+                    p.gP += (d.gP || 0); 
+                    p.aP += (d.aP || 0);
+                    p.t += (d.total || 0); 
+                    p.count++;
                 }
             }
             if(p.count > 0) list.push(p);
@@ -202,8 +206,8 @@
                 <td>${i+1}</td>
                 <td class="text-left pl-6 oswald uppercase text-emerald-900">${p.name}</td>
                 ${p.s.map(v => `<td class="opacity-40 text-xs">${v}</td>`).join('')}
-                <td class="text-red-600">${p.gP}(${p.gV})</td>
-                <td class="text-green-700">${p.aP}(${p.aV})</td>
+                <td class="text-red-600 font-bold">${p.gP}(${p.gV})</td>
+                <td class="text-green-700 font-bold">${p.aP}(${p.aV})</td>
                 <td class="bg-emerald-50 text-xl font-black text-emerald-950">${p.t}</td>
                 ${isAdmin ? `
                 <td style="display: table-cell !important;">
@@ -228,19 +232,32 @@
         const gV = parseInt(document.getElementById('gA').value || 0);
         const aV = parseInt(document.getElementById('aA').value || 0);
 
+        // LOGIC: Goals > 0 = 6pts, Assists > 0 = 4pts
+        const gP = gV > 0 ? 6 : 0;
+        const aP = aV > 0 ? 4 : 0;
+        const statsTotal = sc.reduce((a, b) => a + b, 0);
+
         firebase.database().ref(`golaha_data/${yr}/${name}/${m}/${w}`).set({
-            sc, gV, aV, gP: (gV*6), aP: (aV*4), total: sc.reduce((a,b)=>a+b,0)+(gV*6)+(aV*4)
-        }).then(() => cancelEdit());
+            sc, 
+            gV, 
+            aV, 
+            gP, 
+            aP, 
+            total: (statsTotal + gP + aP)
+        }).then(() => {
+            cancelEdit();
+            alert("Saved successfully!");
+        });
     }
 
     function editEntry(name) {
         const yr = document.getElementById('viewYear').value;
         const m = document.getElementById('selMonth').value;
         const w = document.getElementById('selWeek').value;
-        if (m === "" || w === "") return alert("Filter by Month and Week first!");
+        if (m === "" || w === "") return alert("Filter by Month and Week first to edit a specific entry!");
 
         const data = db[yr][name][m][w];
-        if(!data) return alert("No data found.");
+        if(!data) return alert("No record found for this specific week.");
 
         document.getElementById('pName').value = name;
         document.getElementById('inMonth').value = m;
