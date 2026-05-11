@@ -26,10 +26,6 @@
         .tab-active { background: var(--gool-gold) !important; color: black !important; box-shadow: 0 0 15px rgba(251, 191, 36, 0.3); }
         .btn-edit { background: #2563eb !important; color: white !important; padding: 6px 12px; border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; border: none; }
         .btn-del { background: #dc2626 !important; color: white !important; padding: 6px 12px; border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; border: none; }
-        
-        .season-trigger { cursor: pointer; transition: 0.3s; }
-        .season-trigger:hover { color: var(--gool-gold); }
-        
         .admin-only { display: none; }
     </style>
 </head>
@@ -40,7 +36,7 @@
         <div>
             <h1 class="text-5xl font-bold oswald text-white uppercase tracking-tighter">GOLAHA <span class="text-yellow-500">LABA GOOL</span></h1>
             <div class="flex items-center gap-2 mt-2">
-                <span onclick="secretLogin()" class="text-[10px] text-gray-400 uppercase tracking-widest font-bold season-trigger">Season:</span>
+                <span onclick="secretLogin()" class="text-[10px] text-gray-400 uppercase tracking-widest font-bold cursor-pointer">Season:</span>
                 <select id="viewYear" onchange="render()" class="bg-transparent text-yellow-500 font-bold oswald border-none outline-none cursor-pointer text-lg"></select>
             </div>
         </div>
@@ -82,8 +78,8 @@
                         <input type="number" id="s6" placeholder="R9" class="p-2 rounded text-center">
                     </div>
                     <div class="grid grid-cols-2 gap-2">
-                        <div><label class="text-[9px] text-red-400 font-bold ml-1">GOALS</label><input type="number" id="gA" class="w-full p-2 rounded bg-red-900/10 text-center font-bold"></div>
-                        <div><label class="text-[9px] text-green-400 font-bold ml-1">ASSISTS</label><input type="number" id="aA" class="w-full p-2 rounded bg-green-900/10 text-center font-bold"></div>
+                        <div><label class="text-[9px] text-red-400 font-bold ml-1">GOAL COUNT</label><input type="number" id="gA" class="w-full p-2 rounded bg-red-900/10 text-center font-bold"></div>
+                        <div><label class="text-[9px] text-green-400 font-bold ml-1">ASSIST COUNT</label><input type="number" id="aA" class="w-full p-2 rounded bg-green-900/10 text-center font-bold"></div>
                     </div>
                     <button onclick="save()" id="btnSave" class="w-full py-4 rounded-xl bg-emerald-600 text-white font-bold oswald shadow-lg active:scale-95 transition-transform">SAVE TO CLOUD</button>
                     <button onclick="cancelEdit()" id="btnCancel" class="hidden w-full text-red-400 text-[10px] underline mt-2 font-bold uppercase text-center">Cancel Edit</button>
@@ -114,7 +110,6 @@
 </div>
 
 <script>
-    // 1. FIREBASE CONFIG
     const firebaseConfig = {
       apiKey: "AIzaSyBf2qZ1CcKt7QHnNi55H9JxBxliW7isXiE",
       authDomain: "labagole-36eef.firebaseapp.com",
@@ -128,9 +123,7 @@
     firebase.initializeApp(firebaseConfig);
     const dbRef = firebase.database().ref('golaha_data');
 
-    // 2. ADMIN LOGIC
     let isAdmin = new URLSearchParams(window.location.search).get('view') === 'admin';
-
     if(isAdmin) {
         document.getElementById('adminPanel').style.display = 'block';
         document.getElementById('actionHeader').style.display = 'table-cell';
@@ -139,16 +132,10 @@
 
     function secretLogin() {
         let pw = prompt("Admin Password Required:");
-        if(pw === "123") {
-            window.location.search = "?view=admin";
-        }
+        if(pw === "123") window.location.search = "?view=admin";
     }
+    function logout() { window.location.search = ""; }
 
-    function logout() {
-        window.location.search = ""; 
-    }
-
-    // 3. SYSTEM LOGIC
     let db = {};
     let activeFilter = 'YEAR';
     const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
@@ -188,12 +175,13 @@
                     if(activeFilter==='WEEK' && w !== vW) continue;
                     let d = db[yr][name][m][w];
                     
-                    d.sc.forEach((v,i) => p.s[i] += (v || 0));
-                    p.gV += (d.gV || 0); 
-                    p.aV += (d.aV || 0); 
-                    p.gP += (d.gP || 0); 
-                    p.aP += (d.aP || 0);
-                    p.t += (d.total || 0); 
+                    d.sc.forEach((v,i) => p.s[i] += (parseInt(v) || 0));
+                    p.gV += (parseInt(d.gV) || 0); 
+                    p.aV += (parseInt(d.aV) || 0); 
+                    // Sum the points stored in the DB (which are 6 or 4 per entry)
+                    p.gP += (parseInt(d.gP) || 0); 
+                    p.aP += (parseInt(d.aP) || 0);
+                    p.t += (parseInt(d.total) || 0); 
                     p.count++;
                 }
             }
@@ -232,21 +220,18 @@
         const gV = parseInt(document.getElementById('gA').value || 0);
         const aV = parseInt(document.getElementById('aA').value || 0);
 
-        // LOGIC: Goals > 0 = 6pts, Assists > 0 = 4pts
+        // LOGIC: If they score at least 1 goal, they get 6 points. Total goals tracked in gV.
         const gP = gV > 0 ? 6 : 0;
+        // LOGIC: If they assist at least 1 time, they get 4 points. Total assists tracked in aV.
         const aP = aV > 0 ? 4 : 0;
+        
         const statsTotal = sc.reduce((a, b) => a + b, 0);
+        const total = statsTotal + gP + aP;
 
         firebase.database().ref(`golaha_data/${yr}/${name}/${m}/${w}`).set({
-            sc, 
-            gV, 
-            aV, 
-            gP, 
-            aP, 
-            total: (statsTotal + gP + aP)
+            sc, gV, aV, gP, aP, total
         }).then(() => {
             cancelEdit();
-            alert("Saved successfully!");
         });
     }
 
@@ -254,10 +239,9 @@
         const yr = document.getElementById('viewYear').value;
         const m = document.getElementById('selMonth').value;
         const w = document.getElementById('selWeek').value;
-        if (m === "" || w === "") return alert("Filter by Month and Week first to edit a specific entry!");
-
+        if (m === "" || w === "") return alert("Filter by Month and Week first!");
         const data = db[yr][name][m][w];
-        if(!data) return alert("No record found for this specific week.");
+        if(!data) return alert("No record found.");
 
         document.getElementById('pName').value = name;
         document.getElementById('inMonth').value = m;
@@ -265,22 +249,19 @@
         data.sc.forEach((val, i) => document.getElementById('s' + (i + 1)).value = val);
         document.getElementById('gA').value = data.gV;
         document.getElementById('aA').value = data.aV;
-
         document.getElementById('btnSave').innerText = "UPDATE CLOUD";
         document.getElementById('btnCancel').classList.remove('hidden');
         window.scrollTo(0,0);
     }
 
     function deleteEntry(name) {
-        if(!confirm(`Delete entry for ${name}?`)) return;
+        if(!confirm(`Delete ${name}?`)) return;
         const yr = document.getElementById('viewYear').value;
         const m = document.getElementById('selMonth').value;
         const w = document.getElementById('selWeek').value;
-
         let path = `golaha_data/${yr}/${name}`;
         if(activeFilter === 'WEEK' && m !== "" && w !== "") path += `/${m}/${w}`;
         else if(activeFilter === 'MONTH' && m !== "") path += `/${m}`;
-
         firebase.database().ref(path).remove();
     }
 
