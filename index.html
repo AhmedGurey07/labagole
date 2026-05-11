@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Golaha Laba Gool - Official View</title>
+    <title>Golaha Laba Gole - Official View</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
@@ -27,6 +27,10 @@
         .btn-edit { background: #2563eb !important; color: white !important; padding: 6px 12px; border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; border: none; }
         .btn-del { background: #dc2626 !important; color: white !important; padding: 6px 12px; border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; border: none; }
         .admin-only { display: none; }
+        
+        /* Rank column styling at the end */
+        .rank-badge { background: #fbbf24; color: black; padding: 4px 8px; border-radius: 8px; font-size: 14px; font-weight: 900; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .rank-gold { background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); color: white; }
     </style>
 </head>
 <body>
@@ -94,10 +98,12 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>#</th><th class="text-left pl-6">Ciyaaryahanka</th>
+                                <th>#</th>
+                                <th class="text-left pl-6">Ciyaaryahanka</th>
                                 <th>Tme</th><th>Beh</th><th>Skl</th><th>Pwr</th><th>Tem</th><th>Res</th>
                                 <th class="text-red-600">G(Pts)</th><th class="text-green-700">A(Pts)</th>
                                 <th class="bg-emerald-900/10 text-emerald-900">Total</th>
+                                <th>RANK</th>
                                 <th id="actionHeader" class="admin-only">Action</th>
                             </tr>
                         </thead>
@@ -178,7 +184,6 @@
                     d.sc.forEach((v,i) => p.s[i] += (parseInt(v) || 0));
                     p.gV += (parseInt(d.gV) || 0); 
                     p.aV += (parseInt(d.aV) || 0); 
-                    // Sum the points stored in the DB (which are 6 or 4 per entry)
                     p.gP += (parseInt(d.gP) || 0); 
                     p.aP += (parseInt(d.aP) || 0);
                     p.t += (parseInt(d.total) || 0); 
@@ -188,15 +193,29 @@
             if(p.count > 0) list.push(p);
         }
 
-        list.sort((a,b) => b.t - a.t).forEach((p, i) => {
+        // TIE-BREAKER LOGIC: 1. Total, 2. Goal Value, 3. Assist Value
+        list.sort((a, b) => {
+            if (b.t !== a.t) return b.t - a.t;
+            if (b.gV !== a.gV) return b.gV - a.gV;
+            return b.aV - a.aV;
+        });
+
+        list.forEach((p, i) => {
+            const rankNum = i + 1;
             const row = document.createElement('tr');
+            
             row.innerHTML = `
-                <td>${i+1}</td>
+                <td class="text-xs opacity-50 italic">${rankNum}</td>
                 <td class="text-left pl-6 oswald uppercase text-emerald-900">${p.name}</td>
                 ${p.s.map(v => `<td class="opacity-40 text-xs">${v}</td>`).join('')}
                 <td class="text-red-600 font-bold">${p.gP}(${p.gV})</td>
                 <td class="text-green-700 font-bold">${p.aP}(${p.aV})</td>
                 <td class="bg-emerald-50 text-xl font-black text-emerald-950">${p.t}</td>
+                <td>
+                    <span class="rank-badge ${rankNum === 1 ? 'rank-gold' : ''}">
+                        ${rankNum === 1 ? '🥇' : rankNum}
+                    </span>
+                </td>
                 ${isAdmin ? `
                 <td style="display: table-cell !important;">
                     <div class="flex gap-2 justify-center">
@@ -220,9 +239,7 @@
         const gV = parseInt(document.getElementById('gA').value || 0);
         const aV = parseInt(document.getElementById('aA').value || 0);
 
-        // LOGIC: If they score at least 1 goal, they get 6 points. Total goals tracked in gV.
         const gP = gV > 0 ? 6 : 0;
-        // LOGIC: If they assist at least 1 time, they get 4 points. Total assists tracked in aV.
         const aP = aV > 0 ? 4 : 0;
         
         const statsTotal = sc.reduce((a, b) => a + b, 0);
