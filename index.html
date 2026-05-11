@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Golaha Laba Gool - Official View</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Inter:wght@400;600&display=swap');
+        :root { --gool-green: #064e3b; --gool-dark: #0a0a0a; --gool-gold: #fbbf24; }
+        body { background-color: var(--gool-dark); background-image: radial-gradient(circle at 50% -20%, #1a3a2a, transparent); font-family: 'Inter', sans-serif; color: #e2e8f0; min-height: 100vh; padding: 20px; }
+        .glass-panel { background: rgba(26, 26, 26, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(251, 191, 36, 0.2); border-radius: 24px; }
+        .oswald { font-family: 'Oswald', sans-serif; }
+        .master-frame { border: 4px solid var(--gool-gold); background-color: #022c22; border-radius: 30px; overflow: hidden; }
+        input, select { background: rgba(255, 255, 255, 0.05) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; color: white !important; outline: none; }
+        select option { background-color: white !important; color: #1a1a1a !important; font-weight: 600; }
+        table { border-spacing: 0 8px; border-collapse: separate; width: 100%; }
+        thead th { color: var(--gool-gold); font-family: 'Oswald'; padding: 12px; text-transform: uppercase; font-size: 0.75rem; border-bottom: 1px solid rgba(251, 191, 36, 0.2); }
+        tbody tr { background: white; transition: 0.2s; }
+        tbody td { color: var(--gool-green); font-weight: 700; padding: 12px; text-align: center; }
+        .tab-btn { padding: 10px 16px; border-radius: 12px; font-size: 0.75rem; font-weight: 800; background: rgba(255,255,255,0.05); color: white; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; }
+        .tab-active { background: var(--gool-gold) !important; color: black !important; box-shadow: 0 0 15px rgba(251, 191, 36, 0.3); }
+        .btn-edit { background: #2563eb !important; color: white !important; padding: 6px 12px; border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; border: none; }
+        .btn-del { background: #dc2626 !important; color: white !important; padding: 6px 12px; border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; border: none; }
+        
+        .season-trigger { cursor: pointer; transition: 0.3s; }
+        .season-trigger:hover { color: var(--gool-gold); }
+        
+        .admin-only { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="max-w-[1600px] mx-auto">
+    <header class="mb-8 px-4 flex flex-col xl:flex-row justify-between items-center gap-6">
+        <div>
+            <h1 class="text-5xl font-bold oswald text-white uppercase tracking-tighter">GOLAHA <span class="text-yellow-500">LABA GOOL</span></h1>
+            <div class="flex items-center gap-2 mt-2">
+                <span onclick="secretLogin()" class="text-[10px] text-gray-400 uppercase tracking-widest font-bold season-trigger">Season:</span>
+                <select id="viewYear" onchange="render()" class="bg-transparent text-yellow-500 font-bold oswald border-none outline-none cursor-pointer text-lg"></select>
+            </div>
+        </div>
+
+        <div class="glass-panel p-3 flex flex-wrap gap-3 justify-center items-center">
+            <button onclick="changeFilter('YEAR')" id="f-YEAR" class="tab-btn tab-active">🏆 YEAR TOTAL</button>
+            <select id="selMonth" onchange="changeFilter('MONTH')" class="tab-btn">
+                <option value="">-- MONTH --</option>
+                <option value="0">January</option><option value="1">February</option><option value="2">March</option>
+                <option value="3">April</option><option value="4">May</option><option value="5">June</option>
+                <option value="6">July</option><option value="7">August</option><option value="8">September</option>
+                <option value="9">October</option><option value="10">November</option><option value="11">December</option>
+            </select>
+            <select id="selWeek" onchange="changeFilter('WEEK')" class="tab-btn">
+                <option value="">-- WEEK --</option>
+                <option value="1">Week 1</option><option value="2">Week 2</option><option value="3">Week 3</option><option value="4">Week 4</option>
+            </select>
+        </div>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <aside id="adminPanel" class="lg:col-span-3 admin-only">
+            <div id="formCard" class="glass-panel p-6 sticky top-6">
+                <h2 class="text-xl mb-4 oswald text-yellow-500 border-b border-yellow-500/30 pb-2 uppercase text-center">Admin Entry</h2>
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-2">
+                        <select id="inMonth" class="p-2 rounded text-xs"></select>
+                        <select id="inWeek" class="p-2 rounded text-xs">
+                            <option value="1">Week 1</option><option value="2">Week 2</option><option value="3">Week 3</option><option value="4">Week 4</option>
+                        </select>
+                    </div>
+                    <input type="text" id="pName" placeholder="PLAYER NAME" class="w-full p-3 rounded-xl font-bold uppercase border border-white/10">
+                    <div class="grid grid-cols-3 gap-2">
+                        <input type="number" id="s1" placeholder="T2" class="p-2 rounded text-center">
+                        <input type="number" id="s2" placeholder="B3" class="p-2 rounded text-center">
+                        <input type="number" id="s3" placeholder="S4" class="p-2 rounded text-center">
+                        <input type="number" id="s4" placeholder="P5" class="p-2 rounded text-center">
+                        <input type="number" id="s5" placeholder="T7" class="p-2 rounded text-center">
+                        <input type="number" id="s6" placeholder="R9" class="p-2 rounded text-center">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div><label class="text-[9px] text-red-400 font-bold ml-1">GOALS</label><input type="number" id="gA" class="w-full p-2 rounded bg-red-900/10 text-center font-bold"></div>
+                        <div><label class="text-[9px] text-green-400 font-bold ml-1">ASSISTS</label><input type="number" id="aA" class="w-full p-2 rounded bg-green-900/10 text-center font-bold"></div>
+                    </div>
+                    <button onclick="save()" id="btnSave" class="w-full py-4 rounded-xl bg-emerald-600 text-white font-bold oswald shadow-lg active:scale-95 transition-transform">SAVE TO CLOUD</button>
+                    <button onclick="cancelEdit()" id="btnCancel" class="hidden w-full text-red-400 text-[10px] underline mt-2 font-bold uppercase text-center">Cancel Edit</button>
+                    <button onclick="logout()" class="w-full text-[9px] text-gray-500 mt-4 uppercase text-center">Exit Admin Mode</button>
+                </div>
+            </div>
+        </aside>
+
+        <main id="mainTableArea" class="lg:col-span-12">
+            <div class="master-frame shadow-2xl">
+                <div class="p-4 overflow-x-auto">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th><th class="text-left pl-6">Ciyaaryahanka</th>
+                                <th>Tme</th><th>Beh</th><th>Skl</th><th>Pwr</th><th>Tem</th><th>Res</th>
+                                <th class="text-red-600">G(Pts)</th><th class="text-green-700">A(Pts)</th>
+                                <th class="bg-emerald-900/10 text-emerald-900">Total</th>
+                                <th id="actionHeader" class="admin-only">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    // 1. FIREBASE CONFIG
+    const firebaseConfig = {
+      apiKey: "AIzaSyBf2qZ1CcKt7QHnNi55H9JxBxliW7isXiE",
+      authDomain: "labagole-36eef.firebaseapp.com",
+      databaseURL: "https://labagole-36eef-default-rtdb.firebaseio.com",
+      projectId: "labagole-36eef",
+      storageBucket: "labagole-36eef.firebasestorage.app",
+      messagingSenderId: "747283642005",
+      appId: "1:747283642005:web:c5843eb1ae73e52a980d9c"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const dbRef = firebase.database().ref('golaha_data');
+
+    // 2. ADMIN LOGIC (PUBLIC BY DEFAULT)
+    let isAdmin = new URLSearchParams(window.location.search).get('view') === 'admin';
+
+    if(isAdmin) {
+        document.getElementById('adminPanel').style.display = 'block';
+        document.getElementById('actionHeader').style.display = 'table-cell';
+        document.getElementById('mainTableArea').classList.replace('lg:col-span-12', 'lg:col-span-9');
+    }
+
+    function secretLogin() {
+        let pw = prompt("Admin Password Required:");
+        if(pw === "123") {
+            // Adds ?view=admin to the URL to unlock the page for this session
+            window.location.search = "?view=admin";
+        }
+    }
+
+    function logout() {
+        window.location.search = ""; // Removes the admin flag and goes back to public view
+    }
+
+    // 3. SYSTEM LOGIC
+    let db = {};
+    let activeFilter = 'YEAR';
+    const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+    dbRef.on('value', (snapshot) => {
+        db = snapshot.val() || {};
+        render();
+    });
+
+    function setup() {
+        const yearSelect = document.getElementById('viewYear');
+        for (let y = 2026; y <= 2030; y++) {
+            let opt = document.createElement('option');
+            opt.value = y; opt.innerHTML = y;
+            yearSelect.appendChild(opt);
+        }
+        const mIn = document.getElementById('inMonth');
+        MONTHS.forEach((m, i) => mIn.innerHTML += `<option value="${i}">${m}</option>`);
+    }
+    setup();
+
+    function render() {
+        const body = document.getElementById('pBody');
+        body.innerHTML = '';
+        const yr = document.getElementById('viewYear').value;
+        const vM = document.getElementById('selMonth').value;
+        const vW = document.getElementById('selWeek').value;
+
+        if(!db[yr]) return;
+
+        let list = [];
+        for(let name in db[yr]) {
+            let p = { name, s:[0,0,0,0,0,0], gV:0, aV:0, gP:0, aP:0, t:0, count:0 };
+            for(let m in db[yr][name]) {
+                if((activeFilter==='MONTH' || activeFilter==='WEEK') && m !== vM) continue;
+                for(let w in db[yr][name][m]) {
+                    if(activeFilter==='WEEK' && w !== vW) continue;
+                    let d = db[yr][name][m][w];
+                    d.sc.forEach((v,i) => p.s[i] += v);
+                    p.gV += d.gV; p.aV += d.aV; p.gP += d.gP; p.aP += d.aP;
+                    p.t += d.total; p.count++;
+                }
+            }
+            if(p.count > 0) list.push(p);
+        }
+
+        list.sort((a,b) => b.t - a.t).forEach((p, i) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${i+1}</td>
+                <td class="text-left pl-6 oswald uppercase text-emerald-900">${p.name}</td>
+                ${p.s.map(v => `<td class="opacity-40 text-xs">${v}</td>`).join('')}
+                <td class="text-red-600">${p.gP}(${p.gV})</td>
+                <td class="text-green-700">${p.aP}(${p.aV})</td>
+                <td class="bg-emerald-50 text-xl font-black text-emerald-950">${p.t}</td>
+                ${isAdmin ? `
+                <td style="display: table-cell !important;">
+                    <div class="flex gap-2 justify-center">
+                        <button onclick="editEntry('${p.name}')" class="btn-edit">EDIT</button>
+                        <button onclick="deleteEntry('${p.name}')" class="btn-del">DEL</button>
+                    </div>
+                </td>` : ''}
+            `;
+            body.appendChild(row);
+        });
+    }
+
+    function save() {
+        const yr = document.getElementById('viewYear').value;
+        const name = document.getElementById('pName').value.toUpperCase().trim();
+        const m = document.getElementById('inMonth').value;
+        const w = document.getElementById('inWeek').value;
+        if(!name) return alert("Name is required!");
+
+        const sc = [1,2,3,4,5,6].map(i => parseInt(document.getElementById('s'+i).value || 0));
+        const gV = parseInt(document.getElementById('gA').value || 0);
+        const aV = parseInt(document.getElementById('aA').value || 0);
+
+        firebase.database().ref(`golaha_data/${yr}/${name}/${m}/${w}`).set({
+            sc, gV, aV, gP: (gV*6), aP: (aV*4), total: sc.reduce((a,b)=>a+b,0)+(gV*6)+(aV*4)
+        }).then(() => cancelEdit());
+    }
+
+    function editEntry(name) {
+        const yr = document.getElementById('viewYear').value;
+        const m = document.getElementById('selMonth').value;
+        const w = document.getElementById('selWeek').value;
+        if (m === "" || w === "") return alert("Filter by Month and Week first!");
+
+        const data = db[yr][name][m][w];
+        if(!data) return alert("No data found.");
+
+        document.getElementById('pName').value = name;
+        document.getElementById('inMonth').value = m;
+        document.getElementById('inWeek').value = w;
+        data.sc.forEach((val, i) => document.getElementById('s' + (i + 1)).value = val);
+        document.getElementById('gA').value = data.gV;
+        document.getElementById('aA').value = data.aV;
+
+        document.getElementById('btnSave').innerText = "UPDATE CLOUD";
+        document.getElementById('btnCancel').classList.remove('hidden');
+        window.scrollTo(0,0);
+    }
+
+    function deleteEntry(name) {
+        if(!confirm(`Delete entry for ${name}?`)) return;
+        const yr = document.getElementById('viewYear').value;
+        const m = document.getElementById('selMonth').value;
+        const w = document.getElementById('selWeek').value;
+
+        let path = `golaha_data/${yr}/${name}`;
+        if(activeFilter === 'WEEK' && m !== "" && w !== "") path += `/${m}/${w}`;
+        else if(activeFilter === 'MONTH' && m !== "") path += `/${m}`;
+
+        firebase.database().ref(path).remove();
+    }
+
+    function changeFilter(mode) {
+        activeFilter = mode;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
+        if(mode === 'YEAR') {
+            document.getElementById('f-YEAR').classList.add('tab-active');
+            document.getElementById('selMonth').value = "";
+            document.getElementById('selWeek').value = "";
+        }
+        render();
+    }
+
+    function cancelEdit() {
+        document.querySelectorAll('#formCard input').forEach(i => i.value = "");
+        document.getElementById('btnSave').innerText = "SAVE TO CLOUD";
+        document.getElementById('btnCancel').classList.add('hidden');
+    }
+</script>
+</body>
+</html>
