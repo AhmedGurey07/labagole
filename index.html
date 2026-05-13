@@ -27,8 +27,6 @@
         .btn-edit { background: #2563eb !important; color: white !important; padding: 6px 12px; border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; border: none; }
         .btn-del { background: #dc2626 !important; color: white !important; padding: 6px 12px; border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; border: none; }
         .admin-only { display: none; }
-        
-        /* Rank column styling at the end */
         .rank-badge { background: #fbbf24; color: black; padding: 4px 8px; border-radius: 8px; font-size: 14px; font-weight: 900; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         .rank-gold { background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); color: white; }
     </style>
@@ -72,7 +70,11 @@
                             <option value="1">Week 1</option><option value="2">Week 2</option><option value="3">Week 3</option><option value="4">Week 4</option>
                         </select>
                     </div>
-                    <input type="text" id="pName" placeholder="PLAYER NAME" class="w-full p-3 rounded-xl font-bold uppercase border border-white/10">
+                    
+                    <!-- UPDATED: Added list attribute and datalist for Player Names -->
+                    <input type="text" id="pName" list="playerNameList" placeholder="PLAYER NAME" class="w-full p-3 rounded-xl font-bold uppercase border border-white/10">
+                    <datalist id="playerNameList"></datalist>
+
                     <div class="grid grid-cols-3 gap-2">
                         <input type="number" id="s1" placeholder="T2" class="p-2 rounded text-center">
                         <input type="number" id="s2" placeholder="B3" class="p-2 rounded text-center">
@@ -170,6 +172,18 @@
         const vM = document.getElementById('selMonth').value;
         const vW = document.getElementById('selWeek').value;
 
+        // UPDATED: Populate the Player Name Datalist
+        const dataList = document.getElementById('playerNameList');
+        dataList.innerHTML = '';
+        if (db[yr]) {
+            // Get all unique names from database, sort them, and add to dropdown
+            Object.keys(db[yr]).sort().forEach(name => {
+                let option = document.createElement('option');
+                option.value = name;
+                dataList.appendChild(option);
+            });
+        }
+
         if(!db[yr]) return;
 
         let list = [];
@@ -193,7 +207,6 @@
             if(p.count > 0) list.push(p);
         }
 
-        // TIE-BREAKER LOGIC: 1. Total, 2. Goal Value, 3. Assist Value
         list.sort((a, b) => {
             if (b.t !== a.t) return b.t - a.t;
             if (b.gV !== a.gV) return b.gV - a.gV;
