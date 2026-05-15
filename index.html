@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Golaha Laba Gole - Registry Edition</title>
+    <title>Golaha Laba Gole - Elite Analytics</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
@@ -13,43 +13,113 @@
         :root { --gool-gold: #fbbf24; --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); }
         body { background-color: #070707; background-image: radial-gradient(circle at 50% 0%, #112b1d 0%, #070707 70%); font-family: 'Inter', sans-serif; color: #f1f5f9; min-height: 100vh; padding: 20px; }
         
-        /* Award Styling */
         .award-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(251, 191, 36, 0.2); border-radius: 32px; padding: 24px; position: relative; overflow: hidden; backdrop-filter: blur(10px); }
         .award-box { height: 260px; width: 100%; border-radius: 20px; background: #000; border: 2px solid rgba(251, 191, 36, 0.1); position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .award-img { width: 100%; height: 100%; object-fit: cover; }
         .rank-one-tag { position: absolute; top: 12px; right: 12px; background: var(--gold-gradient); color: black; padding: 4px 12px; border-radius: 99px; font-weight: 900; font-size: 10px; z-index: 10; }
         .name-display { background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 1.5rem; font-weight: 900; text-transform: uppercase; margin-top: 15px; font-family: 'Oswald'; }
         
-        /* Panel Styling */
         .glass-panel { background: rgba(20, 20, 20, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.05); border-radius: 24px; }
         .tab-btn { padding: 8px 16px; border-radius: 12px; font-weight: 700; background: rgba(255,255,255,0.03); color: #94a3b8; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: 0.3s; }
         .tab-active { background: var(--gool-gold) !important; color: #000 !important; }
         
         table { border-spacing: 0 8px; border-collapse: separate; width: 100%; }
-        tbody tr { background: white; border-radius: 12px; transition: transform 0.2s; }
-        tbody td { color: #064e3b; font-weight: 800; padding: 14px; text-align: center; }
+        tbody tr { background: white; border-radius: 12px; transition: 0.2s; cursor: pointer; }
+        tbody tr:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        tbody td { color: #064e3b; font-weight: 800; padding: 12px; text-align: center; }
         
+        .rank-badge { background: var(--gold-gradient); color: black; padding: 4px 14px; border-radius: 14px; font-weight: 900; display: inline-block; min-width: 42px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .rank-badge-1 { background: linear-gradient(135deg, #fcd34d 0%, #fbbf24 100%); outline: 2px solid #fbbf24; outline-offset: 2px; }
+        .total-col { background: #f0fdf4; font-size: 1.1rem; border-left: 1px solid rgba(0,0,0,0.03); }
+
+        /* Modified Admin Only Visibility */
         .admin-only { display: none; }
+        [data-admin="true"] .admin-only { display: table-cell; }
+        div.admin-only[data-admin="true"] { display: block; }
+
         .oswald { font-family: 'Oswald', sans-serif; }
-        select option { background: #111; color: white; }
+        .star-glow { text-shadow: 0 0 8px rgba(251, 191, 36, 0.6); }
+
+        #reportModal, #historyModal { display: none; position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); padding: 20px; align-items: center; justify-content: center; }
+        .report-content { background: #0f172a; border: 2px solid rgba(251, 191, 36, 0.3); border-radius: 32px; max-width: 500px; width: 100%; padding: 32px; position: relative; }
     </style>
 </head>
-<body>
+<body id="mainBody">
 
-<div class="max-w-[1400px] mx-auto">
-    <header class="mb-12 flex flex-col lg:flex-row justify-between items-center gap-8">
-        <h1 class="text-6xl font-black oswald text-white tracking-tighter" onclick="secretLogin()">GOLAHA <span class="text-yellow-500">LABA GOLE</span></h1>
+<div id="reportModal" onclick="closeReport(event)">
+    <div class="report-content" onclick="event.stopPropagation()">
+        <button onclick="closeReport()" class="absolute top-4 right-6 text-gray-400 text-2xl font-bold">&times;</button>
+        <div id="reportPhoto" class="w-24 h-24 rounded-full mx-auto border-4 border-yellow-500 overflow-hidden mb-4">
+            <img src="" class="w-full h-full object-cover">
+        </div>
+        <h2 id="reportName" class="text-3xl font-black text-center oswald text-yellow-500 uppercase tracking-wide mb-1">Player Name</h2>
+        <div id="repStars" class="text-center mb-4"></div>
         
+        <div class="space-y-3">
+            <div class="flex justify-between border-b border-white/5 pb-2">
+                <span class="text-gray-400 text-[10px] font-bold uppercase">Report Context</span>
+                <span id="repMatches" class="text-[12px] font-black text-blue-400 uppercase">0</span>
+            </div>
+            <div class="flex justify-between border-b border-white/5 pb-2">
+                <span class="text-gray-400 text-[10px] font-bold">TOTAL ELITE POINTS</span>
+                <span id="repTotal" class="text-lg font-black text-white">0</span>
+            </div>
+
+            <div class="grid grid-cols-4 gap-2">
+                <div class="bg-white/5 p-2 rounded-xl text-center"><p class="text-[9px] text-red-500 font-bold uppercase">Goals</p><p id="repGoals" class="text-lg font-black">0</p></div>
+                <div class="bg-white/5 p-2 rounded-xl text-center"><p class="text-[9px] text-green-500 font-bold uppercase">Assists</p><p id="repAssists" class="text-lg font-black">0</p></div>
+                <div class="bg-yellow-500/10 p-2 rounded-xl text-center border border-yellow-500/20"><p class="text-[9px] text-yellow-500 font-bold uppercase">Yellow</p><p id="repYellow" class="text-lg font-black text-yellow-500">0</p></div>
+                <div class="bg-red-600/10 p-2 rounded-xl text-center border border-red-600/20"><p class="text-[9px] text-red-600 font-bold uppercase">Red</p><p id="repRed" class="text-lg font-black text-red-600">0</p></div>
+            </div>
+
+            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest text-center mt-2">Skill Breakdown</p>
+            <div class="grid grid-cols-3 gap-2 text-[10px] text-center">
+                <div class="bg-black/30 p-2 rounded-lg"><p class="text-gray-500">TIME</p><p id="repS1" class="font-bold text-white"></p></div>
+                <div class="bg-black/30 p-2 rounded-lg"><p class="text-gray-500">BEH</p><p id="repS2" class="font-bold text-white"></p></div>
+                <div class="bg-black/30 p-2 rounded-lg"><p class="text-gray-500">SAFE</p><p id="repS3" class="font-bold text-white"></p></div>
+                <div class="bg-black/30 p-2 rounded-lg"><p class="text-gray-500">PERF</p><p id="repS4" class="font-bold text-white"></p></div>
+                <div class="bg-black/30 p-2 rounded-lg"><p class="text-gray-500">TEAM</p><p id="repS5" class="font-bold text-white"></p></div>
+                <div class="bg-black/30 p-2 rounded-lg"><p class="text-gray-500">REF</p><p id="repS6" class="font-bold text-white"></p></div>
+            </div>
+
+            <button onclick="openHistorySelector()" class="w-full mt-4 py-3 rounded-xl border border-yellow-500/50 text-yellow-500 font-bold text-xs hover:bg-yellow-500 hover:text-black transition uppercase oswald tracking-widest">
+                View History
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="historyModal" onclick="closeHistory()">
+    <div class="report-content" onclick="event.stopPropagation()">
+        <h3 class="oswald text-2xl text-yellow-500 mb-6 text-center tracking-tighter">SELECT RECORD</h3>
+        <div class="space-y-4">
+            <div>
+                <label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Year</label>
+                <select id="histYear" class="w-full p-4 bg-black/40 border border-white/10 rounded-xl text-white font-bold"></select>
+            </div>
+            <div>
+                <label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Month</label>
+                <select id="histMonth" class="w-full p-4 bg-black/40 border border-white/10 rounded-xl text-white font-bold"></select>
+            </div>
+            <div>
+                <label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Week</label>
+                <select id="histWeek" class="w-full p-4 bg-black/40 border border-white/10 rounded-xl text-white font-bold">
+                    <option value="1">Week 1</option><option value="2">Week 2</option><option value="3">Week 3</option><option value="4">Week 4</option>
+                </select>
+            </div>
+            <button onclick="fetchSpecificHistory()" class="w-full py-4 bg-yellow-500 text-black font-black rounded-xl oswald uppercase mt-2">Show History</button>
+            <button onclick="closeHistory()" class="w-full text-gray-500 text-[10px] font-bold uppercase tracking-widest mt-2">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div class="max-w-[1450px] mx-auto">
+    <header class="mb-12 flex flex-col lg:flex-row justify-between items-center gap-8">
+        <h1 class="text-6xl font-black oswald text-white tracking-tighter cursor-pointer" onclick="secretLogin()">GOLAHA <span class="text-yellow-500">LABA GOLE</span></h1>
         <div class="glass-panel p-2 flex flex-wrap gap-2 justify-center shadow-2xl">
             <select id="viewYear" onchange="render()" class="tab-btn bg-transparent border-none font-bold text-yellow-500"></select>
             <button onclick="changeFilter('YEAR')" id="f-YEAR" class="tab-btn tab-active">🏆 SEASON</button>
-            <select id="selMonth" onchange="changeFilter('MONTH')" class="tab-btn bg-transparent border-none">
-                <option value="">-- MONTH --</option>
-                <option value="0">January</option><option value="1">February</option><option value="2">March</option>
-                <option value="3">April</option><option value="4">May</option><option value="5">June</option>
-                <option value="6">July</option><option value="7">August</option><option value="8">September</option>
-                <option value="9">October</option><option value="10">November</option><option value="11">December</option>
-            </select>
+            <select id="selMonth" onchange="changeFilter('MONTH')" class="tab-btn bg-transparent border-none"><option value="">-- MONTH --</option></select>
             <select id="selWeek" onchange="changeFilter('WEEK')" class="tab-btn bg-transparent border-none">
                 <option value="">-- WEEK --</option>
                 <option value="1">Week 1</option><option value="2">Week 2</option><option value="3">Week 3</option><option value="4">Week 4</option>
@@ -57,7 +127,6 @@
         </div>
     </header>
 
-    <!-- Award Highlights -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
         <div class="award-card"><div class="award-box" id="box-WEEK"><span>🏆</span></div><div class="rank-one-tag">WEEKLY MVP</div><div id="name-WEEK" class="name-display text-center">---</div></div>
         <div class="award-card border-yellow-500"><div class="award-box" id="box-MONTH"><span>⚽</span></div><div class="rank-one-tag">MONTHLY KING</div><div id="name-MONTH" class="name-display text-center">---</div></div>
@@ -65,75 +134,65 @@
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
-        <!-- Input Center (Admin Only) -->
         <aside id="adminPanel" class="lg:col-span-3 admin-only">
-            <div id="formCard" class="glass-panel p-6 sticky top-6 border-white/5 shadow-2xl">
-                
-                <!-- Admin Tabs -->
+            <div id="formCard" class="glass-panel p-6 sticky top-6 border-white/5">
                 <div class="flex gap-2 mb-6 border-b border-white/10 pb-4">
-                    <button onclick="switchAdminTab('data')" id="tabData" class="text-[10px] font-bold uppercase text-yellow-500">Enter Stats</button>
+                    <button onclick="switchAdminTab('data')" id="tabData" class="text-[10px] font-bold uppercase text-yellow-500">Stats</button>
                     <span class="text-gray-700">|</span>
-                    <button onclick="switchAdminTab('reg')" id="tabReg" class="text-[10px] font-bold uppercase text-gray-500">Register Player</button>
+                    <button onclick="switchAdminTab('reg')" id="tabReg" class="text-[10px] font-bold uppercase text-gray-500">Registry</button>
                 </div>
-
-                <!-- Registration Form -->
                 <div id="regForm" class="hidden space-y-4">
-                    <h3 class="oswald text-sm text-yellow-500">NEW PLAYER REGISTRY</h3>
-                    <input type="text" id="regName" placeholder="PLAYER FULL NAME" class="w-full p-4 rounded-xl bg-black/40 border border-white/10 uppercase font-bold text-white outline-none">
-                    <div class="p-3 rounded-xl bg-white/5 border border-white/10">
-                        <label class="text-[10px] text-gray-400 block mb-1">UPLOAD PHOTO</label>
-                        <input type="file" id="regPhoto" class="text-[10px] w-full" accept="image/*">
-                    </div>
-                    <button onclick="registerPlayer()" class="w-full py-3 rounded-xl bg-blue-600 text-white font-bold uppercase text-xs">Save to Registry</button>
+                    <input type="text" id="regName" placeholder="PLAYER NAME" class="w-full p-4 rounded-xl bg-black/40 border border-white/10 uppercase font-bold text-white">
+                    <input type="file" id="regPhoto" class="text-[10px] w-full" accept="image/*">
+                    <button onclick="registerPlayer()" class="w-full py-3 rounded-xl bg-blue-600 text-white font-bold uppercase text-xs">Save Profile</button>
                 </div>
-
-                <!-- Stats Form -->
                 <div id="statsForm" class="space-y-4">
-                    <h3 class="oswald text-sm text-yellow-500">UPLOAD WEEKLY STATS</h3>
-                    <select id="pNameSelect" class="w-full p-4 rounded-xl bg-black/40 border border-white/10 font-bold text-white outline-none">
-                        <option value="">-- SELECT PLAYER --</option>
-                    </select>
-                    
+                    <select id="pNameSelect" class="w-full p-4 rounded-xl bg-black/40 border border-white/10 font-bold text-white"></select>
                     <div class="grid grid-cols-2 gap-2">
                         <select id="inMonth" class="p-3 rounded-xl bg-black/40 text-xs text-white"></select>
-                        <select id="inWeek" class="p-3 rounded-xl bg-black/40 text-xs text-white">
-                            <option value="1">Week 1</option><option value="2">Week 2</option><option value="3">Week 3</option><option value="4">Week 4</option>
-                        </select>
+                        <select id="inWeek" class="p-3 rounded-xl bg-black/40 text-xs text-white"><option value="1">W1</option><option value="2">W2</option><option value="3">W3</option><option value="4">W4</option></select>
                     </div>
-
                     <div class="grid grid-cols-3 gap-2">
-                        <input type="number" id="s1" placeholder="T2" class="p-3 rounded-xl bg-black/40 text-center text-xs">
-                        <input type="number" id="s2" placeholder="B3" class="p-3 rounded-xl bg-black/40 text-center text-xs">
-                        <input type="number" id="s3" placeholder="S4" class="p-3 rounded-xl bg-black/40 text-center text-xs">
-                        <input type="number" id="s4" placeholder="P5" class="p-3 rounded-xl bg-black/40 text-center text-xs">
-                        <input type="number" id="s5" placeholder="T7" class="p-3 rounded-xl bg-black/40 text-center text-xs">
-                        <input type="number" id="s6" placeholder="R9" class="p-3 rounded-xl bg-black/40 text-center text-xs">
+                        <input type="number" id="s1" placeholder="Time" class="p-3 rounded-xl bg-black/40 text-center text-[10px] text-white">
+                        <input type="number" id="s2" placeholder="Beh." class="p-3 rounded-xl bg-black/40 text-center text-[10px] text-white">
+                        <input type="number" id="s3" placeholder="Safe" class="p-3 rounded-xl bg-black/40 text-center text-[10px] text-white">
+                        <input type="number" id="s4" placeholder="Perf" class="p-3 rounded-xl bg-black/40 text-center text-[10px] text-white">
+                        <input type="number" id="s5" placeholder="Team" class="p-3 rounded-xl bg-black/40 text-center text-[10px] text-white">
+                        <input type="number" id="s6" placeholder="Ref" class="p-3 rounded-xl bg-black/40 text-center text-[10px] text-white">
                     </div>
-
                     <div class="grid grid-cols-2 gap-2">
-                        <input type="number" id="gA" placeholder="Goals" class="p-3 rounded-xl bg-red-500/10 text-red-500 font-bold text-center">
-                        <input type="number" id="aA" placeholder="Assists" class="p-3 rounded-xl bg-green-500/10 text-green-500 font-bold text-center">
+                        <input type="number" id="yCard" placeholder="Yellow" class="p-3 rounded-xl bg-yellow-500/10 text-yellow-500 text-center font-bold">
+                        <input type="number" id="rCard" placeholder="Red" class="p-3 rounded-xl bg-red-600/10 text-red-600 text-center font-bold">
                     </div>
-
-                    <button onclick="saveStats()" id="btnSave" class="w-full py-4 rounded-xl bg-yellow-500 text-black font-black oswald uppercase tracking-wider">Save Record</button>
-                    <button onclick="cancelEdit()" id="btnCancel" class="hidden w-full text-red-500 text-[10px] font-bold mt-2">CANCEL</button>
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="number" id="gA" placeholder="Goals" class="p-3 rounded-xl bg-red-500/10 text-red-500 text-center">
+                        <input type="number" id="aA" placeholder="Assists" class="p-3 rounded-xl bg-green-500/10 text-green-500 text-center">
+                    </div>
+                    <button onclick="saveStats()" id="btnSave" class="w-full py-4 rounded-xl bg-yellow-500 text-black font-black oswald">SAVE RECORD</button>
                 </div>
-
-                <button onclick="logout()" class="w-full text-[10px] text-gray-600 mt-6 uppercase tracking-widest">Logout</button>
+                <button onclick="logout()" class="w-full text-[10px] text-gray-600 mt-6">LOGOUT</button>
             </div>
         </aside>
 
-        <!-- Table Display Area -->
-        <div id="mainTableArea" class="lg:col-span-12">
-            <div class="glass-panel overflow-hidden border-white/5 shadow-2xl">
-                <div class="p-1 overflow-x-auto">
-                    <table class="w-full">
-                        <thead class="oswald text-[10px] tracking-widest text-gray-500 uppercase">
-                            <tr><th class="p-4">Rank</th><th class="p-4 text-left">Athlete</th><th>T2</th><th>B3</th><th>S4</th><th>P5</th><th>T7</th><th>R9</th><th class="text-red-500">G</th><th class="text-green-500">A</th><th class="text-black">Total</th><th class="admin-only">Action</th></tr>
-                        </thead>
-                        <tbody id="pBody"></tbody>
-                    </table>
-                </div>
+        <div id="mainTableArea" class="lg:col-span-12 overflow-x-auto">
+            <div class="glass-panel min-w-[1100px]">
+                <table>
+                    <thead class="oswald text-[10px] text-gray-500 uppercase">
+                        <tr>
+                            <th class="p-4 text-left">Athlete</th>
+                            <th class="text-center">Skill Rating</th>
+                            <th class="text-blue-500">MP</th> 
+                            <th class="text-red-500">G</th>
+                            <th class="text-green-500">A</th>
+                            <th class="admin-only text-yellow-500">Y</th>
+                            <th class="admin-only text-red-600">R</th>
+                            <th>Total</th>
+                            <th class="p-4">Rank</th>
+                            <th class="admin-only">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pBody"></tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -146,7 +205,6 @@
       databaseURL: "https://labagole-36eef-default-rtdb.firebaseio.com",
       projectId: "labagole-36eef",
       storageBucket: "labagole-36eef.firebasestorage.app",
-      messagingSenderId: "747283642005",
       appId: "1:747283642005:web:c5843eb1ae73e52a980d9c"
     };
 
@@ -154,67 +212,115 @@
     const dbRef = firebase.database().ref('golaha_data');
     const profilesRef = firebase.database().ref('golaha_profiles');
 
+    const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    let db = {}, profiles = {}, activeFilter = 'YEAR';
+    let currentReportPlayer = "";
     let isAdmin = new URLSearchParams(window.location.search).get('view') === 'admin';
+
+    // Apply Admin state to the body for CSS control
     if(isAdmin) {
-        document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
+        document.getElementById('mainBody').setAttribute('data-admin', 'true');
         document.getElementById('mainTableArea').classList.replace('lg:col-span-12', 'lg:col-span-9');
     }
 
-    function secretLogin() { let pw = prompt("Admin Code:"); if(pw === "123") window.location.search = "?view=admin"; }
-    function logout() { window.location.search = ""; }
-
-    let db = {}, profiles = {}, activeFilter = 'YEAR';
-    const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-
-    dbRef.on('value', s => { db = s.val() || {}; render(); });
-    profilesRef.on('value', s => { 
-        profiles = s.val() || {}; 
-        updateNameDropdown(); 
-        render(); 
-    });
-
     function setup() {
-        const yrSel = document.getElementById('viewYear');
-        for (let y = 2026; y <= 2030; y++) { let o = document.createElement('option'); o.value = y; o.innerHTML = y; yrSel.appendChild(o); }
-        const mIn = document.getElementById('inMonth');
-        MONTHS.forEach((m, i) => mIn.innerHTML += `<option value="${i}">${m}</option>`);
+        const viewYear = document.getElementById('viewYear');
+        const inMonth = document.getElementById('inMonth');
+        const selMonth = document.getElementById('selMonth');
+        for (let y = 2026; y <= 2030; y++) viewYear.innerHTML += `<option value="${y}">${y}</option>`;
+        MONTHS.forEach((m, i) => {
+            inMonth.innerHTML += `<option value="${i}">${m}</option>`;
+            selMonth.innerHTML += `<option value="${i}">${m}</option>`;
+        });
     }
     setup();
 
-    function updateNameDropdown() {
+    dbRef.on('value', s => { db = s.val() || {}; render(); });
+    profilesRef.on('value', s => { profiles = s.val() || {}; updateDropdowns(); render(); });
+
+    function secretLogin() { if(prompt("Code:") === "123") window.location.search = "?view=admin"; }
+    function logout() { window.location.search = ""; }
+
+    function updateDropdowns() {
         const sel = document.getElementById('pNameSelect');
-        const currentVal = sel.value;
         sel.innerHTML = '<option value="">-- SELECT PLAYER --</option>';
-        Object.keys(profiles).sort().forEach(name => {
-            sel.innerHTML += `<option value="${name}">${name}</option>`;
-        });
-        sel.value = currentVal;
+        Object.keys(profiles).sort().forEach(n => sel.innerHTML += `<option value="${n}">${n}</option>`);
     }
 
-    function switchAdminTab(tab) {
-        document.getElementById('regForm').classList.toggle('hidden', tab !== 'reg');
-        document.getElementById('statsForm').classList.toggle('hidden', tab !== 'data');
-        document.getElementById('tabReg').classList.toggle('text-yellow-500', tab === 'reg');
-        document.getElementById('tabReg').classList.toggle('text-gray-500', tab !== 'reg');
-        document.getElementById('tabData').classList.toggle('text-yellow-500', tab === 'data');
-        document.getElementById('tabData').classList.toggle('text-gray-500', tab !== 'data');
+    function openReport(playerName) {
+        currentReportPlayer = playerName;
+        const yr = document.getElementById('viewYear').value;
+        const vM = document.getElementById('selMonth').value;
+        const vW = document.getElementById('selWeek').value;
+        let rep = { n: playerName, s: [0,0,0,0,0,0], g: 0, a: 0, y: 0, r: 0, t: 0, count: 0 };
+        
+        if (db[yr] && db[yr][playerName]) {
+            for (let m in db[yr][playerName]) {
+                for (let w in db[yr][playerName][m]) {
+                    if (activeFilter === 'YEAR' || (activeFilter === 'MONTH' && m === vM) || (activeFilter === 'WEEK' && m === vM && w === vW)) {
+                        let d = db[yr][playerName][m][w];
+                        d.sc.forEach((v, i) => rep.s[i] += v);
+                        rep.g += (d.gV || 0); rep.a += (d.aV || 0);
+                        rep.y += (d.yV || 0); rep.r += (d.rV || 0);
+                        rep.t += d.total; rep.count++;
+                    }
+                }
+            }
+        }
+
+        document.getElementById('reportName').innerText = playerName;
+        document.getElementById('reportPhoto').querySelector('img').src = profiles[playerName] || 'https://via.placeholder.com/150';
+        document.getElementById('repMatches').innerText = `${rep.count} Matches Average`;
+        document.getElementById('repTotal').innerText = rep.t;
+        document.getElementById('repGoals').innerText = rep.g;
+        document.getElementById('repAssists').innerText = rep.a;
+        document.getElementById('repYellow').innerText = rep.y;
+        document.getElementById('repRed').innerText = rep.r;
+        
+        const g = rep.count || 1;
+        rep.s.forEach((val, i) => document.getElementById(`repS${i+1}`).innerText = (val/g).toFixed(1));
+
+        const avgSkill = (rep.s.reduce((a,b)=>a+b, 0) / g);
+        const starCount = Math.floor(avgSkill / 6);
+        let sHtml = "";
+        for(let s=1; s<=5; s++) sHtml += s <= starCount ? `<span class="text-yellow-500 text-2xl">★</span>` : `<span class="text-white/10 text-2xl">★</span>`;
+        document.getElementById('repStars').innerHTML = sHtml;
+        document.getElementById('reportModal').style.display = 'flex';
     }
 
-    function registerPlayer() {
-        const name = document.getElementById('regName').value.toUpperCase().trim();
-        const file = document.getElementById('regPhoto').files[0];
-        if(!name || !file) return alert("Enter Name and Select Photo!");
+    function closeReport(e) { if(!e || e.target.id === 'reportModal') document.getElementById('reportModal').style.display = 'none'; }
 
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => {
-            profilesRef.child(name).set(reader.result).then(() => {
-                alert(name + " Registered!");
-                document.getElementById('regName').value = "";
-                document.getElementById('regPhoto').value = "";
-                switchAdminTab('data');
-            });
-        };
+    function openHistorySelector() {
+        document.getElementById('histYear').innerHTML = document.getElementById('viewYear').innerHTML;
+        document.getElementById('histMonth').innerHTML = document.getElementById('selMonth').innerHTML;
+        document.getElementById('historyModal').style.display = 'flex';
+    }
+
+    function closeHistory() { document.getElementById('historyModal').style.display = 'none'; }
+
+    function fetchSpecificHistory() {
+        const y = document.getElementById('histYear').value;
+        const mIndex = document.getElementById('histMonth').value;
+        const w = document.getElementById('histWeek').value;
+        const mName = MONTHS[mIndex] || "??";
+        const record = db[y]?.[currentReportPlayer]?.[mIndex]?.[w];
+        
+        if (!record) return alert("No record found for this period.");
+
+        document.getElementById('repMatches').innerHTML = `<span class="text-yellow-500 font-black">${y} ${mName} WEEK ${w} DATA</span>`;
+        document.getElementById('repTotal').innerText = record.total;
+        document.getElementById('repGoals').innerText = record.gV || 0;
+        document.getElementById('repAssists').innerText = record.aV || 0;
+        document.getElementById('repYellow').innerText = record.yV || 0;
+        document.getElementById('repRed').innerText = record.rV || 0;
+        record.sc.forEach((val, i) => document.getElementById(`repS${i+1}`).innerText = val.toFixed(1));
+
+        const score = record.sc.reduce((a,b)=>a+b, 0);
+        const stars = Math.floor(score / 6);
+        let sHtml = "";
+        for(let s=1; s<=5; s++) sHtml += s <= stars ? `<span class="text-yellow-500 text-2xl">★</span>` : `<span class="text-white/10 text-2xl">★</span>`;
+        document.getElementById('repStars').innerHTML = sHtml;
+        closeHistory();
     }
 
     function render() {
@@ -222,99 +328,106 @@
         const yr = document.getElementById('viewYear').value;
         const vM = document.getElementById('selMonth').value;
         const vW = document.getElementById('selWeek').value;
-
-        let scores = { WEEK: [], MONTH: [], YEAR: [], LIST: [] };
+        let winners = { WEEK: [], MONTH: [], YEAR: [], LIST: [] };
 
         for(let name in db[yr]) {
-            let pW = { name, t:0, count:0 }, pM = { name, t:0, count:0 }, pY = { name, t:0, count:0 }, listP = { name, s:[0,0,0,0,0,0], gV:0, aV:0, t:0, count:0 };
+            let lp={n:name, s:[0,0,0,0,0,0], g:0, a:0, y:0, r:0, t:0, count:0};
+            let pW={n:name, t:0}, pM={n:name, t:0}, pY={n:name, t:0};
             for(let m in db[yr][name]) {
                 for(let w in db[yr][name][m]) {
                     let d = db[yr][name][m][w];
-                    pY.t += d.total; pY.count++;
-                    if(m === vM) { pM.t += d.total; pM.count++; }
-                    if(m === vM && w === vW) { pW.t += d.total; pW.count++; }
-                    if(activeFilter === 'YEAR' || (activeFilter === 'MONTH' && m === vM) || (activeFilter === 'WEEK' && m === vM && w === vW)) {
-                        d.sc.forEach((v,i) => listP.s[i] += parseInt(v));
-                        listP.gV += d.gV; listP.aV += d.aV; listP.t += d.total; listP.count++;
+                    pY.t += d.total;
+                    if(m === vM) pM.t += d.total;
+                    if(m === vM && w === vW) pW.t += d.total;
+                    if(activeFilter==='YEAR' || (activeFilter==='MONTH' && m===vM) || (activeFilter==='WEEK' && m===vM && w===vW)) {
+                        d.sc.forEach((v,i) => lp.s[i] += v);
+                        lp.g += (d.gV || 0); lp.a += (d.aV || 0); lp.y += (d.yV || 0); lp.r += (d.rV || 0); lp.t += d.total;
+                        lp.count++; 
                     }
                 }
             }
-            if(pW.count > 0) scores.WEEK.push(pW);
-            if(pM.count > 0) scores.MONTH.push(pM);
-            if(pY.count > 0) scores.YEAR.push(pY);
-            if(listP.count > 0) scores.LIST.push(listP);
+            if(pW.t > 0) winners.WEEK.push(pW);
+            if(pM.t > 0) winners.MONTH.push(pM);
+            if(pY.t > 0) winners.YEAR.push(pY);
+            if(lp.t > 0) winners.LIST.push(lp);
         }
 
-        const getTop = (arr) => arr.sort((a,b) => b.t - a.t)[0]?.name || "---";
-        updateAwardBox('WEEK', getTop(scores.WEEK));
-        updateAwardBox('MONTH', getTop(scores.MONTH));
-        updateAwardBox('YEAR', getTop(scores.YEAR));
+        ['WEEK','MONTH','YEAR'].forEach(t => {
+            let top = winners[t].sort((a,b)=>b.t-a.t)[0]?.n || "---";
+            document.getElementById(`name-${t}`).innerText = top;
+            document.getElementById(`box-${t}`).innerHTML = profiles[top] ? `<img src="${profiles[top]}" class="award-img">` : `👤`;
+        });
 
-        scores.LIST.sort((a,b) => b.t - a.t).forEach((p, i) => {
-            const r = document.createElement('tr');
-            r.innerHTML = `<td>#${i+1}</td><td class="text-left oswald uppercase text-lg">${p.name}</td>${p.s.map(v => `<td class="text-xs text-gray-400">${v}</td>`).join('')}<td class="text-red-600">${p.gV}</td><td class="text-green-600">${p.aV}</td><td class="bg-yellow-500/10 font-black text-2xl">${p.t}</td>${isAdmin ? `<td><button onclick="editEntry('${p.name}')" class="text-blue-500">✎</button></td>` : ''}`;
-            body.appendChild(r);
+        winners.LIST.sort((a,b)=>b.t-a.t).forEach((p, i) => {
+            let avgSkill = (p.s.reduce((a,b)=>a+b, 0) / (p.count || 1));
+            let starCount = Math.floor(avgSkill / 6);
+            let sHtml = "";
+            for(let s=1; s<=5; s++) sHtml += s <= starCount ? `<span class="text-yellow-500 star-glow text-xl">★</span>` : `<span class="text-white/10 text-xl">★</span>`;
+            
+            const row = document.createElement('tr');
+            row.onclick = () => openReport(p.n);
+            row.innerHTML = `
+                <td class="text-left oswald uppercase p-4">${p.n}</td>
+                <td class="text-center">${sHtml}</td> 
+                <td class="text-blue-600">${p.count}</td>
+                <td>${p.g}</td><td>${p.a}</td>
+                <td class="admin-only text-yellow-600">${p.y}</td>
+                <td class="admin-only text-red-600">${p.r}</td>
+                <td class="total-col font-black oswald">${p.t}</td>
+                <td><span class="${i+1 === 1 ? 'rank-badge rank-badge-1' : 'rank-badge'}">${i+1 === 1 ? '🥇' : i+1}</span></td>
+                ${isAdmin ? `<td class="admin-only space-x-2"><button onclick="event.stopPropagation(); editEntry('${p.n}')" class="text-blue-500">✎</button><button onclick="event.stopPropagation(); deleteEntry('${p.n}')" class="text-red-500">✖</button></td>` : ''}`;
+            body.appendChild(row);
         });
     }
 
-    function updateAwardBox(type, name) {
-        document.getElementById(`name-${type}`).innerText = name;
-        const box = document.getElementById(`box-${type}`);
-        box.innerHTML = profiles[name] ? `<img src="${profiles[name]}" class="award-img">` : `<span class="text-4xl opacity-20">👤</span>`;
-    }
-
     function saveStats() {
-        const yr = document.getElementById('viewYear').value;
-        const name = document.getElementById('pNameSelect').value;
-        const m = document.getElementById('inMonth').value;
-        const w = document.getElementById('inWeek').value;
-        if(!name || m==="" || w==="") return alert("Missing Selections!");
-
-        const sc = [1,2,3,4,5,6].map(i => parseInt(document.getElementById('s'+i).value || 0));
-        const gV = parseInt(document.getElementById('gA').value || 0);
-        const aV = parseInt(document.getElementById('aA').value || 0);
-        const total = sc.reduce((a, b) => a + b, 0) + (gV > 0 ? 6 : 0) + (aV > 0 ? 4 : 0);
-
-        firebase.database().ref(`golaha_data/${yr}/${name}/${m}/${w}`).set({ sc, gV, aV, total }).then(() => {
-            alert("Stats Saved!");
-            cancelEdit();
+        const yr = document.getElementById('viewYear').value, name = document.getElementById('pNameSelect').value;
+        const m = document.getElementById('inMonth').value, w = document.getElementById('inWeek').value;
+        if(!name) return alert("Select Player");
+        const limits = [2, 3, 4, 5, 7, 9];
+        const sc = [1,2,3,4,5,6].map((idx, i) => Math.min(parseInt(document.getElementById('s'+idx).value || 0), limits[i]));
+        const gV = parseInt(document.getElementById('gA').value || 0), aV = parseInt(document.getElementById('aA').value || 0);
+        const yV = parseInt(document.getElementById('yCard').value || 0), rV = parseInt(document.getElementById('rCard').value || 0);
+        const total = sc.reduce((a,b)=>a+b, 0) + (gV*6) + (aV*4);
+        dbRef.child(`${yr}/${name}/${m}/${w}`).set({sc, gV, aV, yV, rV, total}).then(() => {
+            document.querySelectorAll('#statsForm input').forEach(i => i.value = "");
+            alert("Saved!");
         });
     }
 
     function editEntry(name) {
-        const yr = document.getElementById('viewYear').value;
-        const m = document.getElementById('selMonth').value;
-        const w = document.getElementById('selWeek').value;
-        if (!db[yr][name][m][w]) return alert("Select correct filters for this record!");
-        
-        const data = db[yr][name][m][w];
+        const yr = document.getElementById('viewYear').value, m = document.getElementById('selMonth').value, w = document.getElementById('selWeek').value;
+        const data = db[yr]?.[name]?.[m]?.[w];
+        if(!data) return alert("No record found.");
         document.getElementById('pNameSelect').value = name;
-        document.getElementById('inMonth').value = m;
-        document.getElementById('inWeek').value = w;
-        data.sc.forEach((v, i) => document.getElementById('s' + (i + 1)).value = v);
-        document.getElementById('gA').value = data.gV;
-        document.getElementById('aA').value = data.aV;
-        
-        document.getElementById('formCard').scrollIntoView({ behavior: 'auto', block: 'start' });
-        document.getElementById('btnSave').innerText = "Update Record";
-        document.getElementById('btnCancel').classList.remove('hidden');
+        document.getElementById('inMonth').value = m; document.getElementById('inWeek').value = w;
+        data.sc.forEach((v, i) => document.getElementById(`s${i+1}`).value = v);
+        document.getElementById('gA').value = data.gV || 0; document.getElementById('aA').value = data.aV || 0;
+        document.getElementById('yCard').value = data.yV || 0; document.getElementById('rCard').value = data.rV || 0;
     }
 
-    function cancelEdit() {
-        document.querySelectorAll('#statsForm input').forEach(i => i.value = "");
-        document.getElementById('pNameSelect').value = "";
-        document.getElementById('btnSave').innerText = "Save Record";
-        document.getElementById('btnCancel').classList.add('hidden');
+    function registerPlayer() {
+        const name = document.getElementById('regName').value.toUpperCase().trim(), file = document.getElementById('regPhoto').files[0];
+        if(!name || !file) return alert("Missing data");
+        const reader = new FileReader();
+        reader.onload = () => profilesRef.child(name).set(reader.result).then(() => alert("Saved"));
+        reader.readAsDataURL(file);
     }
 
-    function changeFilter(mode) {
-        activeFilter = mode;
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
-        if(mode === 'YEAR') {
-            document.getElementById('f-YEAR').classList.add('tab-active');
-            document.getElementById('selMonth').value = ""; document.getElementById('selWeek').value = "";
-        }
-        render();
+    function deleteEntry(name) {
+        const yr = document.getElementById('viewYear').value, m = document.getElementById('selMonth').value, w = document.getElementById('selWeek').value;
+        if(confirm(`Delete ${name}'s stats?`)) dbRef.child(`${yr}/${name}/${m}/${w}`).remove();
+    }
+
+    function switchAdminTab(t) { document.getElementById('regForm').classList.toggle('hidden', t !== 'reg'); document.getElementById('statsForm').classList.toggle('hidden', t !== 'data'); }
+
+    function changeFilter(m) { 
+        activeFilter = m; 
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active')); 
+        if(m === 'YEAR') document.getElementById('f-YEAR').classList.add('tab-active');
+        if(m === 'MONTH') document.getElementById('selMonth').classList.add('tab-active');
+        if(m === 'WEEK') document.getElementById('selWeek').classList.add('tab-active');
+        render(); 
     }
 </script>
 </body>
