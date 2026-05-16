@@ -408,10 +408,27 @@
                 const msg = data[key];
                 const isMe = msg.sender === currentUserProfileUsername;
                 const bubble = document.createElement('div');
-                bubble.className = `flex flex-col max-w-[85%] rounded-2xl p-3 gap-1 ${isMe ? 'bg-yellow-500 text-black self-end rounded-tr-none' : 'bg-white/5 text-white self-start rounded-tl-none border border-white/5'}`;
+                // Added relative positioning for admin controls
+                bubble.className = `flex flex-col max-w-[85%] rounded-2xl p-3 gap-1 relative ${isMe ? 'bg-yellow-500 text-black self-end rounded-tr-none' : 'bg-white/5 text-white self-start rounded-tl-none border border-white/5'}`;
                 
                 const formattedTime = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '';
-                let innerPayloadMarkup = `<span class="text-[9px] font-black uppercase tracking-wider ${isMe ? 'text-black/60' : 'text-yellow-500'}">${msg.sender} <span class="font-normal opacity-70 ml-1">${formattedTime}</span></span>`;
+                
+                // Admin Edit/Delete Controls
+                let adminControls = "";
+                if(isUserAdmin) {
+                    adminControls = `
+                        <div class="absolute -top-2 -right-2 flex gap-1">
+                            <button onclick="editChatMessage('${key}')" class="bg-blue-600 text-white text-[8px] px-2 py-1 rounded-full hover:bg-blue-700 shadow-lg font-black uppercase">Edit</button>
+                            <button onclick="deleteChatMessage('${key}')" class="bg-red-600 text-white text-[8px] px-2 py-1 rounded-full hover:bg-red-700 shadow-lg font-black uppercase">Del</button>
+                        </div>
+                    `;
+                }
+
+                let innerPayloadMarkup = `
+                    ${adminControls}
+                    <span class="text-[9px] font-black uppercase tracking-wider ${isMe ? 'text-black/60' : 'text-yellow-500'}">
+                        ${msg.sender} <span class="font-normal opacity-70 ml-1">${formattedTime}</span>
+                    </span>`;
                 
                 if (msg.type === "TEXT") innerPayloadMarkup += `<p class="text-xs font-semibold break-words mt-0.5">${msg.content}</p>`;
                 else if (msg.type === "IMAGE") innerPayloadMarkup += `<img src="${msg.content}" class="w-full rounded-xl mt-1.5 max-h-48 object-cover border border-black/20" onclick="window.open('${msg.content}', '_blank')">`;
@@ -423,6 +440,30 @@
             container.scrollTop = container.scrollHeight;
         });
     }
+
+    // --- New Admin Chat Functions ---
+    function deleteChatMessage(msgId) {
+        if(!isUserAdmin) return;
+        if(confirm("Permanently delete this message?")) {
+            chatRef.child(msgId).remove();
+        }
+    }
+
+    function editChatMessage(msgId) {
+        if(!isUserAdmin) return;
+        chatRef.child(msgId).get().then((snapshot) => {
+            const msg = snapshot.val();
+            if(msg && msg.type === "TEXT") {
+                const newText = prompt("Edit message content:", msg.content);
+                if(newText !== null && newText.trim() !== "") {
+                    chatRef.child(msgId).update({ content: newText.trim() });
+                }
+            } else {
+                alert("Only text messages can be edited.");
+            }
+        });
+    }
+    // --------------------------------
 
     function sendChatMessage() {
         const input = document.getElementById('chatTextInput');
