@@ -44,7 +44,6 @@
         #reportModal, #historyModal { display: none; position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); padding: 20px; align-items: center; justify-content: center; }
         .report-content { background: #0f172a; border: 2px solid rgba(251, 191, 36, 0.3); border-radius: 32px; max-width: 500px; width: 100%; padding: 32px; position: relative; }
 
-        /* Chat & Delete Styles */
         .chat-scroll::-webkit-scrollbar { width: 6px; }
         .chat-scroll::-webkit-scrollbar-thumb { background: rgba(251, 191, 36, 0.3); border-radius: 10px; }
         #floatingChatWindow { display: none; width: 420px; max-width: calc(100vw - 40px); height: 600px; max-height: calc(100vh - 120px); z-index: 100; transition: transform 0.3s; }
@@ -74,6 +73,12 @@
         <h1 class="text-4xl font-black oswald text-white tracking-tighter mb-2">GOLAHA <span class="text-yellow-500">LABA GOLE</span></h1>
         <p id="authSubtitle" class="text-xs text-gray-400 font-bold tracking-widest uppercase mb-8">Secure Access Portal</p>
         <div class="space-y-4 text-left">
+            <div id="signUpNameContainer" class="hidden">
+                <label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Select Your Athlete Profile</label>
+                <select id="signUpNameSelect" class="w-full mt-1 p-4 rounded-xl bg-black/40 border border-white/10 font-bold text-white tracking-wide focus:outline-none focus:border-yellow-500/50">
+                    <option value="">-- SELECT NAME --</option>
+                </select>
+            </div>
             <div>
                 <label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Email Address</label>
                 <input type="email" id="loginEmail" placeholder="player@golaha.com" class="w-full mt-1 p-4 rounded-xl bg-black/40 border border-white/10 font-bold text-white tracking-wide focus:outline-none focus:border-yellow-500/50">
@@ -307,7 +312,7 @@
 
     firebase.initializeApp(firebaseConfig);
     const dbRef = firebase.database().ref('golaha_data');
-    const profilesRef = firebase.database().ref('golaha_profiles');
+    const profilesRef = firebase.database().ref('golaha_profiles'); // READ FROM THIS NODE
     const chatRef = firebase.database().ref('golaha_public_chatroom'); 
     const auth = firebase.auth();
 
@@ -358,6 +363,9 @@
             loginScreen.style.display = 'flex';
             dashboardArea.classList.add('hidden');
             chatSystemWidget.classList.add('hidden');
+            
+            // Listen for profile changes even when logged out so the signup dropdown populates
+            profilesRef.on('value', s => { profiles = s.val() || {}; updateDropdowns(); });
         }
     });
 
@@ -398,8 +406,6 @@
                 bubble.className = `flex flex-col max-w-[85%] rounded-2xl p-3 gap-1 msg-container ${isMe ? 'bg-yellow-500 text-black self-end rounded-tr-none' : 'bg-white/5 text-white self-start rounded-tl-none border border-white/5'}`;
                 
                 const formattedTime = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '';
-                
-                // Add Delete Button for Admin
                 const deleteBtnHtml = isUserAdmin ? `<span onclick="deleteChatMessage('${key}')" class="delete-msg-btn">Delete</span>` : "";
 
                 let innerPayloadMarkup = `<span class="text-[9px] font-black uppercase tracking-wider ${isMe ? 'text-black/60' : 'text-yellow-500'}">${msg.sender} <span class="font-normal opacity-70 ml-1">${formattedTime}</span> ${deleteBtnHtml}</span>`;
@@ -455,13 +461,24 @@
         document.getElementById('authSubmitBtn').innerText = authMode === "LOGIN" ? "Login" : "Register Account";
         document.getElementById('toggleText').innerText = authMode === "LOGIN" ? "Don't have an account?" : "Already have an account?";
         document.getElementById('toggleActionBtn').innerText = authMode === "LOGIN" ? "Sign Up Here" : "Login Here";
+        
+        // Show/Hide Athlete profile dropdown for Sign Up
+        document.getElementById('signUpNameContainer').classList.toggle('hidden', authMode === "LOGIN");
     }
 
     function handleAuthSubmit() {
         const email = document.getElementById('loginEmail').value.trim();
         const pass = document.getElementById('loginPassword').value;
+        const selectedProfile = document.getElementById('signUpNameSelect').value;
         const errEl = document.getElementById('loginError');
+
         if(!email || !pass) return errEl.innerText = "Fill in all details.";
+        
+        // Ensure athlete name is selected during registration
+        if(authMode === "SIGNUP" && !selectedProfile) {
+            return errEl.innerText = "Please select your athlete name.";
+        }
+
         const authAction = authMode === "LOGIN" ? auth.signInWithEmailAndPassword(email, pass) : auth.createUserWithEmailAndPassword(email, pass);
         authAction.catch(err => { errEl.innerText = err.message; });
     }
@@ -480,9 +497,14 @@
     setup();
 
     function updateDropdowns() {
-        const sel = document.getElementById('pNameSelect');
-        sel.innerHTML = '<option value="">-- SELECT PLAYER --</option>';
-        Object.keys(profiles).sort().forEach(n => sel.innerHTML += `<option value="${n}">${n}</option>`);
+        const adminSel = document.getElementById('pNameSelect');
+        const signUpSel = document.getElementById('signUpNameSelect'); // THE DROPDOWN IN REGISTRATION
+        
+        const playerOptions = '<option value="">-- SELECT NAME --</option>' + 
+            Object.keys(profiles).sort().map(n => `<option value="${n}">${n}</option>`).join('');
+            
+        if(adminSel) adminSel.innerHTML = playerOptions;
+        if(signUpSel) signUpSel.innerHTML = playerOptions;
     }
 
     function render() {
