@@ -15,17 +15,13 @@
         body { background-color: #070707; background-image: radial-gradient(circle at 50% 0%, #112b1d 0%, #070707 70%); font-family: 'Inter', sans-serif; color: #f1f5f9; min-height: 100vh; padding: 20px; }
         
         .award-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(251, 191, 36, 0.2); border-radius: 32px; padding: 24px; position: relative; overflow: hidden; backdrop-filter: blur(10px); }
-        
         .award-row { display: flex; gap: 8px; justify-content: center; align-items: flex-end; height: 200px; width: 100%; margin-bottom: 12px; }
         .box-side { height: 140px; width: 28%; border-radius: 16px; background: #000; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; }
         .box-main { height: 190px; width: 40%; border-radius: 20px; background: #000; border: 2px solid rgba(251, 191, 36, 0.4); overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 0 20px rgba(251,191,36,0.2); }
-        
         .award-img { width: 100%; height: 100%; object-fit: cover; }
         .mini-badge { position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); background: black; color: white; padding: 2px 6px; border-radius: 6px; font-size: 8px; font-weight: 900; white-space: nowrap; border: 1px solid rgba(255,255,255,0.2); }
-        
         .rank-one-tag { position: absolute; top: 12px; right: 12px; background: var(--gold-gradient); color: black; padding: 4px 12px; border-radius: 99px; font-weight: 900; font-size: 10px; z-index: 10; }
         .name-display { background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 1.4rem; font-weight: 900; text-transform: uppercase; margin-top: 10px; font-family: 'Oswald'; }
-        
         .glass-panel { background: rgba(20, 20, 20, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.05); border-radius: 24px; }
         .tab-btn { padding: 8px 16px; border-radius: 12px; font-weight: 700; background: rgba(255,255,255,0.03); color: #94a3b8; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: 0.3s; }
         .tab-active { background: var(--gool-gold) !important; color: #000 !important; }
@@ -34,14 +30,13 @@
         tbody tr { background: rgba(255, 255, 255, 0.02); border-radius: 12px; transition: 0.2s; cursor: pointer; }
         tbody tr:hover { transform: translateY(-2px); background: rgba(255, 255, 255, 0.05); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
         tbody td { color: #f1f5f9; font-weight: 600; padding: 16px; text-align: center; }
-        
         .rank-badge { background: var(--gold-gradient); color: black; padding: 4px 14px; border-radius: 14px; font-weight: 900; display: inline-block; min-width: 42px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .rank-badge-1 { background: linear-gradient(135deg, #fcd34d 0%, #fbbf24 100%); outline: 2px solid #fbbf24; outline-offset: 2px; }
         .total-col { background: rgba(251, 191, 36, 0.1); color: var(--gool-gold); font-size: 1.1rem; }
 
         .admin-only { display: none !important; }
-        body[data-role="admin"] .admin-only { display: table-cell !important; }
-        div.admin-only[data-role="admin"], aside.admin-only[data-role="admin"] { display: block !important; }
+        body[data-role="admin"] .admin-only { display: block !important; }
+        body[data-role="admin"] table .admin-only { display: table-cell !important; }
 
         .oswald { font-family: 'Oswald', sans-serif; }
         .star-glow { text-shadow: 0 0 8px rgba(251, 191, 36, 0.6); }
@@ -49,11 +44,27 @@
         #reportModal, #historyModal { display: none; position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); padding: 20px; align-items: center; justify-content: center; }
         .report-content { background: #0f172a; border: 2px solid rgba(251, 191, 36, 0.3); border-radius: 32px; max-width: 500px; width: 100%; padding: 32px; position: relative; }
 
+        /* Chat & Delete Styles */
         .chat-scroll::-webkit-scrollbar { width: 6px; }
-        .chat-scroll::-webkit-scrollbar-track { background: transparent; }
         .chat-scroll::-webkit-scrollbar-thumb { background: rgba(251, 191, 36, 0.3); border-radius: 10px; }
-
-        #floatingChatWindow { display: none; width: 420px; max-width: calc(100vw - 40px); height: 600px; max-height: calc(100vh - 120px); z-index: 100; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        #floatingChatWindow { display: none; width: 420px; max-width: calc(100vw - 40px); height: 600px; max-height: calc(100vh - 120px); z-index: 100; transition: transform 0.3s; }
+        #unreadBadge { position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 10px; font-weight: 900; width: 22px; height: 22px; border-radius: 50%; display: none; align-items: center; justify-content: center; border: 2px solid #070707; }
+        
+        .msg-container { position: relative; }
+        .delete-msg-btn { 
+            display: none; 
+            margin-left: 8px; 
+            color: #f87171; 
+            font-size: 9px; 
+            font-weight: 900; 
+            text-transform: uppercase;
+            cursor: pointer;
+            padding: 2px 5px;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 4px;
+        }
+        body[data-role="admin"] .delete-msg-btn { display: inline-block; }
+        .delete-msg-btn:hover { background: #ef4444; color: white; }
     </style>
 </head>
 <body id="mainBody">
@@ -62,7 +73,6 @@
     <div class="glass-panel max-w-md w-full p-8 border border-yellow-500/20 text-center shadow-2xl">
         <h1 class="text-4xl font-black oswald text-white tracking-tighter mb-2">GOLAHA <span class="text-yellow-500">LABA GOLE</span></h1>
         <p id="authSubtitle" class="text-xs text-gray-400 font-bold tracking-widest uppercase mb-8">Secure Access Portal</p>
-        
         <div class="space-y-4 text-left">
             <div>
                 <label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Email Address</label>
@@ -74,7 +84,6 @@
             </div>
             <button onclick="handleAuthSubmit()" id="authSubmitBtn" class="w-full mt-2 py-4 bg-yellow-500 text-black font-black rounded-xl oswald uppercase tracking-widest hover:bg-yellow-400 transition">Login</button>
         </div>
-
         <p class="text-xs text-gray-400 mt-6 font-semibold">
             <span id="toggleText">Don't have an account?</span> 
             <button onclick="toggleAuthMode()" id="toggleActionBtn" class="text-yellow-500 font-black underline ml-1 focus:outline-none">Sign Up Here</button>
@@ -215,8 +224,8 @@
 <div id="chatSystemWidget" class="hidden">
     <button onclick="toggleChatWindow()" id="chatBubbleTriggerBtn" class="fixed bottom-6 right-6 w-16 h-16 rounded-full bg-gradient-to-br from-yellow-500 to-amber-600 text-black font-black text-2xl flex items-center justify-center shadow-2xl transition hover:scale-110 active:scale-95 z-50 border border-yellow-400/50">
         💬
+        <div id="unreadBadge">0</div>
     </button>
-
     <div id="floatingChatWindow" class="fixed bottom-24 right-6 glass-panel border border-yellow-500/20 flex flex-col shadow-2xl overflow-hidden">
         <div class="bg-black/80 border-b border-white/10 p-4 flex justify-between items-center">
             <div>
@@ -225,11 +234,8 @@
             </div>
             <button onclick="toggleChatWindow()" class="text-gray-400 hover:text-white font-black text-xl px-2 focus:outline-none">&times;</button>
         </div>
-
         <div id="chatMessageStream" class="flex-1 overflow-y-auto p-4 space-y-4 chat-scroll flex flex-col bg-neutral-950/20"></div>
-
         <div id="chatUploadLoaderAlert" class="hidden text-[10px] font-black tracking-widest text-yellow-500 uppercase px-4 py-2 bg-black border-t border-yellow-500/20 animate-pulse">⚡ Uploading multimedia bundle...</div>
-
         <div class="p-3 bg-black/60 border-t border-white/10 flex items-center gap-2">
             <input type="text" id="chatTextInput" placeholder="Type a public broadcast dispatch..." onkeydown="if(event.key==='Enter') sendChatMessage()" class="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-gray-500 font-medium focus:outline-none focus:border-yellow-500/40">
             <div class="flex items-center gap-1">
@@ -241,9 +247,7 @@
                     <span class="text-sm">🎥</span>
                     <input type="file" id="chatVideoInput" accept="video/*" onchange="uploadChatMediaFile('VIDEO')" class="hidden">
                 </label>
-                <button onclick="sendChatMessage()" class="bg-yellow-500 hover:bg-yellow-400 text-black text-xs font-black px-3 py-2 rounded-xl oswald uppercase tracking-wider transition">
-                    Send
-                </button>
+                <button onclick="sendChatMessage()" class="bg-yellow-500 hover:bg-yellow-400 text-black text-xs font-black px-3 py-2 rounded-xl oswald uppercase tracking-wider transition">Send</button>
             </div>
         </div>
     </div>
@@ -252,29 +256,18 @@
 <div id="reportModal" onclick="closeReport(event)">
     <div class="report-content" onclick="event.stopPropagation()">
         <button onclick="closeReport(null)" class="absolute top-4 right-6 text-gray-400 text-2xl font-bold">&times;</button>
-        <div id="reportPhoto" class="w-24 h-24 rounded-full mx-auto border-4 border-yellow-500 overflow-hidden mb-4">
-            <img src="" class="w-full h-full object-cover" alt="Player">
-        </div>
-        <h2 id="reportName" class="text-3xl font-black text-center oswald text-yellow-500 uppercase tracking-wide mb-1">Player Name</h2>
+        <div id="reportPhoto" class="w-24 h-24 rounded-full mx-auto border-4 border-yellow-500 overflow-hidden mb-4"><img src="" class="w-full h-full object-cover"></div>
+        <h2 id="reportName" class="text-3xl font-black text-center oswald text-yellow-500 uppercase tracking-wide mb-1">---</h2>
         <div id="repStars" class="text-center mb-4"></div>
-        
         <div class="space-y-3">
-            <div class="flex justify-between border-b border-white/5 pb-2">
-                <span class="text-gray-400 text-[10px] font-bold uppercase">Report Context</span>
-                <span id="repMatches" class="text-[12px] font-black text-blue-400 uppercase">0</span>
-            </div>
-            <div class="flex justify-between border-b border-white/5 pb-2">
-                <span class="text-gray-400 text-[10px] font-bold">TOTAL ELITE POINTS</span>
-                <span id="repTotal" class="text-lg font-black text-white">0</span>
-            </div>
-
+            <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-gray-400 text-[10px] font-bold uppercase">Report Context</span><span id="repMatches" class="text-[12px] font-black text-blue-400 uppercase">0</span></div>
+            <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-gray-400 text-[10px] font-bold">TOTAL ELITE POINTS</span><span id="repTotal" class="text-lg font-black text-white">0</span></div>
             <div class="grid grid-cols-4 gap-2">
                 <div class="bg-white/5 p-2 rounded-xl text-center"><p class="text-[9px] text-red-500 font-bold uppercase">Goals</p><p id="repGoals" class="text-lg font-black">0</p></div>
                 <div class="bg-white/5 p-2 rounded-xl text-center"><p class="text-[9px] text-green-500 font-bold uppercase">Assists</p><p id="repAssists" class="text-lg font-black">0</p></div>
                 <div class="bg-yellow-500/10 p-2 rounded-xl text-center border border-yellow-500/20"><p class="text-[9px] text-yellow-500 font-bold uppercase">Yellow</p><p id="repYellow" class="text-lg font-black text-yellow-500">0</p></div>
                 <div class="bg-red-600/10 p-2 rounded-xl text-center border border-red-600/20"><p class="text-[9px] text-red-600 font-bold uppercase">Red</p><p id="repRed" class="text-lg font-black text-red-600">0</p></div>
             </div>
-
             <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest text-center mt-2">Skill Breakdown</p>
             <div class="grid grid-cols-3 gap-2 text-[10px] text-center">
                 <div class="bg-black/30 p-2 rounded-lg"><p class="text-gray-500">TIME</p><p id="repS1" class="font-bold text-white">-</p></div>
@@ -284,10 +277,7 @@
                 <div class="bg-black/30 p-2 rounded-lg"><p class="text-gray-500">TEAM</p><p id="repS5" class="font-bold text-white">-</p></div>
                 <div class="bg-black/30 p-2 rounded-lg"><p class="text-gray-500">REF</p><p id="repS6" class="font-bold text-white">-</p></div>
             </div>
-
-            <button onclick="openHistorySelector()" class="w-full mt-4 py-3 rounded-xl border border-yellow-500/50 text-yellow-500 font-bold text-xs hover:bg-yellow-500 hover:text-black transition uppercase oswald tracking-widest">
-                View History
-            </button>
+            <button onclick="openHistorySelector()" class="w-full mt-4 py-3 rounded-xl border border-yellow-500/50 text-yellow-500 font-bold text-xs uppercase oswald tracking-widest">View History</button>
         </div>
     </div>
 </div>
@@ -296,20 +286,9 @@
     <div class="report-content" onclick="event.stopPropagation()">
         <h3 class="oswald text-2xl text-yellow-500 mb-6 text-center tracking-tighter">SELECT RECORD</h3>
         <div class="space-y-4">
-            <div>
-                <label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Year</label>
-                <select id="histYear" class="w-full p-4 bg-black/40 border border-white/10 rounded-xl text-white font-bold"></select>
-            </div>
-            <div>
-                <label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Month</label>
-                <select id="histMonth" class="w-full p-4 bg-black/40 border border-white/10 rounded-xl text-white font-bold"></select>
-            </div>
-            <div>
-                <label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Week</label>
-                <select id="histWeek" class="w-full p-4 bg-black/40 border border-white/10 rounded-xl text-white font-bold">
-                    <option value="1">Week 1</option><option value="2">Week 2</option><option value="3">Week 3</option><option value="4">Week 4</option>
-                </select>
-            </div>
+            <div><label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Year</label><select id="histYear" class="w-full p-4 bg-black/40 border border-white/10 rounded-xl text-white font-bold"></select></div>
+            <div><label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Month</label><select id="histMonth" class="w-full p-4 bg-black/40 border border-white/10 rounded-xl text-white font-bold"></select></div>
+            <div><label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Week</label><select id="histWeek" class="w-full p-4 bg-black/40 border border-white/10 rounded-xl text-white font-bold"><option value="1">Week 1</option><option value="2">Week 2</option><option value="3">Week 3</option><option value="4">Week 4</option></select></div>
             <button onclick="fetchSpecificHistory()" class="w-full py-4 bg-yellow-500 text-black font-black rounded-xl oswald uppercase mt-2">Show History</button>
             <button onclick="closeHistory()" class="w-full text-gray-500 text-[10px] font-bold uppercase tracking-widest mt-2">Cancel</button>
         </div>
@@ -339,6 +318,10 @@
     let authMode = "LOGIN";
     let currentUserProfileUsername = "Anonymous";
 
+    let chatIsOpen = false;
+    let unreadCount = 0;
+    let lastSeenMsgTimestamp = parseInt(localStorage.getItem('lastSeenMsg')) || 0;
+
     auth.onAuthStateChanged(user => {
         const loginScreen = document.getElementById('loginScreen');
         const dashboardArea = document.getElementById('dashboardArea');
@@ -352,7 +335,6 @@
             loginScreen.style.display = 'none';
             dashboardArea.classList.remove('hidden');
             chatSystemWidget.classList.remove('hidden');
-            
             currentUserProfileUsername = user.email.split('@')[0];
             welcomeMessage.innerText = `👋 WELCOME, ${currentUserProfileUsername}`;
             
@@ -368,30 +350,33 @@
                 mainTableArea.classList.replace('lg:col-span-9', 'lg:col-span-12');
             }
 
-            dbRef.off();
-            profilesRef.off();
-            chatRef.off();
-            
+            dbRef.off(); profilesRef.off(); chatRef.off();
             dbRef.on('value', s => { db = s.val() || {}; render(); });
             profilesRef.on('value', s => { profiles = s.val() || {}; updateDropdowns(); render(); });
-            
             listenToGlobalPublicChatroom();
-
         } else {
             loginScreen.style.display = 'flex';
             dashboardArea.classList.add('hidden');
             chatSystemWidget.classList.add('hidden');
-            document.getElementById('floatingChatWindow').style.display = 'none';
         }
     });
 
     function toggleChatWindow() {
         const windowEl = document.getElementById('floatingChatWindow');
-        windowEl.style.display = windowEl.style.display === 'flex' ? 'none' : 'flex';
-        if (windowEl.style.display === 'flex') {
+        chatIsOpen = (windowEl.style.display !== 'flex');
+        windowEl.style.display = chatIsOpen ? 'flex' : 'none';
+        if (chatIsOpen) {
+            unreadCount = 0; updateBadgeUI();
+            lastSeenMsgTimestamp = Date.now(); localStorage.setItem('lastSeenMsg', lastSeenMsgTimestamp);
             const container = document.getElementById('chatMessageStream');
             container.scrollTop = container.scrollHeight;
         }
+    }
+
+    function updateBadgeUI() {
+        const badge = document.getElementById('unreadBadge');
+        if (unreadCount > 0) { badge.innerText = unreadCount; badge.style.display = 'flex'; }
+        else { badge.style.display = 'none'; }
     }
 
     function listenToGlobalPublicChatroom() {
@@ -399,71 +384,44 @@
             const container = document.getElementById('chatMessageStream');
             container.innerHTML = "";
             const data = snapshot.val();
-            if(!data) {
-                container.innerHTML = `<div class="text-[11px] text-gray-500 font-bold uppercase text-center my-auto px-4">Locker room quiet.</div>`;
-                return;
-            }
+            if(!data) { container.innerHTML = `<div class="text-[11px] text-gray-500 font-bold text-center px-4 my-auto">Locker room quiet.</div>`; return; }
 
             Object.keys(data).sort().forEach(key => {
                 const msg = data[key];
                 const isMe = msg.sender === currentUserProfileUsername;
+                
+                if (msg.timestamp > lastSeenMsgTimestamp && !isMe && !chatIsOpen) {
+                    unreadCount++; updateBadgeUI();
+                }
+
                 const bubble = document.createElement('div');
-                // Added relative positioning for admin controls
-                bubble.className = `flex flex-col max-w-[85%] rounded-2xl p-3 gap-1 relative ${isMe ? 'bg-yellow-500 text-black self-end rounded-tr-none' : 'bg-white/5 text-white self-start rounded-tl-none border border-white/5'}`;
+                bubble.className = `flex flex-col max-w-[85%] rounded-2xl p-3 gap-1 msg-container ${isMe ? 'bg-yellow-500 text-black self-end rounded-tr-none' : 'bg-white/5 text-white self-start rounded-tl-none border border-white/5'}`;
                 
                 const formattedTime = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '';
                 
-                // Admin Edit/Delete Controls
-                let adminControls = "";
-                if(isUserAdmin) {
-                    adminControls = `
-                        <div class="absolute -top-2 -right-2 flex gap-1">
-                            <button onclick="editChatMessage('${key}')" class="bg-blue-600 text-white text-[8px] px-2 py-1 rounded-full hover:bg-blue-700 shadow-lg font-black uppercase">Edit</button>
-                            <button onclick="deleteChatMessage('${key}')" class="bg-red-600 text-white text-[8px] px-2 py-1 rounded-full hover:bg-red-700 shadow-lg font-black uppercase">Del</button>
-                        </div>
-                    `;
-                }
+                // Add Delete Button for Admin
+                const deleteBtnHtml = isUserAdmin ? `<span onclick="deleteChatMessage('${key}')" class="delete-msg-btn">Delete</span>` : "";
 
-                let innerPayloadMarkup = `
-                    ${adminControls}
-                    <span class="text-[9px] font-black uppercase tracking-wider ${isMe ? 'text-black/60' : 'text-yellow-500'}">
-                        ${msg.sender} <span class="font-normal opacity-70 ml-1">${formattedTime}</span>
-                    </span>`;
+                let innerPayloadMarkup = `<span class="text-[9px] font-black uppercase tracking-wider ${isMe ? 'text-black/60' : 'text-yellow-500'}">${msg.sender} <span class="font-normal opacity-70 ml-1">${formattedTime}</span> ${deleteBtnHtml}</span>`;
                 
                 if (msg.type === "TEXT") innerPayloadMarkup += `<p class="text-xs font-semibold break-words mt-0.5">${msg.content}</p>`;
-                else if (msg.type === "IMAGE") innerPayloadMarkup += `<img src="${msg.content}" class="w-full rounded-xl mt-1.5 max-h-48 object-cover border border-black/20" onclick="window.open('${msg.content}', '_blank')">`;
-                else if (msg.type === "VIDEO") innerPayloadMarkup += `<video src="${msg.content}" controls class="w-full rounded-xl mt-1.5 max-h-48 bg-black border border-black/20"></video>`;
+                else if (msg.type === "IMAGE") innerPayloadMarkup += `<img src="${msg.content}" class="w-full rounded-xl mt-1.5 max-h-48 object-cover" onclick="window.open('${msg.content}', '_blank')">`;
+                else if (msg.type === "VIDEO") innerPayloadMarkup += `<video src="${msg.content}" controls class="w-full rounded-xl mt-1.5 max-h-48 bg-black"></video>`;
 
                 bubble.innerHTML = innerPayloadMarkup;
                 container.appendChild(bubble);
             });
-            container.scrollTop = container.scrollHeight;
+            if (chatIsOpen) container.scrollTop = container.scrollHeight;
         });
     }
 
-    // --- New Admin Chat Functions ---
     function deleteChatMessage(msgId) {
-        if(!isUserAdmin) return;
-        if(confirm("Permanently delete this message?")) {
-            chatRef.child(msgId).remove();
+        if(confirm("Permanently remove this message from the locker room?")) {
+            chatRef.child(msgId).remove()
+                .then(() => console.log("Message deleted"))
+                .catch(err => alert("Delete error: " + err.message));
         }
     }
-
-    function editChatMessage(msgId) {
-        if(!isUserAdmin) return;
-        chatRef.child(msgId).get().then((snapshot) => {
-            const msg = snapshot.val();
-            if(msg && msg.type === "TEXT") {
-                const newText = prompt("Edit message content:", msg.content);
-                if(newText !== null && newText.trim() !== "") {
-                    chatRef.child(msgId).update({ content: newText.trim() });
-                }
-            } else {
-                alert("Only text messages can be edited.");
-            }
-        });
-    }
-    // --------------------------------
 
     function sendChatMessage() {
         const input = document.getElementById('chatTextInput');
@@ -482,19 +440,11 @@
         const fileSelector = document.getElementById(inputId);
         const file = fileSelector.files[0];
         if(!file || file.size > 12 * 1024 * 1024) return alert("File missing or too large (>12MB).");
-
         document.getElementById('chatUploadLoaderAlert').classList.remove('hidden');
         const reader = new FileReader();
-        reader.onload = function() {
-            chatRef.push({
-                sender: currentUserProfileUsername,
-                type: mediaType,
-                content: reader.result,
-                timestamp: firebase.database.ServerValue.TIMESTAMP
-            }).then(() => {
-                document.getElementById('chatUploadLoaderAlert').classList.add('hidden');
-                fileSelector.value = "";
-            });
+        reader.onload = () => {
+            chatRef.push({ sender: currentUserProfileUsername, type: mediaType, content: reader.result, timestamp: firebase.database.ServerValue.TIMESTAMP })
+            .then(() => { document.getElementById('chatUploadLoaderAlert').classList.add('hidden'); fileSelector.value = ""; });
         };
         reader.readAsDataURL(file);
     }
@@ -520,10 +470,8 @@
 
     function setup() {
         const viewYear = document.getElementById('viewYear'), inMonth = document.getElementById('inMonth'), selMonth = document.getElementById('selMonth');
-        viewYear.innerHTML = '';
-        for (let y = 2026; y <= 2030; y++) viewYear.innerHTML += `<option value="${y}">${y}</option>`;
-        inMonth.innerHTML = '';
-        selMonth.innerHTML = '<option value="">-- MONTH --</option>';
+        viewYear.innerHTML = ''; for (let y = 2026; y <= 2030; y++) viewYear.innerHTML += `<option value="${y}">${y}</option>`;
+        inMonth.innerHTML = ''; selMonth.innerHTML = '<option value="">-- MONTH --</option>';
         MONTHS.forEach((m, i) => {
             inMonth.innerHTML += `<option value="${i}">${m}</option>`;
             selMonth.innerHTML += `<option value="${i}">${m}</option>`;
@@ -544,11 +492,7 @@
         const vM = document.getElementById('selMonth').value;
         const vW = document.getElementById('selWeek').value;
 
-        let winners = {
-            WEEK: [], MONTH: [], YEAR: [], LIST: [],
-            G_WEEK: [], G_MONTH: [], G_YEAR: [],
-            A_WEEK: [], A_MONTH: [], A_YEAR: []
-        };
+        let winners = { WEEK: [], MONTH: [], YEAR: [], LIST: [], G_WEEK: [], G_MONTH: [], G_YEAR: [], A_WEEK: [], A_MONTH: [], A_YEAR: [] };
 
         for(let name in db[yr]) {
             let lp={n:name, s:[0,0,0,0,0,0], g:0, a:0, y:0, r:0, t:0, count:0};
@@ -558,14 +502,11 @@
 
             for(let m in db[yr][name]) {
                 for(let w in db[yr][name][m]) {
-                    let d = db[yr][name][m][w];
-                    if(!d) continue;
+                    let d = db[yr][name][m][w]; if(!d) continue;
                     let goals = d.gV || 0, assists = d.aV || 0, points = d.total || 0;
-
                     pY.t += points; gY.v += goals; gY.secondaryA += assists; gY.tertiaryPoints += points; aY.v += assists;
                     if(vM !== "" && m === vM) { pM.t += points; gM.v += goals; gM.secondaryA += assists; gM.tertiaryPoints += points; aM.v += assists; }
                     if(vM !== "" && vW !== "" && m === vM && w === vW) { pW.t += points; gW.v += goals; gW.secondaryA += assists; gW.tertiaryPoints += points; aW.v += assists; }
-                    
                     if(activeFilter==='YEAR' || (activeFilter==='MONTH' && m===vM) || (activeFilter==='WEEK' && m===vM && w===vW)) {
                         if(d.sc) d.sc.forEach((v,i) => { if(lp.s[i] !== undefined) lp.s[i] += v; });
                         lp.g += goals; lp.a += assists; lp.y += (d.yV || 0); lp.r += (d.rV || 0); lp.t += points; lp.count++; 
@@ -583,17 +524,12 @@
             let topMvp = isSelectionMade ? (winners[t].sort((a,b)=>b.t-a.t)[0]?.n || "---") : "---";
             let topScorer = isSelectionMade ? winners[`G_${t}`].sort((a,b) => (b.v - a.v) || (b.secondaryA - a.secondaryA) || (b.tertiaryPoints - a.tertiaryPoints))[0] : null;
             let topAssist = isSelectionMade ? winners[`A_${t}`].sort((a,b) => b.v - a.v)[0] : null;
-
             document.getElementById(`name-${t}`).innerText = topMvp;
             document.getElementById(`goal-${t}`).innerText = topScorer ? `${topScorer.n} (${topScorer.v})` : "---";
             document.getElementById(`assist-${t}`).innerText = topAssist ? `${topAssist.n} (${topAssist.v})` : "---";
-
             const mvpBox = document.getElementById(`box-${t}`), gImg = document.getElementById(`img-goal-${t}`), aImg = document.getElementById(`img-assist-${t}`);
-            if (!isSelectionMade || topMvp === "---") {
-                mvpBox.innerHTML = `👤<span class="mini-badge">👑 MVP</span>`;
-                gImg.innerHTML = `👤<span class="mini-badge">⚽ GOALS</span>`;
-                aImg.innerHTML = `👤<span class="mini-badge">🎯 ASST</span>`;
-            } else {
+            if (!isSelectionMade || topMvp === "---") { mvpBox.innerHTML = `👤<span class="mini-badge">👑 MVP</span>`; gImg.innerHTML = `👤<span class="mini-badge">⚽ GOALS</span>`; aImg.innerHTML = `👤<span class="mini-badge">🎯 ASST</span>`; } 
+            else { 
                 mvpBox.innerHTML = profiles[topMvp] ? `<img src="${profiles[topMvp]}" class="award-img"><span class="mini-badge">👑 MVP</span>` : `👤<span class="mini-badge">👑 MVP</span>`;
                 let gN = topScorer?.n || "", aN = topAssist?.n || "";
                 gImg.innerHTML = profiles[gN] ? `<img src="${profiles[gN]}" class="award-img"><span class="mini-badge">⚽ GOALS</span>` : `👤<span class="mini-badge">⚽ GOALS</span>`;
@@ -617,19 +553,14 @@
         const limits = [2, 3, 4, 5, 7, 9], sc = [1,2,3,4,5,6].map((idx, i) => Math.min(parseInt(document.getElementById('s'+idx).value || 0), limits[i]));
         const gV = parseInt(document.getElementById('gA').value || 0), aV = parseInt(document.getElementById('aA').value || 0), yV = parseInt(document.getElementById('yCard').value || 0), rV = parseInt(document.getElementById('rCard').value || 0);
         const total = sc.reduce((a,b)=>a+b, 0) + (gV*6) + (aV*4);
-        dbRef.child(`${yr}/${name}/${m}/${w}`).set({sc, gV, aV, yV, rV, total}).then(() => {
-            document.querySelectorAll('#statsForm input').forEach(i => i.value = "");
-            alert("Saved!");
-        });
+        dbRef.child(`${yr}/${name}/${m}/${w}`).set({sc, gV, aV, yV, rV, total}).then(() => { document.querySelectorAll('#statsForm input').forEach(i => i.value = ""); alert("Saved!"); });
     }
 
     function editEntry(name) {
         const yr = document.getElementById('viewYear').value, m = document.getElementById('selMonth').value, w = document.getElementById('selWeek').value;
         if(!m || !w) return alert("Select Month/Week filter first.");
-        const data = db[yr]?.[name]?.[m]?.[w];
-        if(!data) return alert("No record found.");
-        document.getElementById('pNameSelect').value = name;
-        document.getElementById('inMonth').value = m; document.getElementById('inWeek').value = w;
+        const data = db[yr]?.[name]?.[m]?.[w]; if(!data) return alert("No record found.");
+        document.getElementById('pNameSelect').value = name; document.getElementById('inMonth').value = m; document.getElementById('inWeek').value = w;
         if(data.sc) data.sc.forEach((v, i) => { const el = document.getElementById(`s${i+1}`); if(el) el.value = v; });
         document.getElementById('gA').value = data.gV || 0; document.getElementById('aA').value = data.aV || 0;
         document.getElementById('yCard').value = data.yV || 0; document.getElementById('rCard').value = data.rV || 0;
@@ -658,10 +589,7 @@
                 for (let w in db[yr][playerName][m]) {
                     if (activeFilter === 'YEAR' || (activeFilter === 'MONTH' && m === vM) || (activeFilter === 'WEEK' && m === vM && w === vW)) {
                         let d = db[yr][playerName][m][w];
-                        if(d && d.sc) {
-                            d.sc.forEach((v, i) => { if(rep.s[i] !== undefined) rep.s[i] += v; });
-                            rep.g += (d.gV || 0); rep.a += (d.aV || 0); rep.y += (d.yV || 0); rep.r += (d.rV || 0); rep.t += (d.total || 0); rep.count++;
-                        }
+                        if(d && d.sc) { d.sc.forEach((v, i) => { if(rep.s[i] !== undefined) rep.s[i] += v; }); rep.g += (d.gV || 0); rep.a += (d.aV || 0); rep.y += (d.yV || 0); rep.r += (d.rV || 0); rep.t += (d.total || 0); rep.count++; }
                     }
                 }
             }
@@ -670,12 +598,10 @@
         document.getElementById('reportPhoto').querySelector('img').src = profiles[playerName] || 'https://via.placeholder.com/150';
         document.getElementById('repMatches').innerText = `${rep.count} Matches Total`;
         document.getElementById('repTotal').innerText = rep.t; document.getElementById('repGoals').innerText = rep.g; document.getElementById('repAssists').innerText = rep.a; document.getElementById('repYellow').innerText = rep.y; document.getElementById('repRed').innerText = rep.r;
-        const g = rep.count || 1;
-        rep.s.forEach((val, i) => { const el = document.getElementById(`repS${i+1}`); if(el) el.innerText = (val/g).toFixed(1); });
+        const g = rep.count || 1; rep.s.forEach((val, i) => { const el = document.getElementById(`repS${i+1}`); if(el) el.innerText = (val/g).toFixed(1); });
         const avgS = (rep.s.reduce((a,b)=>a+b, 0) / g), starC = Math.min(5, Math.floor(avgS / 6));
         let sH = ""; for(let s=1; s<=5; s++) sH += s <= starC ? `<span class="text-yellow-500 text-2xl">★</span>` : `<span class="text-white/10 text-2xl">★</span>`;
-        document.getElementById('repStars').innerHTML = sH;
-        document.getElementById('reportModal').style.display = 'flex';
+        document.getElementById('repStars').innerHTML = sH; document.getElementById('reportModal').style.display = 'flex';
     }
 
     function closeReport(e) { if(!e || e.target.id === 'reportModal') document.getElementById('reportModal').style.display = 'none'; }
@@ -683,8 +609,7 @@
     function closeHistory() { document.getElementById('historyModal').style.display = 'none'; }
     function switchAdminTab(t) { document.getElementById('regForm').classList.toggle('hidden', t !== 'reg'); document.getElementById('statsForm').classList.toggle('hidden', t !== 'data'); }
     function changeFilter(m) { 
-        activeFilter = m; 
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active')); 
+        activeFilter = m; document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active')); 
         if(m === 'YEAR') document.getElementById('f-YEAR').classList.add('tab-active');
         if(m === 'MONTH') document.getElementById('selMonth').classList.add('tab-active');
         if(m === 'WEEK') document.getElementById('selWeek').classList.add('tab-active');
