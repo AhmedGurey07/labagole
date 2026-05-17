@@ -116,7 +116,7 @@
         <div id="attendancePollContainer" class="glass-panel p-6 flex flex-col md:flex-row items-center gap-6 border-yellow-500/30 flex-[2] hidden">
             <div class="text-center md:text-left">
                 <h4 class="text-xs font-black text-gray-500 uppercase tracking-widest mb-1">Attendance Poll</h4>
-                <p class="text-xl font-black oswald text-white uppercase italic">ASC dhamaan akhyaarta hala Xaadiro</p>
+                <p class="text-xl font-black oswald text-white uppercase italic">Asc dhamaan akhyaarta caawa waa habeenkaan ciyaaraynay hore la loo xaadiro </p>
             </div>
             <div class="flex items-center gap-3">
                 <button onclick="castVote('JOOGE')" class="px-6 py-3 bg-green-600/20 hover:bg-green-600 border border-green-500/30 rounded-2xl text-green-400 hover:text-white font-black oswald transition uppercase tracking-widest">Jooge</button>
@@ -691,12 +691,16 @@
             for(let m in db[yr][name]) {
                 for(let w in db[yr][name][m]) {
                     let d = db[yr][name][m][w]; if(!d) continue;
-                    pY.t += d.total; gY.v += d.gV; aY.v += d.aV;
-                    if(vM !== "" && m === vM) { pM.t += d.total; gM.v += d.gV; aM.v += d.aV; }
-                    if(vM !== "" && vW !== "" && m === vM && w === vW) { pW.t += d.total; gW.v += d.gV; aW.v += d.aV; }
+                    pY.t += (d.total || 0); gY.v += (d.gV || 0); aY.v += (d.aV || 0);
+                    if(vM !== "" && m === vM) { pM.t += (d.total || 0); gM.v += (d.gV || 0); aM.v += (d.aV || 0); }
+                    if(vM !== "" && vW !== "" && m === vM && w === vW) { pW.t += (d.total || 0); gW.v += (d.gV || 0); aW.v += (d.aV || 0); }
                     if(activeFilter==='YEAR' || (activeFilter==='MONTH' && m===vM) || (activeFilter==='WEEK' && m===vM && w===vW)) {
                         if(d.sc) d.sc.forEach((v,i) => lp.s[i] += v);
-                        lp.g += d.gV; lp.a += d.aV; lp.y += d.yV; lp.r += d.rV; lp.t += d.total; lp.count++; 
+                        lp.g += (d.gV || 0); 
+                        lp.a += (d.aV || 0); 
+                        lp.y += (d.yV || 0); 
+                        lp.r += (d.rV || 0); 
+                        lp.t += (d.total || 0); lp.count++; 
                     }
                 }
             }
@@ -753,8 +757,13 @@
     function saveStats() {
         const yr = document.getElementById('viewYear').value, name = document.getElementById('pNameSelect').value, m = document.getElementById('inMonth').value, w = document.getElementById('inWeek').value;
         if(!name) return alert("Select Player");
-        const sc = [1,2,3,4,5,6].map(idx => parseInt(document.getElementById('s'+idx).value || 0));
-        const gV = parseInt(document.getElementById('gA').value || 0), aV = parseInt(document.getElementById('aA').value || 0), yV = parseInt(document.getElementById('yCard').value || 0), rV = parseInt(document.getElementById('rCard').value || 0);
+        
+        const sc = [1,2,3,4,5,6].map(idx => parseInt(document.getElementById('s'+idx).value) || 0);
+        const gV = parseInt(document.getElementById('gA').value) || 0;
+        const aV = parseInt(document.getElementById('aA').value) || 0;
+        const yV = parseInt(document.getElementById('yCard').value) || 0;
+        const rV = parseInt(document.getElementById('rCard').value) || 0;
+        
         const total = sc.reduce((a,b)=>a+b, 0) + (gV*6) + (aV*4);
         dbRef.child(`${yr}/${name}/${m}/${w}`).set({sc, gV, aV, yV, rV, total}).then(() => { alert("Saved!"); render(); });
     }
@@ -765,9 +774,11 @@
         const data = db[yr]?.[name]?.[m]?.[w];
         if(!data) return alert("No record found.");
         document.getElementById('pNameSelect').value = name;
-        data.sc.forEach((v, i) => document.getElementById(`s${i+1}`).value = v);
-        document.getElementById('gA').value = data.gV; document.getElementById('aA').value = data.aV;
-        document.getElementById('yCard').value = data.yV; document.getElementById('rCard').value = data.rV;
+        if(data.sc) data.sc.forEach((v, i) => document.getElementById(`s${i+1}`).value = v);
+        document.getElementById('gA').value = data.gV || 0; 
+        document.getElementById('aA').value = data.aV || 0;
+        document.getElementById('yCard').value = data.yV || 0; 
+        document.getElementById('rCard').value = data.rV || 0;
     }
 
     function deleteEntry(name) {
@@ -827,6 +838,7 @@
     }
 
     function closeReport(e) { if(!e || e.target.id === 'reportModal') document.getElementById('reportModal').style.display = 'none'; }
+    
     function openHistorySelector() { 
         document.getElementById('histYear').innerHTML = document.getElementById('viewYear').innerHTML; 
         document.getElementById('histMonth').innerHTML = document.getElementById('selMonth').innerHTML; 
@@ -834,16 +846,64 @@
         document.getElementById('histMonth').value = document.getElementById('selMonth').value || "0";
         document.getElementById('historyModal').style.display = 'flex'; 
     }
+    
     function closeHistory() { document.getElementById('historyModal').style.display = 'none'; }
+
     function fetchSpecificHistory() {
-        const yr = document.getElementById('histYear').value, mo = document.getElementById('histMonth').value, wk = document.getElementById('histWeek').value;
-        document.getElementById('viewYear').value = yr; document.getElementById('selMonth').value = mo; document.getElementById('selWeek').value = wk;
+        // 1. Get Selections from history form
+        const yr = document.getElementById('histYear').value;
+        const mo = document.getElementById('histMonth').value;
+        const wk = document.getElementById('histWeek').value;
+        const playerName = document.getElementById('reportName').innerText; // The athlete currently in Pic 1
+
+        // 2. Update the background filters (Dashboard sync)
+        document.getElementById('viewYear').value = yr; 
+        document.getElementById('selMonth').value = mo; 
+        document.getElementById('selWeek').value = wk;
         activeFilter = 'WEEK';
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
         document.getElementById('selWeek').classList.add('tab-active');
-        render(); closeHistory();
+
+        // 3. Find specific record for this player
+        const specificData = db[yr]?.[playerName]?.[mo]?.[wk];
+
+        if (specificData) {
+            // 4. Update Pic 1 labels with the selected week's data
+            document.getElementById('repTotal').innerText = specificData.total || 0;
+            document.getElementById('repGoals').innerText = specificData.gV || 0;
+            document.getElementById('repAssists').innerText = specificData.aV || 0;
+            document.getElementById('repYellow').innerText = specificData.yV || 0;
+            document.getElementById('repRed').innerText = specificData.rV || 0;
+            document.getElementById('repMatches').innerText = `WEEK ${wk} RECORD`;
+
+            // 5. Update Skill Breakdown for Pic 1
+            if (specificData.sc) {
+                specificData.sc.forEach((val, i) => {
+                    document.getElementById(`repS${i+1}`).innerText = val.toFixed(1);
+                });
+
+                // Update Stars based on this specific week
+                const avgTotal = specificData.sc.reduce((a, b) => a + b, 0);
+                const starCount = Math.min(5, Math.floor(avgTotal / 6));
+                let starHtml = "";
+                for (let s = 1; s <= 5; s++) {
+                    starHtml += s <= starCount ? 
+                        `<span class="text-yellow-500 star-glow text-xl">★</span>` : 
+                        `<span class="text-white/10 text-xl">★</span>`;
+                }
+                document.getElementById('repStars').innerHTML = starHtml;
+            }
+            
+            // Re-render dashboard behind modal
+            render(); 
+            closeHistory();
+        } else {
+            alert(`No history found for ${playerName} in ${MONTHS[mo]} Week ${wk}`);
+        }
     }
+
     function switchAdminTab(t) { document.getElementById('regForm').classList.toggle('hidden', t !== 'reg'); document.getElementById('statsForm').classList.toggle('hidden', t !== 'data'); }
+    
     function changeFilter(m) { 
         activeFilter = m; document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active')); 
         if(m === 'YEAR') document.getElementById('f-YEAR').classList.add('tab-active');
