@@ -8,12 +8,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
-    <link rel="manifest" href="manifest.json">
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js');
-  }
-</script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;700;900&family=Inter:wght@400;700;900&display=swap');
@@ -47,7 +41,7 @@
         .oswald { font-family: 'Oswald', sans-serif; }
         .star-glow { text-shadow: 0 0 8px rgba(251, 191, 36, 0.6); }
 
-        #reportModal, #historyModal, #voteListModal { display: none; position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); padding: 20px; align-items: center; justify-content: center; }
+        #reportModal, #historyModal, #voteListModal, #largeViewModal { display: none; position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); padding: 20px; align-items: center; justify-content: center; }
         .report-content { background: #0f172a; border: 2px solid rgba(251, 191, 36, 0.3); border-radius: 32px; max-width: 500px; width: 100%; padding: 32px; position: relative; }
 
         .chat-scroll::-webkit-scrollbar { width: 6px; }
@@ -55,9 +49,16 @@
         #floatingChatWindow { display: none; width: 420px; max-width: calc(100vw - 40px); height: 600px; max-height: calc(100vh - 120px); z-index: 100; transition: transform 0.3s; }
         #unreadBadge { position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 10px; font-weight: 900; width: 22px; height: 22px; border-radius: 50%; display: none; align-items: center; justify-content: center; border: 2px solid #070707; }
         
-        .msg-container { position: relative; }
-        .delete-msg-btn { display: none; margin-left: 8px; color: #f87171; font-size: 9px; font-weight: 900; text-transform: uppercase; cursor: pointer; padding: 2px 5px; background: rgba(239, 68, 68, 0.1); border-radius: 4px; }
-        body[data-role="admin"] .delete-msg-btn { display: inline-block; }
+        @media print {
+            body { background: white !important; color: black !important; padding: 0; margin: 0; }
+            #dashboardArea, #chatSystemWidget, #largeViewModal button, header, aside { display: none !important; }
+            #largeViewModal { display: block !important; position: static !important; background: white !important; backdrop-filter: none !important; padding: 0 !important; }
+            #largeViewModal .bg-[#0f172a] { background: white !important; border: none !important; color: black !important; max-width: 100% !important; max-height: none !important; width: 100% !important; }
+            #largeViewModal .text-yellow-500 { color: black !important; }
+            #largeViewModal table { width: 100% !important; color: black !important; }
+            #largeViewModal th, #largeViewModal td { color: black !important; border-bottom: 1px solid #eee !important; padding: 12px !important; }
+            .chat-scroll { overflow: visible !important; }
+        }
     </style>
 </head>
 <body id="mainBody">
@@ -102,6 +103,11 @@
                 <option value="">-- WEEK --</option>
                 <option value="1">Week 1</option><option value="2">Week 2</option><option value="3">Week 3</option><option value="4">Week 4</option>
             </select>
+            
+            <button id="publicReportBtn" onclick="showLargeView()" class="hidden tab-btn bg-blue-600 text-white border-none hover:bg-blue-500 flex items-center gap-2">
+                📊 VIEW REPORT
+            </button>
+
             <button onclick="handleLogout()" class="tab-btn bg-red-950/40 text-red-400 border border-red-500/20 hover:bg-red-900 hover:text-white">🚪 LOGOUT</button>
         </div>
     </header>
@@ -193,12 +199,59 @@
                     <button onclick="switchAdminTab('data')" id="tabData" class="text-[10px] font-bold uppercase text-yellow-500">Stats</button>
                     <span class="text-gray-700">|</span>
                     <button onclick="switchAdminTab('reg')" id="tabReg" class="text-[10px] font-bold uppercase text-gray-500">Registry</button>
+                    <span class="text-gray-700">|</span>
+                    <button onclick="switchAdminTab('pay')" id="tabPay" class="text-[10px] font-bold uppercase text-gray-500">Payments</button>
+                    <span class="text-gray-700">|</span>
+                    <button onclick="switchAdminTab('payAn')" id="tabPayAn" class="text-[10px] font-bold uppercase text-gray-500">Analytics</button>
                 </div>
+                
                 <div id="regForm" class="hidden space-y-4">
                     <input type="text" id="regName" placeholder="PLAYER NAME" class="w-full p-4 rounded-xl bg-black/40 border border-white/10 uppercase font-bold text-white">
                     <input type="file" id="regPhoto" class="text-[10px] w-full" accept="image/*">
                     <button onclick="registerPlayer()" class="w-full py-3 rounded-xl bg-blue-600 text-white font-bold uppercase text-xs">Save Profile</button>
                 </div>
+
+                <div id="payForm" class="hidden space-y-4">
+                    <div class="bg-yellow-500/10 p-3 rounded-xl border border-yellow-500/20">
+                        <label class="text-[10px] font-bold text-yellow-500 uppercase">Set Monthly Fee ($)</label>
+                        <input type="number" id="monthlyFeeInput" onchange="updateGlobalFee(this.value)" class="w-full bg-transparent text-xl font-black text-white focus:outline-none" placeholder="10">
+                    </div>
+                    <select id="payPlayerSelect" class="w-full p-4 rounded-xl bg-black/40 border border-white/10 font-bold text-white"></select>
+                    <button onclick="togglePaymentStatus()" class="w-full py-4 rounded-xl bg-green-600 text-white font-black oswald uppercase">Toggle Paid Status</button>
+                </div>
+
+                <div id="payAnForm" class="hidden space-y-4">
+                    <h4 class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 text-center">Payment Analytics Report</h4>
+                    
+                    <div class="bg-blue-500/10 p-3 rounded-xl border border-blue-500/20 mb-4">
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" id="reportVisibilityToggle" onchange="toggleReportVisibility(this.checked)" class="w-4 h-4 accent-blue-500">
+                            <label for="reportVisibilityToggle" class="text-[10px] font-bold text-blue-400 uppercase cursor-pointer">Make Report Public</label>
+                        </div>
+                    </div>
+
+                    <select id="anYear" onchange="updatePaymentReport()" class="w-full p-3 rounded-xl bg-black/40 border border-white/10 text-white text-xs"></select>
+                    <select id="anMonth" onchange="updatePaymentReport()" class="w-full p-3 rounded-xl bg-black/40 border border-white/10 text-white text-xs"></select>
+                    <select id="anStatus" onchange="updatePaymentReport()" class="w-full p-3 rounded-xl bg-black/40 border border-white/10 text-white text-xs font-bold">
+                        <option value="ALL">ALL STATUS</option>
+                        <option value="PAID">PAID ONLY</option>
+                        <option value="UNPAID">UNPAID ONLY</option>
+                    </select>
+                    
+                    <div class="mt-4 max-h-[250px] overflow-y-auto chat-scroll pr-1">
+                        <table class="w-full text-[10px]" id="paymentReportTable">
+                            <thead class="text-yellow-500 uppercase border-b border-white/10">
+                                <tr>
+                                    <th class="p-2 text-left">Player</th>
+                                    <th class="p-2 text-center">Fee</th>
+                                    <th class="p-2 text-right">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reportTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <div id="statsForm" class="space-y-4">
                     <select id="pNameSelect" class="w-full p-4 rounded-xl bg-black/40 border border-white/10 font-bold text-white"></select>
                     <div class="grid grid-cols-2 gap-2">
@@ -255,6 +308,23 @@
                     <tbody id="pBody"></tbody>
                 </table>
             </div>
+        </div>
+    </div>
+</div>
+
+<div id="largeViewModal" onclick="closeLargeView(event)">
+    <div class="bg-[#0f172a] w-full max-w-6xl max-h-[90vh] rounded-3xl border border-yellow-500/30 flex flex-col shadow-2xl overflow-hidden" onclick="event.stopPropagation()">
+        <div class="p-6 border-b border-white/10 flex justify-between items-center bg-black/40">
+            <div>
+                <h2 class="text-2xl font-black oswald text-yellow-500 uppercase">Detailed Payment Report</h2>
+                <p id="largeViewSubtitle" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest"></p>
+            </div>
+            <button onclick="closeLargeView(null)" class="text-gray-400 hover:text-white text-3xl font-bold transition">&times;</button>
+        </div>
+        <div id="modalContent" class="overflow-auto p-8 chat-scroll"></div>
+        <div class="p-6 border-t border-white/10 bg-black/20 flex justify-end gap-4">
+            
+            <button onclick="closeLargeView(null)" class="px-6 py-2 bg-white/5 text-gray-400 font-bold rounded-xl hover:bg-white/10 transition uppercase text-xs">Close View</button>
         </div>
     </div>
 </div>
@@ -383,6 +453,7 @@
     const votesRef = firebase.database().ref('golaha_votes');
     const settingsRef = firebase.database().ref('golaha_settings'); 
     const presenceRef = firebase.database().ref('golaha_presence');
+    const paymentsRef = firebase.database().ref('golaha_payments');
     const auth = firebase.auth();
 
     const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -390,7 +461,8 @@
     let isUserAdmin = false;
     let authMode = "LOGIN";
     let currentUserProfileUsername = "Anonymous";
-
+    let currentFee = 10;
+    let paymentData = {};
     let chatIsOpen = false;
     let unreadCount = 0;
     let lastSeenMsgTimestamp = parseInt(localStorage.getItem('lastSeenMsg')) || 0;
@@ -410,24 +482,16 @@
             loginScreen.style.display = 'none';
             dashboardArea.classList.remove('hidden');
             chatSystemWidget.classList.remove('hidden');
-            
             currentUserProfileUsername = user.displayName || user.email.split('@')[0];
             welcomeMessage.innerText = `👋 WELCOME, ${currentUserProfileUsername}`;
-            
             setupPresence(user);
-
+            
             profilesRef.on('value', s => {
                 profiles = s.val() || {};
                 const userProfile = profiles[currentUserProfileUsername];
                 const userPhoto = typeof userProfile === 'string' ? userProfile : userProfile?.photo;
-                if (userPhoto) {
-                    avatarImg.src = userPhoto;
-                    avatarImg.classList.remove('hidden');
-                    avatarPlaceholder.classList.add('hidden');
-                } else {
-                    avatarImg.classList.add('hidden');
-                    avatarPlaceholder.classList.remove('hidden');
-                }
+                if (userPhoto) { avatarImg.src = userPhoto; avatarImg.classList.remove('hidden'); avatarPlaceholder.classList.add('hidden'); }
+                else { avatarImg.classList.add('hidden'); avatarPlaceholder.classList.remove('hidden'); }
                 updateDropdowns();
                 render();
             });
@@ -445,10 +509,21 @@
                 mainTableArea.classList.replace('lg:col-span-9', 'lg:col-span-12');
             }
 
-            dbRef.off(); chatRef.off(); votesRef.off(); settingsRef.off();
+            dbRef.off(); chatRef.off(); votesRef.off(); settingsRef.off(); paymentsRef.off();
             dbRef.on('value', s => { db = s.val() || {}; render(); });
             votesRef.on('value', s => { votes = s.val() || {}; updateVoteUI(); });
+            
+            paymentsRef.on('value', s => {
+                const data = s.val() || {};
+                currentFee = data.globalFee || 10;
+                paymentData = data.records || {};
+                const feeInput = document.getElementById('monthlyFeeInput');
+                if(feeInput) feeInput.value = currentFee;
+                render();
+                updatePaymentReport();
+            });
 
+            // Handle Poll Visibility Setting
             settingsRef.child('pollVisible').on('value', s => {
                 const isVisible = s.val() || false;
                 const pollContainer = document.getElementById('attendancePollContainer');
@@ -456,6 +531,18 @@
                 if(isUserAdmin && visibilityCheckbox) visibilityCheckbox.checked = isVisible;
                 if (isVisible || isUserAdmin) pollContainer.classList.remove('hidden');
                 else pollContainer.classList.add('hidden');
+            });
+
+            // Handle Report Visibility Setting
+            settingsRef.child('reportVisible').on('value', s => {
+                const isVisible = s.val() || false;
+                const reportBtn = document.getElementById('publicReportBtn');
+                const visibilityCheckbox = document.getElementById('reportVisibilityToggle');
+                if(isUserAdmin && visibilityCheckbox) visibilityCheckbox.checked = isVisible;
+                
+                // Show button if it's public OR if the user is an admin
+                if (isVisible || isUserAdmin) reportBtn.classList.remove('hidden');
+                else reportBtn.classList.add('hidden');
             });
 
             listenToGlobalPublicChatroom();
@@ -467,88 +554,133 @@
         }
     });
 
-    function setupPresence(user) {
-        const myPresenceRef = presenceRef.child(currentUserProfileUsername);
-        firebase.database().ref('.info/connected').on('value', (snapshot) => {
-            if (snapshot.val() === true) {
-                myPresenceRef.onDisconnect().remove();
-                myPresenceRef.set(true);
+    // ADMIN: Toggle whether regular users see the "View Report" button
+    function toggleReportVisibility(isChecked) {
+        if(!isUserAdmin) return;
+        settingsRef.update({ reportVisible: isChecked });
+    }
+
+    function updateGlobalFee(val) { if(!isUserAdmin) return; paymentsRef.update({ globalFee: parseInt(val) || 0 }); }
+    
+    function togglePaymentStatus() {
+        const name = document.getElementById('payPlayerSelect').value, yr = document.getElementById('viewYear').value, mo = document.getElementById('selMonth').value;
+        if(!name || mo === "") return alert("Select Player and Month first");
+        const monthKey = `${yr}-${mo}`;
+        const currentStatus = paymentData[monthKey]?.[name] || false;
+        paymentsRef.child('records').child(monthKey).child(name).set(!currentStatus);
+    }
+
+    function updatePaymentReport() {
+        const yr = document.getElementById('anYear').value, mo = document.getElementById('anMonth').value, statusType = document.getElementById('anStatus').value, tableBody = document.getElementById('reportTableBody');
+        if (!tableBody) return;
+        tableBody.innerHTML = "";
+        if (mo === "") { tableBody.innerHTML = `<tr><td colspan="3" class="text-center py-4 text-gray-500">Select month to view report</td></tr>`; return; }
+        const monthKey = `${yr}-${mo}`, records = paymentData[monthKey] || {}, allPlayers = Object.keys(profiles).sort();
+        allPlayers.forEach(name => {
+            const hasPaid = records[name] === true;
+            let shouldDisplay = (statusType === 'ALL') || (statusType === 'PAID' && hasPaid) || (statusType === 'UNPAID' && !hasPaid);
+            if (shouldDisplay) {
+                const row = document.createElement('tr');
+                row.className = "border-b border-white/5 hover:bg-white/5 transition";
+                row.innerHTML = `<td class="p-2 font-bold uppercase text-left">${name}</td><td class="p-2 text-center">$${currentFee}</td><td class="p-2 text-right"><span class="px-2 py-1 rounded text-[8px] font-black ${hasPaid ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'}">${hasPaid ? 'PAID' : 'UNPAID'}</span></td>`;
+                tableBody.appendChild(row);
             }
         });
-        presenceRef.on('value', (snapshot) => {
-            const count = snapshot.numChildren() || 0;
-            const countEl = document.getElementById('onlineCount');
-            if(countEl) countEl.innerText = count;
+    }
+
+    // UPDATED: Now generates the report directly from records so regular users see it
+    function showLargeView() {
+        const modal = document.getElementById('largeViewModal');
+        const content = document.getElementById('modalContent');
+        
+        // Use global header filters
+        const yr = document.getElementById('viewYear').value;
+        const moIdx = document.getElementById('selMonth').value;
+
+        if (moIdx === "") {
+            alert("Please select a month first to view the report.");
+            return;
+        }
+
+        const monthName = MONTHS[moIdx];
+        document.getElementById('largeViewSubtitle').innerText = `SEASON ${yr} | ${monthName.toUpperCase()} DATA`;
+        
+        const monthKey = `${yr}-${moIdx}`;
+        const records = paymentData[monthKey] || {};
+        const allPlayers = Object.keys(profiles).sort();
+        
+        let tableRows = "";
+        allPlayers.forEach(name => {
+            const hasPaid = records[name] === true;
+            tableRows += `
+                <tr class="border-b border-white/5 hover:bg-white/5 transition">
+                    <td class="p-4 font-bold uppercase text-left">${name}</td>
+                    <td class="p-4 text-center">$${currentFee}</td>
+                    <td class="p-4 text-right">
+                        <span class="px-2 py-1 rounded text-[10px] font-black ${hasPaid ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'}">
+                            ${hasPaid ? 'PAID' : 'UNPAID'}
+                        </span>
+                    </td>
+                </tr>`;
         });
+
+        content.innerHTML = `
+            <table class="w-full text-left border-collapse">
+                <thead class="text-yellow-500 uppercase border-b-2 border-yellow-500/20">
+                    <tr class="text-lg">
+                        <th class="p-4">Athletes Name</th>
+                        <th class="p-4 text-center">Standard Fee</th>
+                        <th class="p-4 text-right">Payment Status</th>
+                    </tr>
+                </thead>
+                <tbody class="text-white text-base divide-y divide-white/5">
+                    ${tableRows}
+                </tbody>
+            </table>
+        `;
+
+        modal.style.display = 'flex';
+    }
+
+    function closeLargeView(e) { if(!e || e.target.id === 'largeViewModal') document.getElementById('largeViewModal').style.display = 'none'; }
+
+    function setupPresence(user) {
+        const myPresenceRef = presenceRef.child(currentUserProfileUsername);
+        firebase.database().ref('.info/connected').on('value', (snapshot) => { if (snapshot.val() === true) { myPresenceRef.onDisconnect().remove(); myPresenceRef.set(true); } });
+        presenceRef.on('value', (snapshot) => { const count = snapshot.numChildren() || 0; const countEl = document.getElementById('onlineCount'); if(countEl) countEl.innerText = count; });
     }
 
     function showOnlineUsers() {
         presenceRef.once('value', (snapshot) => {
-            const onlineUsers = snapshot.val() || {};
-            const title = document.getElementById('voteListTitle');
-            const list = document.getElementById('voteListItems');
-            list.innerHTML = "";
-            title.innerText = "Online Athletes";
+            const onlineUsers = snapshot.val() || {}, title = document.getElementById('voteListTitle'), list = document.getElementById('voteListItems');
+            list.innerHTML = ""; title.innerText = "Online Athletes";
             Object.keys(onlineUsers).forEach(name => {
-                const profile = profiles[name];
-                const photo = typeof profile === 'string' ? profile : profile?.photo;
+                const profile = profiles[name], photo = typeof profile === 'string' ? profile : profile?.photo;
                 const div = document.createElement('div');
                 div.className = "flex items-center justify-between p-3 bg-white/5 rounded-2xl border border-white/5 mb-2";
-                div.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full border-2 border-green-500 overflow-hidden">
-                            <img src="${photo || 'https://via.placeholder.com/50'}" class="w-full h-full object-cover">
-                        </div>
-                        <div class="flex flex-col text-left">
-                            <span class="text-xs font-black text-white uppercase oswald">${name}</span>
-                            <span class="text-[8px] text-green-500 font-bold uppercase">Active Now</span>
-                        </div>
-                    </div>
-                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                `;
+                div.innerHTML = `<div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full border-2 border-green-500 overflow-hidden"><img src="${photo || 'https://via.placeholder.com/50'}" class="w-full h-full object-cover"></div><div class="flex flex-col text-left"><span class="text-xs font-black text-white uppercase oswald">${name}</span><span class="text-[8px] text-green-500 font-bold uppercase">Active Now</span></div></div><div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>`;
                 list.appendChild(div);
             });
             document.getElementById('voteListModal').style.display = 'flex';
         });
     }
 
-    function resetAllVotes() {
-        if(confirm("Permanently wipe ALL attendance votes?")) {
-            votesRef.remove().then(() => alert("Reset Complete."));
-        }
-    }
-
-    function togglePollVisibility(isChecked) {
-        if(!isUserAdmin) return;
-        settingsRef.update({ pollVisible: isChecked });
-    }
-
-    function castVote(status) {
-        if(!currentUserProfileUsername || currentUserProfileUsername === "Anonymous") return;
-        votesRef.child(currentUserProfileUsername).set(status);
-    }
-
+    function resetAllVotes() { if(confirm("Permanently wipe ALL attendance votes?")) { votesRef.remove().then(() => alert("Reset Complete.")); } }
+    function togglePollVisibility(isChecked) { if(!isUserAdmin) return; settingsRef.update({ pollVisible: isChecked }); }
+    function castVote(status) { if(!currentUserProfileUsername || currentUserProfileUsername === "Anonymous") return; votesRef.child(currentUserProfileUsername).set(status); }
     function updateVoteUI() {
-        let j = 0, m = 0;
-        Object.values(votes).forEach(v => { if(v === 'JOOGE') j++; if(v === 'MAQANE') m++; });
-        document.getElementById('countJooge').innerText = j;
-        document.getElementById('countMaqane').innerText = m;
+        let j = 0, m = 0; Object.values(votes).forEach(v => { if(v === 'JOOGE') j++; if(v === 'MAQANE') m++; });
+        document.getElementById('countJooge').innerText = j; document.getElementById('countMaqane').innerText = m;
     }
 
     function showVoterList(type) {
-        const title = document.getElementById('voteListTitle');
-        const list = document.getElementById('voteListItems');
-        list.innerHTML = "";
-        let athletes = [];
+        const title = document.getElementById('voteListTitle'), list = document.getElementById('voteListItems');
+        list.innerHTML = ""; let athletes = [];
         if(type === 'JOOGE') { title.innerText = "Jooge Athletes"; athletes = Object.keys(votes).filter(name => votes[name] === 'JOOGE'); } 
         else if(type === 'MAQANE') { title.innerText = "Maqane Athletes"; athletes = Object.keys(votes).filter(name => votes[name] === 'MAQANE'); } 
-        else {
-            title.innerText = "No Response";
-            athletes = Object.keys(profiles).filter(p => !Object.keys(votes).includes(p));
-        }
+        else { title.innerText = "No Response"; athletes = Object.keys(profiles).filter(p => !Object.keys(votes).includes(p)); }
         athletes.forEach(name => {
-            const profile = profiles[name];
-            const photo = typeof profile === 'string' ? profile : profile?.photo;
+            const profile = profiles[name], photo = typeof profile === 'string' ? profile : profile?.photo;
             const div = document.createElement('div');
             div.className = "flex items-center gap-3 p-3 bg-white/5 rounded-2xl border border-white/5";
             div.innerHTML = `<div class="w-8 h-8 rounded-full overflow-hidden"><img src="${photo || 'https://via.placeholder.com/50'}" class="w-full h-full object-cover"></div><span class="text-xs font-black text-white uppercase oswald">${name}</span>`;
@@ -558,34 +690,18 @@
     }
 
     function closeVoteList(e) { if(!e || e.target.id === 'voteListModal') document.getElementById('voteListModal').style.display = 'none'; }
-
     function toggleChatWindow() {
-        const windowEl = document.getElementById('floatingChatWindow');
-        chatIsOpen = (windowEl.style.display !== 'flex');
+        const windowEl = document.getElementById('floatingChatWindow'); chatIsOpen = (windowEl.style.display !== 'flex');
         windowEl.style.display = chatIsOpen ? 'flex' : 'none';
-        if (chatIsOpen) {
-            unreadCount = 0; updateBadgeUI();
-            lastSeenMsgTimestamp = Date.now(); localStorage.setItem('lastSeenMsg', lastSeenMsgTimestamp);
-            const container = document.getElementById('chatMessageStream');
-            container.scrollTop = container.scrollHeight;
-        }
+        if (chatIsOpen) { unreadCount = 0; updateBadgeUI(); lastSeenMsgTimestamp = Date.now(); localStorage.setItem('lastSeenMsg', lastSeenMsgTimestamp); const container = document.getElementById('chatMessageStream'); container.scrollTop = container.scrollHeight; }
     }
-
-    function updateBadgeUI() {
-        const badge = document.getElementById('unreadBadge');
-        if (unreadCount > 0) { badge.innerText = unreadCount; badge.style.display = 'flex'; }
-        else { badge.style.display = 'none'; }
-    }
+    function updateBadgeUI() { const badge = document.getElementById('unreadBadge'); if (unreadCount > 0) { badge.innerText = unreadCount; badge.style.display = 'flex'; } else { badge.style.display = 'none'; } }
 
     function listenToGlobalPublicChatroom() {
         chatRef.limitToLast(100).on('value', snapshot => {
-            const container = document.getElementById('chatMessageStream');
-            container.innerHTML = "";
-            const data = snapshot.val();
-            if(!data) return;
+            const container = document.getElementById('chatMessageStream'); container.innerHTML = ""; const data = snapshot.val(); if(!data) return;
             Object.keys(data).sort().forEach(key => {
-                const msg = data[key];
-                const isMe = msg.sender === currentUserProfileUsername;
+                const msg = data[key], isMe = msg.sender === currentUserProfileUsername;
                 if (msg.timestamp > lastSeenMsgTimestamp && !isMe && !chatIsOpen) { unreadCount++; updateBadgeUI(); }
                 const bubble = document.createElement('div');
                 bubble.className = `flex flex-col max-w-[85%] rounded-2xl p-3 gap-1 msg-container ${isMe ? 'bg-yellow-500 text-black self-end rounded-tr-none' : 'bg-white/5 text-white self-start rounded-tl-none border border-white/5'}`;
@@ -595,35 +711,22 @@
                 if (msg.type === "TEXT") innerPayloadMarkup += `<p class="text-xs font-semibold break-words mt-0.5">${msg.content}</p>`;
                 else if (msg.type === "IMAGE") innerPayloadMarkup += `<img src="${msg.content}" class="w-full rounded-xl mt-1.5 max-h-48 object-cover" onclick="window.open('${msg.content}', '_blank')">`;
                 else if (msg.type === "VIDEO") innerPayloadMarkup += `<video src="${msg.content}" controls class="w-full rounded-xl mt-1.5 max-h-48 bg-black"></video>`;
-                bubble.innerHTML = innerPayloadMarkup;
-                container.appendChild(bubble);
+                bubble.innerHTML = innerPayloadMarkup; container.appendChild(bubble);
             });
             if (chatIsOpen) container.scrollTop = container.scrollHeight;
         });
     }
 
-    function deleteChatMessage(msgId) {
-        if(confirm("Remove message?")) chatRef.child(msgId).remove();
-    }
-
+    function deleteChatMessage(msgId) { if(confirm("Remove message?")) chatRef.child(msgId).remove(); }
     function sendChatMessage() {
-        const input = document.getElementById('chatTextInput');
-        const textValue = input.value.trim();
-        if(!textValue) return;
+        const input = document.getElementById('chatTextInput'), textValue = input.value.trim(); if(!textValue) return;
         chatRef.push({ sender: currentUserProfileUsername, type: "TEXT", content: textValue, timestamp: firebase.database.ServerValue.TIMESTAMP }).then(() => { input.value = ""; });
     }
 
     function uploadChatMediaFile(mediaType) {
-        const inputId = mediaType === "IMAGE" ? "chatImageInput" : "chatVideoInput";
-        const fileSelector = document.getElementById(inputId);
-        const file = fileSelector.files[0];
-        if(!file) return;
-        document.getElementById('chatUploadLoaderAlert').classList.remove('hidden');
-        const reader = new FileReader();
-        reader.onload = () => {
-            chatRef.push({ sender: currentUserProfileUsername, type: mediaType, content: reader.result, timestamp: firebase.database.ServerValue.TIMESTAMP })
-            .then(() => { document.getElementById('chatUploadLoaderAlert').classList.add('hidden'); fileSelector.value = ""; });
-        };
+        const inputId = mediaType === "IMAGE" ? "chatImageInput" : "chatVideoInput", fileSelector = document.getElementById(inputId), file = fileSelector.files[0];
+        if(!file) return; document.getElementById('chatUploadLoaderAlert').classList.remove('hidden');
+        const reader = new FileReader(); reader.onload = () => { chatRef.push({ sender: currentUserProfileUsername, type: mediaType, content: reader.result, timestamp: firebase.database.ServerValue.TIMESTAMP }).then(() => { document.getElementById('chatUploadLoaderAlert').classList.add('hidden'); fileSelector.value = ""; }); };
         reader.readAsDataURL(file);
     }
 
@@ -637,19 +740,11 @@
     function handleAuthSubmit() {
         const email = document.getElementById('loginEmail').value.trim(), pass = document.getElementById('loginPassword').value, selectedProfile = document.getElementById('signUpNameSelect').value, errEl = document.getElementById('loginError');
         if(!email || !pass) return errEl.innerText = "Fill all fields.";
-        
         if(authMode === "SIGNUP") {
             if(!selectedProfile) return errEl.innerText = "Select athlete name.";
-            auth.createUserWithEmailAndPassword(email, pass).then((u) => { 
-                u.user.updateProfile({ displayName: selectedProfile }); 
-                // MARK NAME AS TAKEN
-                return profilesRef.child(selectedProfile).update({ isTaken: true });
-            }).catch(err => { errEl.innerText = err.message; });
-        } else {
-            auth.signInWithEmailAndPassword(email, pass).catch(err => { errEl.innerText = err.message; });
-        }
+            auth.createUserWithEmailAndPassword(email, pass).then((u) => { u.user.updateProfile({ displayName: selectedProfile }); return profilesRef.child(selectedProfile).update({ isTaken: true }); }).catch(err => { errEl.innerText = err.message; });
+        } else { auth.signInWithEmailAndPassword(email, pass).catch(err => { errEl.innerText = err.message; }); }
     }
-
     function handleLogout() { auth.signOut(); }
 
     function setup() {
@@ -661,39 +756,24 @@
     setup();
 
     function updateDropdowns() {
-        const adminSel = document.getElementById('pNameSelect'), signUpSel = document.getElementById('signUpNameSelect'); 
-        const allNames = Object.keys(profiles).sort();
-        
-        // Admin dropdown stays as is
+        const adminSel = document.getElementById('pNameSelect'), signUpSel = document.getElementById('signUpNameSelect'), allNames = Object.keys(profiles).sort();
         const adminOptions = '<option value="">-- SELECT NAME --</option>' + allNames.map(n => `<option value="${n}">${n}</option>`).join('');
-        
-        // Signup dropdown filters for non-taken names
-        const signUpOptions = '<option value="">-- SELECT NAME --</option>' + allNames
-            .filter(n => !profiles[n].isTaken) 
-            .map(n => `<option value="${n}">${n}</option>`).join('');
-            
-        if(adminSel) adminSel.innerHTML = adminOptions;
-        if(signUpSel) signUpSel.innerHTML = signUpOptions;
+        const signUpOptions = '<option value="">-- SELECT NAME --</option>' + allNames.filter(n => !profiles[n].isTaken).map(n => `<option value="${n}">${n}</option>`).join('');
+        if(adminSel) adminSel.innerHTML = adminOptions; if(signUpSel) signUpSel.innerHTML = signUpOptions;
     }
 
-    function releaseName(name) {
-        if(confirm(`Make "${name}" available for sign-up again?`)) {
-            profilesRef.child(name).update({ isTaken: false }).then(() => alert("Name Released."));
-        }
-    }
+    function releaseName(name) { if(confirm(`Make "${name}" available for sign-up again?`)) { profilesRef.child(name).update({ isTaken: false }).then(() => alert("Name Released.")); } }
 
     function render() {
         const body = document.getElementById('pBody'); if(!body) return;
         body.innerHTML = '';
         const yr = document.getElementById('viewYear').value, vM = document.getElementById('selMonth').value, vW = document.getElementById('selWeek').value;
         let winners = { WEEK: [], MONTH: [], YEAR: [], LIST: [], G_WEEK: [], G_MONTH: [], G_YEAR: [], A_WEEK: [], A_MONTH: [], A_YEAR: [] };
-
         for(let name in db[yr]) {
             let lp={n:name, s:[0,0,0,0,0,0], g:0, a:0, y:0, r:0, t:0, count:0};
             let pW={n:name, t:0}, pM={n:name, t:0}, pY={n:name, t:0};
             let gW={n:name, v:0}, gM={n:name, v:0}, gY={n:name, v:0};
             let aW={n:name, v:0}, aM={n:name, v:0}, aY={n:name, v:0};
-
             for(let m in db[yr][name]) {
                 for(let w in db[yr][name][m]) {
                     let d = db[yr][name][m][w]; if(!d) continue;
@@ -702,11 +782,7 @@
                     if(vM !== "" && vW !== "" && m === vM && w === vW) { pW.t += (d.total || 0); gW.v += (d.gV || 0); aW.v += (d.aV || 0); }
                     if(activeFilter==='YEAR' || (activeFilter==='MONTH' && m===vM) || (activeFilter==='WEEK' && m===vM && w===vW)) {
                         if(d.sc) d.sc.forEach((v,i) => lp.s[i] += v);
-                        lp.g += (d.gV || 0); 
-                        lp.a += (d.aV || 0); 
-                        lp.y += (d.yV || 0); 
-                        lp.r += (d.rV || 0); 
-                        lp.t += (d.total || 0); lp.count++; 
+                        lp.g += (d.gV || 0); lp.a += (d.aV || 0); lp.y += (d.yV || 0); lp.r += (d.rV || 0); lp.t += (d.total || 0); lp.count++; 
                     }
                 }
             }
@@ -720,9 +796,11 @@
             const vM = document.getElementById('selMonth').value;
             const vW = document.getElementById('selWeek').value;
             let shouldShow = (t === 'YEAR') || (t === 'MONTH' && vM !== "") || (t === 'WEEK' && vM !== "" && vW !== "");
+            const filteredWinners = winners[t].filter(player => player.t > 0);
+            const hasData = filteredWinners.length > 0;
 
-            if (shouldShow) {
-                const topMvp = winners[t].sort((a, b) => b.t - a.t)[0]?.n || "---";
+            if (shouldShow && hasData) {
+                const topMvp = filteredWinners.sort((a, b) => b.t - a.t)[0]?.n || "---";
                 const topScorer = winners[`G_${t}`].sort((a, b) => b.v - a.v)[0];
                 const topAssist = winners[`A_${t}`].sort((a, b) => b.v - a.v)[0];
 
@@ -730,13 +808,11 @@
                 document.getElementById(`goal-${t}`).innerText = topScorer?.v > 0 ? `${topScorer.n} (${topScorer.v})` : "---";
                 document.getElementById(`assist-${t}`).innerText = topAssist?.v > 0 ? `${topAssist.n} (${topAssist.v})` : "---";
                 
-                const mvpProf = profiles[topMvp];
+                const mvpProf = profiles[topMvp], gProf = profiles[topScorer?.n], aProf = profiles[topAssist?.n];
                 const mvpPhoto = typeof mvpProf === 'string' ? mvpProf : mvpProf?.photo;
-                const gProf = profiles[topScorer?.n];
                 const gPhoto = typeof gProf === 'string' ? gProf : gProf?.photo;
-                const aProf = profiles[topAssist?.n];
                 const aPhoto = typeof aProf === 'string' ? aProf : aProf?.photo;
-
+                
                 document.getElementById(`box-${t}`).innerHTML = mvpPhoto ? `<img src="${mvpPhoto}" class="award-img"><span class="mini-badge">👑 MVP</span>` : `👤<span class="mini-badge">👑 MVP</span>`;
                 document.getElementById(`img-goal-${t}`).innerHTML = gPhoto && topScorer?.v > 0 ? `<img src="${gPhoto}" class="award-img"><span class="mini-badge">⚽ GOALS</span>` : `👤<span class="mini-badge">⚽ GOALS</span>`;
                 document.getElementById(`img-assist-${t}`).innerHTML = aPhoto && topAssist?.v > 0 ? `<img src="${aPhoto}" class="award-img"><span class="mini-badge">🎯 ASST</span>` : `👤<span class="mini-badge">🎯 ASST</span>`;
@@ -744,7 +820,7 @@
                 document.getElementById(`name-${t}`).innerText = "---";
                 document.getElementById(`goal-${t}`).innerText = "---";
                 document.getElementById(`assist-${t}`).innerText = "---";
-                document.getElementById(`box-${t}`).innerHTML = `👤<span class="mini-badge">👑 MVP</span>`;
+                document.getElementById(`box-${t}`).innerHTML = `🏆<span class="mini-badge">👑 MVP</span>`;
                 document.getElementById(`img-goal-${t}`).innerHTML = `👤<span class="mini-badge">⚽ GOALS</span>`;
                 document.getElementById(`img-assist-${t}`).innerHTML = `👤<span class="mini-badge">🎯 ASST</span>`;
             }
@@ -763,13 +839,8 @@
     function saveStats() {
         const yr = document.getElementById('viewYear').value, name = document.getElementById('pNameSelect').value, m = document.getElementById('inMonth').value, w = document.getElementById('inWeek').value;
         if(!name) return alert("Select Player");
-        
         const sc = [1,2,3,4,5,6].map(idx => parseInt(document.getElementById('s'+idx).value) || 0);
-        const gV = parseInt(document.getElementById('gA').value) || 0;
-        const aV = parseInt(document.getElementById('aA').value) || 0;
-        const yV = parseInt(document.getElementById('yCard').value) || 0;
-        const rV = parseInt(document.getElementById('rCard').value) || 0;
-        
+        const gV = parseInt(document.getElementById('gA').value) || 0, aV = parseInt(document.getElementById('aA').value) || 0, yV = parseInt(document.getElementById('yCard').value) || 0, rV = parseInt(document.getElementById('rCard').value) || 0;
         const total = sc.reduce((a,b)=>a+b, 0) + (gV*6) + (aV*4);
         dbRef.child(`${yr}/${name}/${m}/${w}`).set({sc, gV, aV, yV, rV, total}).then(() => { alert("Saved!"); render(); });
     }
@@ -777,138 +848,85 @@
     function editEntry(name) {
         const yr = document.getElementById('viewYear').value, m = document.getElementById('selMonth').value, w = document.getElementById('selWeek').value;
         if(!m || !w) return alert("Select Month & Week filter");
-        const data = db[yr]?.[name]?.[m]?.[w];
-        if(!data) return alert("No record found.");
+        const data = db[yr]?.[name]?.[m]?.[w]; if(!data) return alert("No record found.");
         document.getElementById('pNameSelect').value = name;
         if(data.sc) data.sc.forEach((v, i) => document.getElementById(`s${i+1}`).value = v);
-        document.getElementById('gA').value = data.gV || 0; 
-        document.getElementById('aA').value = data.aV || 0;
-        document.getElementById('yCard').value = data.yV || 0; 
-        document.getElementById('rCard').value = data.rV || 0;
+        document.getElementById('gA').value = data.gV || 0; document.getElementById('aA').value = data.aV || 0;
+        document.getElementById('yCard').value = data.yV || 0; document.getElementById('rCard').value = data.rV || 0;
     }
 
-    function deleteEntry(name) {
-        const yr = document.getElementById('viewYear').value, m = document.getElementById('selMonth').value, w = document.getElementById('selWeek').value;
-        if(confirm(`Delete record?`)) dbRef.child(`${yr}/${name}/${m}/${w}`).remove();
-    }
-
+    function deleteEntry(name) { const yr = document.getElementById('viewYear').value, m = document.getElementById('selMonth').value, w = document.getElementById('selWeek').value; if(confirm(`Delete record?`)) dbRef.child(`${yr}/${name}/${m}/${w}`).remove(); }
+    
     function registerPlayer() {
         const name = document.getElementById('regName').value.toUpperCase().trim(), file = document.getElementById('regPhoto').files[0];
         if(!name || !file) return alert("Fill data");
-        const reader = new FileReader();
-        reader.onload = () => profilesRef.child(name).set({ photo: reader.result, isTaken: false }).then(() => alert("Saved Profile!"));
+        const reader = new FileReader(); reader.onload = () => profilesRef.child(name).set({ photo: reader.result, isTaken: false }).then(() => alert("Saved Profile!"));
         reader.readAsDataURL(file);
     }
 
     function openReport(playerName) {
-        const yr = document.getElementById('viewYear').value;
-        const vM = document.getElementById('selMonth').value;
-        const vW = document.getElementById('selWeek').value;
-        
+        const yr = document.getElementById('viewYear').value, vM = document.getElementById('selMonth').value, vW = document.getElementById('selWeek').value;
         let rep = { s: [0,0,0,0,0,0], g: 0, a: 0, y: 0, r: 0, t: 0, count: 0 };
-        
         if (db[yr] && db[yr][playerName]) {
             for (let m in db[yr][playerName]) {
                 for (let w in db[yr][playerName][m]) {
                     if (activeFilter === 'YEAR' || (activeFilter === 'MONTH' && m === vM) || (activeFilter === 'WEEK' && m === vM && w === vW)) {
-                        let d = db[yr][playerName][m][w];
-                        if(d.sc) d.sc.forEach((v, i) => rep.s[i] += v);
+                        let d = db[yr][playerName][m][w]; if(d.sc) d.sc.forEach((v, i) => rep.s[i] += v);
                         rep.g += (d.gV || 0); rep.a += (d.aV || 0); rep.y += (d.yV || 0); rep.r += (d.rV || 0); rep.t += (d.total || 0); rep.count++;
                     }
                 }
             }
         }
-
         document.getElementById('reportName').innerText = playerName;
-        const profile = profiles[playerName];
-        const photo = typeof profile === 'string' ? profile : profile?.photo;
+        const profile = profiles[playerName], photo = typeof profile === 'string' ? profile : profile?.photo;
         document.getElementById('reportPhoto').querySelector('img').src = photo || 'https://via.placeholder.com/150';
-        document.getElementById('repTotal').innerText = rep.t;
-        document.getElementById('repGoals').innerText = rep.g;
-        document.getElementById('repAssists').innerText = rep.a;
-        document.getElementById('repYellow').innerText = rep.y; 
-        document.getElementById('repRed').innerText = rep.r;    
-        document.getElementById('repMatches').innerText = `${rep.count} MATCHES`;
-
-        rep.s.forEach((val, i) => {
-            const avg = rep.count > 0 ? (val / rep.count).toFixed(1) : "-";
-            document.getElementById(`repS${i+1}`).innerText = avg;
-        });
-
-        const avgTotal = rep.count > 0 ? (rep.s.reduce((a,b)=>a+b, 0) / rep.count) : 0;
-        const starCount = Math.min(5, Math.floor(avgTotal / 6));
-        let starHtml = "";
-        for(let s=1; s<=5; s++) starHtml += s <= starCount ? `<span class="text-yellow-500 star-glow text-xl">★</span>` : `<span class="text-white/10 text-xl">★</span>`;
-        document.getElementById('repStars').innerHTML = starHtml;
-        document.getElementById('reportModal').style.display = 'flex';
+        document.getElementById('repTotal').innerText = rep.t; document.getElementById('repGoals').innerText = rep.g; document.getElementById('repAssists').innerText = rep.a;
+        document.getElementById('repYellow').innerText = rep.y; document.getElementById('repRed').innerText = rep.r; document.getElementById('repMatches').innerText = `${rep.count} MATCHES`;
+        rep.s.forEach((val, i) => { document.getElementById(`repS${i+1}`).innerText = rep.count > 0 ? (val / rep.count).toFixed(1) : "-"; });
+        const avgTotal = rep.count > 0 ? (rep.s.reduce((a,b)=>a+b, 0) / rep.count) : 0, starCount = Math.min(5, Math.floor(avgTotal / 6));
+        let starHtml = ""; for(let s=1; s<=5; s++) starHtml += s <= starCount ? `<span class="text-yellow-500 star-glow text-xl">★</span>` : `<span class="text-white/10 text-xl">★</span>`;
+        document.getElementById('repStars').innerHTML = starHtml; document.getElementById('reportModal').style.display = 'flex';
     }
 
     function closeReport(e) { if(!e || e.target.id === 'reportModal') document.getElementById('reportModal').style.display = 'none'; }
-    
-    function openHistorySelector() { 
-        document.getElementById('histYear').innerHTML = document.getElementById('viewYear').innerHTML; 
-        document.getElementById('histMonth').innerHTML = document.getElementById('selMonth').innerHTML; 
-        document.getElementById('histYear').value = document.getElementById('viewYear').value;
-        document.getElementById('histMonth').value = document.getElementById('selMonth').value || "0";
-        document.getElementById('historyModal').style.display = 'flex'; 
-    }
-    
+    function openHistorySelector() { document.getElementById('histYear').innerHTML = document.getElementById('viewYear').innerHTML; document.getElementById('histMonth').innerHTML = document.getElementById('selMonth').innerHTML; document.getElementById('histYear').value = document.getElementById('viewYear').value; document.getElementById('histMonth').value = document.getElementById('selMonth').value || "0"; document.getElementById('historyModal').style.display = 'flex'; }
     function closeHistory() { document.getElementById('historyModal').style.display = 'none'; }
 
     function fetchSpecificHistory() {
-        // 1. Get Selections from history form
-        const yr = document.getElementById('histYear').value;
-        const mo = document.getElementById('histMonth').value;
-        const wk = document.getElementById('histWeek').value;
-        const playerName = document.getElementById('reportName').innerText; // The athlete currently in Pic 1
-
-        // 2. Update the background filters (Dashboard sync)
-        document.getElementById('viewYear').value = yr; 
-        document.getElementById('selMonth').value = mo; 
-        document.getElementById('selWeek').value = wk;
-        activeFilter = 'WEEK';
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
-        document.getElementById('selWeek').classList.add('tab-active');
-
-        // 3. Find specific record for this player
+        const yr = document.getElementById('histYear').value, mo = document.getElementById('histMonth').value, wk = document.getElementById('histWeek').value, playerName = document.getElementById('reportName').innerText;
+        document.getElementById('viewYear').value = yr; document.getElementById('selMonth').value = mo; document.getElementById('selWeek').value = wk;
+        activeFilter = 'WEEK'; document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active')); document.getElementById('selWeek').classList.add('tab-active');
         const specificData = db[yr]?.[playerName]?.[mo]?.[wk];
-
         if (specificData) {
-            // 4. Update Pic 1 labels with the selected week's data
             document.getElementById('repTotal').innerText = specificData.total || 0;
             document.getElementById('repGoals').innerText = specificData.gV || 0;
             document.getElementById('repAssists').innerText = specificData.aV || 0;
             document.getElementById('repYellow').innerText = specificData.yV || 0;
             document.getElementById('repRed').innerText = specificData.rV || 0;
             document.getElementById('repMatches').innerText = `WEEK ${wk} RECORD`;
-
-            // 5. Update Skill Breakdown for Pic 1
             if (specificData.sc) {
-                specificData.sc.forEach((val, i) => {
-                    document.getElementById(`repS${i+1}`).innerText = val.toFixed(1);
-                });
-
-                // Update Stars based on this specific week
-                const avgTotal = specificData.sc.reduce((a, b) => a + b, 0);
-                const starCount = Math.min(5, Math.floor(avgTotal / 6));
-                let starHtml = "";
-                for (let s = 1; s <= 5; s++) {
-                    starHtml += s <= starCount ? 
-                        `<span class="text-yellow-500 star-glow text-xl">★</span>` : 
-                        `<span class="text-white/10 text-xl">★</span>`;
-                }
+                specificData.sc.forEach((val, i) => { document.getElementById(`repS${i+1}`).innerText = val.toFixed(1); });
+                const avgTotal = specificData.sc.reduce((a, b) => a + b, 0), starCount = Math.min(5, Math.floor(avgTotal / 6));
+                let starHtml = ""; for (let s = 1; s <= 5; s++) starHtml += s <= starCount ? `<span class="text-yellow-500 star-glow text-xl">★</span>` : `<span class="text-white/10 text-xl">★</span>`;
                 document.getElementById('repStars').innerHTML = starHtml;
             }
-            
-            // Re-render dashboard behind modal
-            render(); 
-            closeHistory();
-        } else {
-            alert(`No history found for ${playerName} in ${MONTHS[mo]} Week ${wk}`);
-        }
+            render(); closeHistory();
+        } else { alert(`No history found for ${playerName} in ${MONTHS[mo]} Week ${wk}`); }
     }
 
-    function switchAdminTab(t) { document.getElementById('regForm').classList.toggle('hidden', t !== 'reg'); document.getElementById('statsForm').classList.toggle('hidden', t !== 'data'); }
+    function switchAdminTab(t) { 
+        document.getElementById('regForm').classList.toggle('hidden', t !== 'reg'); 
+        document.getElementById('statsForm').classList.toggle('hidden', t !== 'data'); 
+        document.getElementById('payForm').classList.toggle('hidden', t !== 'pay');
+        document.getElementById('payAnForm').classList.toggle('hidden', t !== 'payAn');
+        const tabs = ['Data', 'Reg', 'Pay', 'PayAn'];
+        tabs.forEach(tab => {
+            const el = document.getElementById('tab' + tab);
+            if(el) el.style.color = (t.toLowerCase() === tab.toLowerCase() || (t === 'payAn' && tab === 'PayAn')) ? '#fbbf24' : '#6b7280';
+        });
+        if(t === 'pay') document.getElementById('payPlayerSelect').innerHTML = document.getElementById('pNameSelect').innerHTML;
+        if(t === 'payAn') { document.getElementById('anYear').innerHTML = document.getElementById('viewYear').innerHTML; document.getElementById('anMonth').innerHTML = document.getElementById('selMonth').innerHTML; updatePaymentReport(); }
+    }
     
     function changeFilter(m) { 
         activeFilter = m; document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active')); 
