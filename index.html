@@ -4,10 +4,330 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Golaha Laba Gole - Elite Analytics & Global Chat</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+    <script src="https://cdn.tailwindcss.com">
+function toggleProfileSettings() {
+    const modal = document.getElementById('profileSettingsModal');
+
+    if (modal.classList.contains('hidden')) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    } else {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+}
+
+async function saveProfileSettings() {
+    const user = auth.currentUser;
+
+    if (!user) {
+        alert("User not logged in");
+        return;
+    }
+
+    const newName = document.getElementById('newDisplayName').value.trim();
+    const newPassword = document.getElementById('newPassword').value.trim();
+    const newPhoto = document.getElementById('newProfilePhoto').files[0];
+
+    try {
+
+        if (newName) {
+            await user.updateProfile({
+                displayName: newName
+            });
+
+            const oldProfile = profiles[currentUserProfileUsername] || {};
+
+            await profilesRef.child(newName).set({
+                ...oldProfile,
+                isTaken: true
+            });
+
+            await profilesRef.child(currentUserProfileUsername).remove();
+
+            currentUserProfileUsername = newName;
+
+            document.getElementById('welcomeMessage').innerText = `👋 WELCOME, ${newName}`;
+        }
+
+        if (newPhoto) {
+            const reader = new FileReader();
+
+            reader.onload = async function(e) {
+                const imageBase64 = e.target.result;
+
+                const existingProfile = profiles[currentUserProfileUsername] || {};
+
+                await profilesRef.child(currentUserProfileUsername).update({
+                    ...existingProfile,
+                    photo: imageBase64
+                });
+
+                document.getElementById('avatarImg').src = imageBase64;
+                document.getElementById('avatarImg').classList.remove('hidden');
+                document.getElementById('avatarPlaceholder').classList.add('hidden');
+            };
+
+            reader.readAsDataURL(newPhoto);
+        }
+
+        if (newPassword) {
+            await user.updatePassword(newPassword);
+        }
+
+        alert("Profile updated successfully!");
+
+        toggleProfileSettings();
+
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+</script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js">
+function toggleProfileSettings() {
+    const modal = document.getElementById('profileSettingsModal');
+
+    if (modal.classList.contains('hidden')) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    } else {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+}
+
+async function saveProfileSettings() {
+    const user = auth.currentUser;
+
+    if (!user) {
+        alert("User not logged in");
+        return;
+    }
+
+    const newName = document.getElementById('newDisplayName').value.trim();
+    const newPassword = document.getElementById('newPassword').value.trim();
+    const newPhoto = document.getElementById('newProfilePhoto').files[0];
+
+    try {
+
+        if (newName) {
+            await user.updateProfile({
+                displayName: newName
+            });
+
+            const oldProfile = profiles[currentUserProfileUsername] || {};
+
+            await profilesRef.child(newName).set({
+                ...oldProfile,
+                isTaken: true
+            });
+
+            await profilesRef.child(currentUserProfileUsername).remove();
+
+            currentUserProfileUsername = newName;
+
+            document.getElementById('welcomeMessage').innerText = `👋 WELCOME, ${newName}`;
+        }
+
+        if (newPhoto) {
+            const reader = new FileReader();
+
+            reader.onload = async function(e) {
+                const imageBase64 = e.target.result;
+
+                const existingProfile = profiles[currentUserProfileUsername] || {};
+
+                await profilesRef.child(currentUserProfileUsername).update({
+                    ...existingProfile,
+                    photo: imageBase64
+                });
+
+                document.getElementById('avatarImg').src = imageBase64;
+                document.getElementById('avatarImg').classList.remove('hidden');
+                document.getElementById('avatarPlaceholder').classList.add('hidden');
+            };
+
+            reader.readAsDataURL(newPhoto);
+        }
+
+        if (newPassword) {
+            await user.updatePassword(newPassword);
+        }
+
+        alert("Profile updated successfully!");
+
+        toggleProfileSettings();
+
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+</script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js">
+function toggleProfileSettings() {
+    const modal = document.getElementById('profileSettingsModal');
+
+    if (modal.classList.contains('hidden')) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    } else {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+}
+
+async function saveProfileSettings() {
+    const user = auth.currentUser;
+
+    if (!user) {
+        alert("User not logged in");
+        return;
+    }
+
+    const newName = document.getElementById('newDisplayName').value.trim();
+    const newPassword = document.getElementById('newPassword').value.trim();
+    const newPhoto = document.getElementById('newProfilePhoto').files[0];
+
+    try {
+
+        if (newName) {
+            await user.updateProfile({
+                displayName: newName
+            });
+
+            const oldProfile = profiles[currentUserProfileUsername] || {};
+
+            await profilesRef.child(newName).set({
+                ...oldProfile,
+                isTaken: true
+            });
+
+            await profilesRef.child(currentUserProfileUsername).remove();
+
+            currentUserProfileUsername = newName;
+
+            document.getElementById('welcomeMessage').innerText = `👋 WELCOME, ${newName}`;
+        }
+
+        if (newPhoto) {
+            const reader = new FileReader();
+
+            reader.onload = async function(e) {
+                const imageBase64 = e.target.result;
+
+                const existingProfile = profiles[currentUserProfileUsername] || {};
+
+                await profilesRef.child(currentUserProfileUsername).update({
+                    ...existingProfile,
+                    photo: imageBase64
+                });
+
+                document.getElementById('avatarImg').src = imageBase64;
+                document.getElementById('avatarImg').classList.remove('hidden');
+                document.getElementById('avatarPlaceholder').classList.add('hidden');
+            };
+
+            reader.readAsDataURL(newPhoto);
+        }
+
+        if (newPassword) {
+            await user.updatePassword(newPassword);
+        }
+
+        alert("Profile updated successfully!");
+
+        toggleProfileSettings();
+
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+</script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js">
+function toggleProfileSettings() {
+    const modal = document.getElementById('profileSettingsModal');
+
+    if (modal.classList.contains('hidden')) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    } else {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+}
+
+async function saveProfileSettings() {
+    const user = auth.currentUser;
+
+    if (!user) {
+        alert("User not logged in");
+        return;
+    }
+
+    const newName = document.getElementById('newDisplayName').value.trim();
+    const newPassword = document.getElementById('newPassword').value.trim();
+    const newPhoto = document.getElementById('newProfilePhoto').files[0];
+
+    try {
+
+        if (newName) {
+            await user.updateProfile({
+                displayName: newName
+            });
+
+            const oldProfile = profiles[currentUserProfileUsername] || {};
+
+            await profilesRef.child(newName).set({
+                ...oldProfile,
+                isTaken: true
+            });
+
+            await profilesRef.child(currentUserProfileUsername).remove();
+
+            currentUserProfileUsername = newName;
+
+            document.getElementById('welcomeMessage').innerText = `👋 WELCOME, ${newName}`;
+        }
+
+        if (newPhoto) {
+            const reader = new FileReader();
+
+            reader.onload = async function(e) {
+                const imageBase64 = e.target.result;
+
+                const existingProfile = profiles[currentUserProfileUsername] || {};
+
+                await profilesRef.child(currentUserProfileUsername).update({
+                    ...existingProfile,
+                    photo: imageBase64
+                });
+
+                document.getElementById('avatarImg').src = imageBase64;
+                document.getElementById('avatarImg').classList.remove('hidden');
+                document.getElementById('avatarPlaceholder').classList.add('hidden');
+            };
+
+            reader.readAsDataURL(newPhoto);
+        }
+
+        if (newPassword) {
+            await user.updatePassword(newPassword);
+        }
+
+        alert("Profile updated successfully!");
+
+        toggleProfileSettings();
+
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+</script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;700;900&family=Inter:wght@400;700;900&display=swap');
@@ -115,7 +435,9 @@
     <div class="flex flex-col lg:flex-row gap-4 mb-10 items-stretch">
         <div class="flex-1">
             <div id="welcomeContainer" class="flex items-center gap-4 w-full bg-yellow-500/10 py-4 px-6 rounded-3xl border border-yellow-500/20">
-                <div id="userAvatar" class="w-12 h-12 rounded-full border-2 border-yellow-500 overflow-hidden flex-shrink-0 bg-black/40 flex items-center justify-center">
+                <div id="userAvatar"
+                     onclick="toggleProfileSettings()"
+                     class="w-12 h-12 rounded-full border-2 border-yellow-500 overflow-hidden flex-shrink-0 bg-black/40 flex items-center justify-center cursor-pointer hover:scale-105 transition">
                     <span id="avatarPlaceholder" class="text-xl">👤</span>
                     <img id="avatarImg" src="" class="hidden w-full h-full object-cover">
                 </div>
@@ -125,25 +447,32 @@
             </div>
         </div>
         
-        <div id="attendancePollContainer" class="glass-panel p-6 flex flex-col md:flex-row items-center gap-6 border-yellow-500/30 flex-[2] hidden">
-            <div class="text-center md:text-left">
-                <h4 class="text-xs font-black text-gray-500 uppercase tracking-widest mb-1">Attendance Poll</h4>
-                <p class="text-xl font-black oswald text-white uppercase italic">Asc dhamaan akhyaarta caawa waa habeenkaan ciyaaraynay hore la loo xaadiro </p>
-            </div>
-            <div class="flex items-center gap-3">
-                <button onclick="castVote('JOOGE')" class="px-6 py-3 bg-green-600/20 hover:bg-green-600 border border-green-500/30 rounded-2xl text-green-400 hover:text-white font-black oswald transition uppercase tracking-widest">Jooge</button>
-                <button onclick="castVote('MAQANE')" class="px-6 py-3 bg-red-600/20 hover:bg-red-600 border border-red-500/30 rounded-2xl text-red-400 hover:text-white font-black oswald transition uppercase tracking-widest">Maqane</button>
-            </div>
-            <div class="flex items-center gap-6 ml-auto border-l border-white/10 pl-6">
-                <div class="text-center cursor-pointer group" onclick="showVoterList('JOOGE')">
-                    <p class="text-[9px] font-bold text-gray-500 uppercase">Jooge</p>
-                    <p id="countJooge" class="text-2xl font-black text-green-500 group-hover:scale-110 transition">0</p>
+        <div id="attendancePollContainer" class="glass-panel p-6 flex flex-col gap-4 border-yellow-500/30 flex-[2] hidden">
+            <div class="flex flex-col xl:flex-row items-center gap-6 w-full">
+                <div class="text-center xl:text-left flex-1">
+                    <h4 class="text-xs font-black text-gray-500 uppercase tracking-widest mb-1">Attendance Poll</h4>
+                    <p class="text-sm font-black oswald text-white uppercase italic">Asc dhamaan akhyaarta caawa waa habeenkaan ciyaaraynay hore la loo xaadiro </p>
                 </div>
-                <div class="text-center cursor-pointer group" onclick="showVoterList('MAQANE')">
-                    <p class="text-[9px] font-bold text-gray-500 uppercase">Maqane</p>
-                    <p id="countMaqane" class="text-2xl font-black text-red-500 group-hover:scale-110 transition">0</p>
+                <div class="flex items-center gap-3">
+                    <button onclick="castVote('JOOGE')" class="px-6 py-3 bg-green-600/20 hover:bg-green-600 border border-green-500/30 rounded-2xl text-green-400 hover:text-white font-black oswald transition uppercase tracking-widest">Jooge</button>
+                    <button onclick="castVote('MAQANE')" class="px-6 py-3 bg-red-600/20 hover:bg-red-600 border border-red-500/30 rounded-2xl text-red-400 hover:text-white font-black oswald transition uppercase tracking-widest">Maqane</button>
                 </div>
-                <button onclick="showVoterList('NONE')" class="bg-white/5 hover:bg-white/10 p-3 rounded-xl border border-white/10 text-[10px] font-black text-yellow-500 uppercase tracking-tighter transition">View No Response</button>
+                <div class="flex items-center gap-6 border-l border-white/10 pl-6">
+                    <div class="text-center cursor-pointer group" onclick="showVoterList('JOOGE')">
+                        <p class="text-[9px] font-bold text-gray-500 uppercase">Jooge</p>
+                        <p id="countJooge" class="text-2xl font-black text-green-500 group-hover:scale-110 transition">0</p>
+                    </div>
+                    <div class="text-center cursor-pointer group" onclick="showVoterList('MAQANE')">
+                        <p class="text-[9px] font-bold text-gray-500 uppercase">Maqane</p>
+                        <p id="countMaqane" class="text-2xl font-black text-red-500 group-hover:scale-110 transition">0</p>
+                    </div>
+                    <button onclick="showVoterList('NONE')" class="bg-white/5 hover:bg-white/10 p-3 rounded-xl border border-white/10 text-[10px] font-black text-yellow-500 uppercase tracking-tighter transition">View No Response</button>
+                </div>
+            </div>
+            
+            <div id="liveVoteFeedSection" class="w-full border-t border-white/10 pt-4 mt-2 hidden admin-only">
+                <h4 class="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-3">Live Vote Feed</h4>
+                <div id="inlineVoteFeed" class="flex flex-wrap gap-2 max-h-[120px] overflow-y-auto chat-scroll pr-2"></div>
             </div>
         </div>
     </div>
@@ -424,7 +753,6 @@
 </div>
 
 <script>
-    // Validation Configuration mapping exact requirements
     const validationRules = {
         's1': { max: 2, text: '0 or 2' }, 
         's2': { max: 3, text: '0, 1, 2 or 3' },
@@ -435,7 +763,6 @@
         's7': { max: 10, text: '0, 1, 2, 3, 4, 5, 6, 7, 8, 9 or 10' }
     };
 
-    // New skill validator function
     function validateSkill(id) {
         const el = document.getElementById(id);
         if (el.value === "") return;
@@ -444,12 +771,11 @@
         const rule = validationRules[id];
         let isInvalid = isNaN(val) || val < 0 || val > rule.max;
         
-        // Strict logic for s1 to enforce only 0 and 2 (as requested)
         if (id === 's1' && val === 1) isInvalid = true;
 
         if (isInvalid) {
             alert(`You entered an unallowed number. For this field, your entry must be ${rule.text}.`);
-            el.value = ""; // Clears the invalid input automatically
+            el.value = ""; 
         }
     }
 
@@ -475,6 +801,7 @@
     const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
     let db = {}, profiles = {}, activeFilter = 'YEAR', votes = {};
     let isUserAdmin = false;
+    let isFinanceUser = false;
     let authMode = "LOGIN";
     let currentUserProfileUsername = "Anonymous";
     let currentFee = 10;
@@ -519,16 +846,54 @@
                 render();
             });
 
-            const admins = ["admin@golaha.com", "admin@gmail.com", "moha@golaha.com", "labagole@admin.com"];
+            const admins = [
+                "admin@golaha.com",
+                "admin@gmail.com",
+                "moha@golaha.com",
+                "labagole@admin.com",
+                "ahmedgurey@golaha.com"
+            ];
+            const financeUsers = ["cashier@golaha.com"];
+            const limitedAdmins = ["sacadcabdale@golaha.com"];
+
             isUserAdmin = admins.includes(user.email.toLowerCase());
-            if (isUserAdmin) {
+            isFinanceUser = financeUsers.includes(user.email.toLowerCase());
+            const isLimitedAdmin = limitedAdmins.includes(user.email.toLowerCase());
+
+            if (isUserAdmin || isLimitedAdmin) {
                 mainBody.setAttribute('data-role', 'admin');
                 adminPanel.classList.remove('admin-only');
                 mainTableArea.classList.replace('lg:col-span-12', 'lg:col-span-9');
+
+                if (isLimitedAdmin) {
+
+                    // Hide payment + analytics + attendance poll controls
+                    document.getElementById('tabPay').style.display = 'none';
+                    document.getElementById('tabPayAn').style.display = 'none';
+
+                    const pollSection = document.querySelector('.border-t.border-white\/10.mt-6.pt-4.space-y-4');
+                    if (pollSection) pollSection.style.display = 'none';
+
+                    setTimeout(() => {
+                        document.getElementById('payForm').classList.add('hidden');
+                        document.getElementById('payAnForm').classList.add('hidden');
+                    }, 50);
+                }
+
             } else {
                 mainBody.removeAttribute('data-role');
                 adminPanel.classList.add('admin-only');
                 mainTableArea.classList.replace('lg:col-span-9', 'lg:col-span-12');
+                if (isFinanceUser) {
+                    adminPanel.classList.remove('admin-only');
+                    mainTableArea.classList.replace('lg:col-span-12', 'lg:col-span-9');
+                    switchAdminTab('pay');
+                    setTimeout(() => {
+                        document.getElementById('statsForm').classList.add('hidden');
+                        document.getElementById('regForm').classList.add('hidden');
+                        document.getElementById('payForm').classList.remove('hidden');
+                    }, 50);
+                }
             }
 
             dbRef.on('value', snapshot => { db = snapshot.val() || {}; render(); });
@@ -546,11 +911,17 @@
                 const settings = s.val() || {};
                 const pollVis = settings.pollVisible || false;
                 const pollContainer = document.getElementById('attendancePollContainer');
+                const liveFeedSection = document.getElementById('liveVoteFeedSection');
                 const pollToggle = document.getElementById('pollVisibilityToggle');
                 
                 if (pollToggle) pollToggle.checked = pollVis;
                 if (pollVis || isUserAdmin) pollContainer.classList.remove('hidden');
                 else pollContainer.classList.add('hidden');
+
+                if (liveFeedSection) {
+                    if (isUserAdmin) liveFeedSection.classList.remove('hidden');
+                    else liveFeedSection.classList.add('hidden');
+                }
 
                 const isVisible = settings.reportVisible || false;
                 const reportBtn = document.getElementById('publicReportBtn');
@@ -575,7 +946,7 @@
     }
 
     function updateGlobalFee(val) {
-        if(!isUserAdmin) return;
+        if(!(isUserAdmin || isFinanceUser)) return;
         paymentsRef.update({ globalFee: parseInt(val) || 0 });
     }
 
@@ -950,11 +1321,13 @@
     function closeReport(e) { if(!e || e.target.id === 'reportModal') document.getElementById('reportModal').style.display = 'none'; }
 
     function switchAdminTab(t) {
-        document.getElementById('regForm').classList.toggle('hidden', t !== 'reg');
-        document.getElementById('statsForm').classList.toggle('hidden', t !== 'data');
+        if(isFinanceUser && !isUserAdmin && (t === 'data' || t === 'reg')) return;
+        document.getElementById('regForm').classList.toggle('hidden', t !== 'reg' || (isFinanceUser && !isUserAdmin));
+        document.getElementById('statsForm').classList.toggle('hidden', t !== 'data' || (isFinanceUser && !isUserAdmin));
         document.getElementById('payForm').classList.toggle('hidden', t !== 'pay');
         document.getElementById('payAnForm').classList.toggle('hidden', t !== 'payAn');
         const tabs = ['Data', 'Reg', 'Pay', 'PayAn'];
+        if(isFinanceUser && !isUserAdmin){ document.getElementById('tabData').style.display='none'; document.getElementById('tabReg').style.display='none'; }
         tabs.forEach(tab => {
             const el = document.getElementById('tab' + tab);
             if(el) el.style.color = (t.toLowerCase() === tab.toLowerCase() || (t === 'payAn' && tab === 'PayAn')) ? '#fbbf24' : '#6b7280';
@@ -1069,18 +1442,68 @@
 
     function castVote(status) {
         if(!currentUserProfileUsername || currentUserProfileUsername === "Anonymous") return alert("Please authenticating session.");
-        votesRef.child(currentUserProfileUsername).set(status);
+        votesRef.child(currentUserProfileUsername).set({
+            status: status,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        });
     }
 
+    // Dynamic Live Inline Vote Feed populator with stacked name and detailed seconds-precise timestamp
     function updateAttendancePollUI() {
         let jooge = 0, maqane = 0;
+        const feedContainer = document.getElementById('inlineVoteFeed');
+        if (feedContainer) feedContainer.innerHTML = "";
+        
+        const voteArray = [];
+        
         for(let key in votes) {
-            if(votes[key] === 'JOOGE') jooge++;
-            if(votes[key] === 'MAQANE') maqane++;
+            const voteData = typeof votes[key] === 'object' ? (votes[key].status ? votes[key] : { status: votes[key], timestamp: null }) : { status: votes[key], timestamp: null };
+            const voteStatus = voteData.status;
+            
+            if(voteStatus === 'JOOGE') jooge++;
+            if(voteStatus === 'MAQANE') maqane++;
+            
+            voteArray.push({ name: key, status: voteStatus, time: voteData.timestamp });
         }
+        
         const cJ = document.getElementById('countJooge'), cM = document.getElementById('countMaqane');
         if(cJ) cJ.innerText = jooge;
         if(cM) cM.innerText = maqane;
+        
+        // Sort with newest timestamps appearing first
+        voteArray.sort((a, b) => (b.time || 0) - (a.time || 0));
+        
+        if (feedContainer) {
+            if(voteArray.length === 0) {
+                feedContainer.innerHTML = `<span class="text-xs text-gray-500 font-bold tracking-wide uppercase italic p-1">No responses captured for this session yet.</span>`;
+            } else {
+                voteArray.forEach(v => {
+                    // Generates exact format with seconds included: e.g., 09:25:30 AM
+                    let timeStr = '--:--:-- --';
+                    if (v.time) {
+                        const dateObj = new Date(v.time);
+                        let hours = dateObj.getHours();
+                        const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+                        const seconds = String(dateObj.getSeconds()).padStart(2, '0');
+                        const ampm = hours >= 12 ? 'PM' : 'AM';
+                        hours = hours % 12;
+                        hours = hours ? hours : 12; // the hour '0' should be '12'
+                        const hoursStr = String(hours).padStart(2, '0');
+                        timeStr = `${hoursStr}:${minutes}:${seconds} ${ampm}`;
+                    }
+                    
+                    const isJooge = v.status === 'JOOGE';
+                    
+                    const badge = document.createElement('div');
+                    badge.className = `flex flex-col items-start min-w-[120px] px-3 py-2 rounded-xl border ${isJooge ? 'bg-green-500/10 border-green-500/20' : 'bg-red-500/10 border-red-500/20'}`;
+                    badge.innerHTML = `
+                        <span class="text-[11px] font-black uppercase tracking-wider ${isJooge ? 'text-green-400' : 'text-red-400'}">${v.name}</span>
+                        <span class="text-[9px] font-medium text-gray-400 mt-0.5 tracking-tight">${timeStr}</span>
+                    `;
+                    feedContainer.appendChild(badge);
+                });
+            }
+        }
     }
 
     function showVoterList(type) {
@@ -1095,7 +1518,7 @@
                 if (!votes[name]) {
                     const profile = profiles[name], photo = typeof profile === 'string' ? profile : profile?.photo;
                     const div = document.createElement('div');
-                    div.className = "flex items-center gap-3 p-3 bg-white/5 rounded-2xl border border-white/5 mb-2";
+                    div.className = "flex items-center gap-3 p-3 bg-white/5 rounded-2xl border border-white/10 mb-2";
                     div.innerHTML = `<div class="w-10 h-10 rounded-full border border-white/10 overflow-hidden"><img src="${photo || 'https://via.placeholder.com/50'}" class="w-full h-full object-cover"></div><span class="text-xs font-black text-white uppercase oswald">${name}</span>`;
                     list.appendChild(div);
                 }
@@ -1103,11 +1526,32 @@
         } else {
             title.innerText = type === 'JOOGE' ? "Jooge Attendees" : "Maqane Absentees";
             for(let name in votes) {
-                if(votes[name] === type) {
+                const voteData = typeof votes[name] === 'object' ? votes[name] : { status: votes[name], timestamp: null };
+                
+                if(voteData.status === type) {
                     const profile = profiles[name], photo = typeof profile === 'string' ? profile : profile?.photo;
+                    let timeStr = '--:--';
+                    if (voteData.timestamp) {
+                        const d = new Date(voteData.timestamp);
+                        let h = d.getHours();
+                        const m = String(d.getMinutes()).padStart(2,'0');
+                        const s = String(d.getSeconds()).padStart(2,'0');
+                        const ampm = h >= 12 ? 'PM' : 'AM';
+                        h = h % 12 || 12;
+                        timeStr = `${String(h).padStart(2,'0')}:${m}:${s} ${ampm}`;
+                    }
+                    
                     const div = document.createElement('div');
-                    div.className = "flex items-center gap-3 p-3 bg-white/5 rounded-2xl border border-white/5 mb-2";
-                    div.innerHTML = `<div class="w-10 h-10 rounded-full border-2 ${type==='JOOGE'?'border-green-500':'border-red-500'} overflow-hidden"><img src="${photo || 'https://via.placeholder.com/50'}" class="w-full h-full object-cover"></div><span class="text-xs font-black text-white uppercase oswald">${name}</span>`;
+                    div.className = "flex items-center justify-between p-3 bg-white/5 rounded-2xl border border-white/5 mb-2";
+                    div.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full border-2 ${type==='JOOGE'?'border-green-500':'border-red-500'} overflow-hidden">
+                                <img src="${photo || 'https://via.placeholder.com/50'}" class="w-full h-full object-cover">
+                            </div>
+                            <span class="text-xs font-black text-white uppercase oswald">${name}</span>
+                        </div>
+                        <span class="text-[10px] font-bold text-gray-400">${timeStr}</span>
+                    `;
                     list.appendChild(div);
                 }
             }
@@ -1208,6 +1652,141 @@
         if(!isUserAdmin) return;
         if(confirm("Remove message object from room logs completely?")) chatRef.child(key).remove();
     }
+
+function toggleProfileSettings() {
+    const modal = document.getElementById('profileSettingsModal');
+
+    if (modal.classList.contains('hidden')) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    } else {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+}
+
+async function saveProfileSettings() {
+    const user = auth.currentUser;
+
+    if (!user) {
+        alert("User not logged in");
+        return;
+    }
+
+    const newName = document.getElementById('newDisplayName').value.trim();
+    const newPassword = document.getElementById('newPassword').value.trim();
+    const newPhoto = document.getElementById('newProfilePhoto').files[0];
+
+    try {
+
+        if (newName) {
+            await user.updateProfile({
+                displayName: newName
+            });
+
+            const oldProfile = profiles[currentUserProfileUsername] || {};
+
+            await profilesRef.child(newName).set({
+                ...oldProfile,
+                isTaken: true
+            });
+
+            await profilesRef.child(currentUserProfileUsername).remove();
+
+            currentUserProfileUsername = newName;
+
+            document.getElementById('welcomeMessage').innerText = `👋 WELCOME, ${newName}`;
+        }
+
+        if (newPhoto) {
+            const reader = new FileReader();
+
+            reader.onload = async function(e) {
+                const imageBase64 = e.target.result;
+
+                const existingProfile = profiles[currentUserProfileUsername] || {};
+
+                await profilesRef.child(currentUserProfileUsername).update({
+                    ...existingProfile,
+                    photo: imageBase64
+                });
+
+                document.getElementById('avatarImg').src = imageBase64;
+                document.getElementById('avatarImg').classList.remove('hidden');
+                document.getElementById('avatarPlaceholder').classList.add('hidden');
+            };
+
+            reader.readAsDataURL(newPhoto);
+        }
+
+        if (newPassword) {
+            await user.updatePassword(newPassword);
+        }
+
+        alert("Profile updated successfully!");
+
+        toggleProfileSettings();
+
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
 </script>
+
+<div id="profileSettingsModal"
+     class="hidden fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm items-center justify-center p-4">
+
+    <div class="bg-[#0f172a] border border-yellow-500/30 rounded-3xl w-full max-w-md p-6 relative">
+
+        <button onclick="toggleProfileSettings()"
+                class="absolute top-4 right-5 text-2xl text-gray-400 hover:text-white">
+            &times;
+        </button>
+
+        <h2 class="text-2xl font-black oswald text-yellow-500 uppercase mb-6 text-center">
+            Profile Settings
+        </h2>
+
+        <div class="space-y-4">
+
+            <div>
+                <label class="text-[10px] uppercase text-gray-400 font-bold">
+                    Change Name
+                </label>
+                <input type="text"
+                       id="newDisplayName"
+                       placeholder="Enter new name"
+                       class="w-full mt-1 p-4 rounded-xl bg-black/40 border border-white/10 text-white font-bold">
+            </div>
+
+            <div>
+                <label class="text-[10px] uppercase text-gray-400 font-bold">
+                    Change Profile Picture
+                </label>
+                <input type="file"
+                       id="newProfilePhoto"
+                       accept="image/*"
+                       class="w-full mt-1 text-xs text-white">
+            </div>
+
+            <div>
+                <label class="text-[10px] uppercase text-gray-400 font-bold">
+                    New Password
+                </label>
+                <input type="password"
+                       id="newPassword"
+                       placeholder="Enter new password"
+                       class="w-full mt-1 p-4 rounded-xl bg-black/40 border border-white/10 text-white font-bold">
+            </div>
+
+            <button onclick="saveProfileSettings()"
+                    class="w-full py-4 bg-yellow-500 hover:bg-yellow-400 text-black font-black oswald rounded-2xl uppercase tracking-widest transition">
+                Save Changes
+            </button>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
