@@ -75,6 +75,7 @@ async function saveProfileSettings() {
             await user.updatePassword(newPassword);
         }
 
+        logUserActivity('PROFILE_UPDATED');
         alert("Profile updated successfully!");
 
         toggleProfileSettings();
@@ -156,6 +157,7 @@ async function saveProfileSettings() {
             await user.updatePassword(newPassword);
         }
 
+        logUserActivity('PROFILE_UPDATED');
         alert("Profile updated successfully!");
 
         toggleProfileSettings();
@@ -237,6 +239,7 @@ async function saveProfileSettings() {
             await user.updatePassword(newPassword);
         }
 
+        logUserActivity('PROFILE_UPDATED');
         alert("Profile updated successfully!");
 
         toggleProfileSettings();
@@ -318,6 +321,7 @@ async function saveProfileSettings() {
             await user.updatePassword(newPassword);
         }
 
+        logUserActivity('PROFILE_UPDATED');
         alert("Profile updated successfully!");
 
         toggleProfileSettings();
@@ -608,7 +612,7 @@ async function saveProfileSettings() {
                 </div>
 
                 <div class="border-t border-white/10 mt-6 pt-4 space-y-4">
-                    <h4 class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Poll Management</h4>
+                    <button onclick="showUserAccess()" class="w-full py-2 mb-3 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded-xl font-bold text-[10px] uppercase">User Access & Logs</button><h4 class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Poll Management</h4>
                     <button onclick="resetAllVotes()" class="w-full py-2 bg-red-600/20 hover:bg-red-600 text-red-500 hover:text-white border border-red-500/30 rounded-xl font-bold text-[10px] uppercase tracking-widest transition">Reset All Votes</button>
                     <div class="flex items-center gap-2 px-2">
                         <input type="checkbox" id="pollVisibilityToggle" onchange="togglePollVisibility(this.checked)" class="w-4 h-4 accent-yellow-500">
@@ -796,6 +800,7 @@ async function saveProfileSettings() {
     const settingsRef = firebase.database().ref('golaha_settings');
     const presenceRef = firebase.database().ref('golaha_presence');
     const paymentsRef = firebase.database().ref('golaha_payments');
+    const logsRef = firebase.database().ref('golaha_user_logs');
     const auth = firebase.auth();
 
     const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -1005,14 +1010,28 @@ async function saveProfileSettings() {
             if(!selectedProfile) return errEl.innerText = "Select athlete name.";
             auth.createUserWithEmailAndPassword(email, pass).then((u) => {
                 u.user.updateProfile({ displayName: selectedProfile });
+                logUserActivity('REGISTER_ACCOUNT',{profile:selectedProfile});
                 return profilesRef.child(selectedProfile).update({ isTaken: true });
             }).catch(err => { errEl.innerText = err.message; });
         } else {
-            auth.signInWithEmailAndPassword(email, pass).catch(err => { errEl.innerText = err.message; });
+            auth.signInWithEmailAndPassword(email, pass).then(()=>{ setTimeout(()=>logUserActivity('LOGIN'),500); }).catch(err => { errEl.innerText = err.message; });
         }
     }
 
-    function handleLogout() { auth.signOut(); }
+
+    function logUserActivity(action, details = {}) {
+        const user = auth.currentUser;
+        if (!user) return;
+        logsRef.push({
+            email: user.email || '',
+            name: currentUserProfileUsername || user.displayName || 'Unknown',
+            action,
+            details,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        });
+    }
+
+    function handleLogout() { logUserActivity('LOGOUT'); auth.signOut(); }
 
     function setup() {
         const viewYear = document.getElementById('viewYear'),
@@ -1068,12 +1087,12 @@ async function saveProfileSettings() {
             const reader = new FileReader();
             reader.onload = function(e) {
                 profilesRef.child(name).set({ photo: e.target.result, isTaken: false });
-                alert("Profile Registered with photo!");
+                logUserActivity('PLAYER_REGISTERED',{player:name}); alert("Profile Registered with photo!");
             };
             reader.readAsDataURL(photoFile);
         } else {
             profilesRef.child(name).set({ photo: "", isTaken: false });
-            alert("Profile Registered without photo!");
+            logUserActivity('PLAYER_REGISTERED',{player:name}); alert("Profile Registered without photo!");
         }
     }
 
@@ -1194,7 +1213,7 @@ async function saveProfileSettings() {
 
             const row = document.createElement('tr');
             row.setAttribute('onclick', `openReport("${p.n}")`);
-            row.innerHTML = `<td class="text-left oswald uppercase p-4">${p.n}</td><td class="text-center">${sH}</td><td class="text-blue-400">${p.count}</td><td class="text-red-400 font-bold">${p.g}</td><td class="text-green-400 font-bold">${p.a}</td><td class="hidden text-indigo-400 font-bold">${p.s[6] !== undefined ? p.s[6] : 0}</td><td class="admin-only text-yellow-500">${p.y}</td><td class="admin-only text-red-500">${p.r}</td><td class="total-col font-black oswald">${p.t}</td><td><span class="${i+1 === 1 ? 'rank-badge rank-badge-1' : 'rank-badge'}">${i+1 === 1 ? '🥇' : i+1}</span></td>${isUserAdmin ? `<td class="admin-only space-x-2"><button onclick="event.stopPropagation(); releaseName('${p.n}')" class="text-green-500">🔓</button><button onclick="event.stopPropagation(); editEntry('${p.n}')" class="text-blue-400">✎</button><button onclick="event.stopPropagation(); deleteEntry('${p.n}')" class="text-red-500">✖</button></td>` : ''}`;
+            row.innerHTML = `<td class="text-left oswald uppercase p-4">${p.n}</td><td class="text-center">${sH}</td><td class="text-blue-400">${p.count}</td><td class="text-red-400 font-bold">${p.g}</td><td class="text-green-400 font-bold">${p.a}</td><td class="hidden text-indigo-400 font-bold">${p.s[6] !== undefined ? p.s[6] : 0}</td><td class="admin-only text-yellow-500">${p.y}</td><td class="admin-only text-red-500">${p.r}</td><td class="total-col font-black oswald">${p.t}</td><td><span class="${i+1 === 1 ? 'rank-badge rank-badge-1' : 'rank-badge'}">${i+1 === 1 ? '🥇' : i+1}</span></td>${(isUserAdmin || ['sacadcabdale@golaha.com'].includes((auth.currentUser?.email||'').toLowerCase())) ? `<td class="admin-only space-x-2"><button onclick="event.stopPropagation(); releaseName('${p.n}')" class="text-green-500">🔓</button><button onclick="event.stopPropagation(); editEntry('${p.n}')" class="text-blue-400">✎</button><button onclick="event.stopPropagation(); deleteEntry('${p.n}')" class="text-red-500">✖</button></td>` : ''}`;
             body.appendChild(row);
         });
     }
@@ -1215,7 +1234,7 @@ async function saveProfileSettings() {
         const total = sc.reduce((a,b)=>a+b, 0) + (gV >= 1 ? 6 : 0) + (aV >= 1 ? 4 : 0);
 
         dbRef.child(`${yr}/${name}/${m}/${w}`).set({ sc, gV, aV, yV, rV, total }).then(() => {
-            alert("Record Saved Successfully!");
+            logUserActivity('ATHLETE_EDITED',{player:name,year:yr,month:m,week:w}); alert("Record Saved Successfully!");
             [1,2,3,4,5,6,7].forEach(idx => document.getElementById('s'+idx).value = "");
             document.getElementById('gA').value = "";
             document.getElementById('aA').value = "";
@@ -1252,7 +1271,7 @@ async function saveProfileSettings() {
               w = document.getElementById('selWeek').value;
         if(m === "" || w === "") return alert("Select Month and Week from filters to purge records.");
         if(confirm(`Erase stats record entry for ${playerName} during Month: ${MONTHS[m]} Week: ${w}?`)) {
-            dbRef.child(`${yr}/${playerName}/${m}/${w}`).remove().then(() => alert("Entry Purged."));
+            dbRef.child(`${yr}/${playerName}/${m}/${w}`).remove().then(() => { logUserActivity('ATHLETE_DELETED',{player:playerName,year:yr,month:m,week:w}); alert("Entry Purged."); });
         }
     }
 
@@ -1401,6 +1420,7 @@ async function saveProfileSettings() {
             if (snapshot.val() === true) {
                 myPresenceRef.onDisconnect().remove();
                 myPresenceRef.set(true);
+                logUserActivity('ONLINE');
             }
         });
         presenceRef.on('value', (snapshot) => {
@@ -1428,6 +1448,40 @@ async function saveProfileSettings() {
             document.getElementById('voteListModal').style.display = 'flex';
         });
     }
+
+    
+function showUserAccess(){
+ logsRef.limitToLast(300).once('value',snap=>{
+  const logs=snap.val()||{};
+  const box=document.getElementById('userAccessList');
+  const search=(document.getElementById('userSearchInput')?.value||'').toLowerCase();
+  const filter=(document.getElementById('logFilterSelect')?.value||'ALL');
+  box.innerHTML='';
+  const grouped={};
+  Object.values(logs).forEach(l=>{
+    if(!grouped[l.email]) grouped[l.email]={email:l.email,name:l.name,logs:[]};
+    grouped[l.email].logs.push(l);
+  });
+  Object.values(grouped).forEach(u=>{
+    const visible=u.logs.filter(l=>{
+      const txt=((l.name||'')+' '+(l.email||'')+' '+(l.action||'')).toLowerCase();
+      return (filter==='ALL'||l.action===filter) && (!search || txt.includes(search));
+    }).sort((a,b)=>(b.timestamp||0)-(a.timestamp||0));
+    if(!visible.length) return;
+    const latest=visible[0];
+    const latestDate=new Date(latest.timestamp||Date.now()).toLocaleString();
+    let logsHtml='';
+    visible.slice(0,10).forEach(l=>{
+      const d=new Date(l.timestamp||Date.now()).toLocaleString();
+      logsHtml += `<div class="text-[10px] border-t border-white/5 pt-1 mt-1"><span class="text-yellow-500">${l.action}</span> • ${d}</div>`;
+    });
+    box.innerHTML += `<div class="mb-3 p-4 rounded-2xl bg-white/5 border border-white/10"><div class="flex justify-between items-center"><div><div class="font-black text-white uppercase">${u.name||'Unknown'}</div><div class="text-gray-400">${u.email||''}</div><div class="text-[10px] text-green-400">Last Activity: ${latestDate}</div></div><div class="flex gap-2"><button onclick="copyUserEmail('${u.email}')" class="px-2 py-1 bg-blue-600/20 text-blue-400 rounded-lg text-[10px]">Copy Email</button></div></div>${logsHtml}</div>`;
+  });
+  if(box.innerHTML==='') box.innerHTML='<div class="text-center text-gray-500 py-6">No users found.</div>';
+  document.getElementById('userAccessModal').classList.remove('hidden');
+ });
+}
+function copyUserEmail(email){navigator.clipboard.writeText(email); alert('Email copied: '+email);}
 
     function resetAllVotes() {
         if(confirm("Permanently wipe ALL attendance votes?")) {
@@ -1723,6 +1777,7 @@ async function saveProfileSettings() {
             await user.updatePassword(newPassword);
         }
 
+        logUserActivity('PROFILE_UPDATED');
         alert("Profile updated successfully!");
 
         toggleProfileSettings();
@@ -1787,6 +1842,28 @@ async function saveProfileSettings() {
         </div>
     </div>
 </div>
+
+
+<div id="userAccessModal" class="hidden fixed inset-0 z-[120] bg-black/80 flex items-center justify-center p-4">
+<div class="bg-[#0f172a] w-full max-w-6xl rounded-3xl p-6 border border-yellow-500/30">
+<div class="flex justify-between items-center mb-4">
+<h3 class="text-xl font-black text-yellow-500">Full User Management</h3>
+<button onclick="document.getElementById('userAccessModal').classList.add('hidden')" class="px-4 py-2 bg-red-600 rounded-xl text-xs font-bold">Close</button>
+</div>
+<div class="grid md:grid-cols-2 gap-4 mb-4">
+<input id="userSearchInput" onkeyup="showUserAccess()" placeholder="Search user/email/action" class="p-3 rounded-xl bg-black/40 border border-white/10 text-white text-xs">
+<select id="logFilterSelect" onchange="showUserAccess()" class="p-3 rounded-xl bg-black/40 border border-white/10 text-white text-xs">
+<option value="ALL">All Actions</option>
+<option value="LOGIN">LOGIN</option>
+<option value="LOGOUT">LOGOUT</option>
+<option value="PROFILE_UPDATED">PROFILE UPDATED</option>
+<option value="PLAYER_REGISTERED">PLAYER REGISTERED</option>
+<option value="ATHLETE_EDITED">ATHLETE EDITED</option>
+<option value="ATHLETE_DELETED">ATHLETE DELETED</option>
+</select>
+</div>
+<div id="userAccessList" class="max-h-[500px] overflow-y-auto text-xs"></div>
+</div></div>
 
 </body>
 </html>
