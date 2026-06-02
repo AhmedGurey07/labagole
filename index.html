@@ -4,334 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Golaha Laba Gole - Elite Analytics & Global Chat</title>
-    <script src="https://cdn.tailwindcss.com">
-function toggleProfileSettings() {
-    const modal = document.getElementById('profileSettingsModal');
-
-    if (modal.classList.contains('hidden')) {
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-    } else {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-    }
-}
-
-async function saveProfileSettings() {
-    const user = auth.currentUser;
-
-    if (!user) {
-        alert("User not logged in");
-        return;
-    }
-
-    const newName = document.getElementById('newDisplayName').value.trim();
-    const newPassword = document.getElementById('newPassword').value.trim();
-    const newPhoto = document.getElementById('newProfilePhoto').files[0];
-
-    try {
-
-        if (newName) {
-            await user.updateProfile({
-                displayName: newName
-            });
-
-            const oldProfile = profiles[currentUserProfileUsername] || {};
-
-            await profilesRef.child(newName).set({
-                ...oldProfile,
-                isTaken: true
-            });
-
-            await profilesRef.child(currentUserProfileUsername).remove();
-
-            currentUserProfileUsername = newName;
-
-            document.getElementById('welcomeMessage').innerText = `👋 WELCOME, ${newName}`;
-        }
-
-        if (newPhoto) {
-            const reader = new FileReader();
-
-            reader.onload = async function(e) {
-                const imageBase64 = e.target.result;
-
-                const existingProfile = profiles[currentUserProfileUsername] || {};
-
-                await profilesRef.child(currentUserProfileUsername).update({
-                    ...existingProfile,
-                    photo: imageBase64
-                });
-
-                document.getElementById('avatarImg').src = imageBase64;
-                document.getElementById('avatarImg').classList.remove('hidden');
-                document.getElementById('avatarPlaceholder').classList.add('hidden');
-            };
-
-            reader.readAsDataURL(newPhoto);
-        }
-
-        if (newPassword) {
-            await user.updatePassword(newPassword);
-        }
-
-        logUserActivity('PROFILE_UPDATED');
-        alert("Profile updated successfully!");
-
-        toggleProfileSettings();
-
-    } catch (error) {
-        alert(error.message);
-    }
-}
-
-</script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js">
-function toggleProfileSettings() {
-    const modal = document.getElementById('profileSettingsModal');
-
-    if (modal.classList.contains('hidden')) {
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-    } else {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-    }
-}
-
-async function saveProfileSettings() {
-    const user = auth.currentUser;
-
-    if (!user) {
-        alert("User not logged in");
-        return;
-    }
-
-    const newName = document.getElementById('newDisplayName').value.trim();
-    const newPassword = document.getElementById('newPassword').value.trim();
-    const newPhoto = document.getElementById('newProfilePhoto').files[0];
-
-    try {
-
-        if (newName) {
-            await user.updateProfile({
-                displayName: newName
-            });
-
-            const oldProfile = profiles[currentUserProfileUsername] || {};
-
-            await profilesRef.child(newName).set({
-                ...oldProfile,
-                isTaken: true
-            });
-
-            await profilesRef.child(currentUserProfileUsername).remove();
-
-            currentUserProfileUsername = newName;
-
-            document.getElementById('welcomeMessage').innerText = `👋 WELCOME, ${newName}`;
-        }
-
-        if (newPhoto) {
-            const reader = new FileReader();
-
-            reader.onload = async function(e) {
-                const imageBase64 = e.target.result;
-
-                const existingProfile = profiles[currentUserProfileUsername] || {};
-
-                await profilesRef.child(currentUserProfileUsername).update({
-                    ...existingProfile,
-                    photo: imageBase64
-                });
-
-                document.getElementById('avatarImg').src = imageBase64;
-                document.getElementById('avatarImg').classList.remove('hidden');
-                document.getElementById('avatarPlaceholder').classList.add('hidden');
-            };
-
-            reader.readAsDataURL(newPhoto);
-        }
-
-        if (newPassword) {
-            await user.updatePassword(newPassword);
-        }
-
-        logUserActivity('PROFILE_UPDATED');
-        alert("Profile updated successfully!");
-
-        toggleProfileSettings();
-
-    } catch (error) {
-        alert(error.message);
-    }
-}
-
-</script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js">
-function toggleProfileSettings() {
-    const modal = document.getElementById('profileSettingsModal');
-
-    if (modal.classList.contains('hidden')) {
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-    } else {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-    }
-}
-
-async function saveProfileSettings() {
-    const user = auth.currentUser;
-
-    if (!user) {
-        alert("User not logged in");
-        return;
-    }
-
-    const newName = document.getElementById('newDisplayName').value.trim();
-    const newPassword = document.getElementById('newPassword').value.trim();
-    const newPhoto = document.getElementById('newProfilePhoto').files[0];
-
-    try {
-
-        if (newName) {
-            await user.updateProfile({
-                displayName: newName
-            });
-
-            const oldProfile = profiles[currentUserProfileUsername] || {};
-
-            await profilesRef.child(newName).set({
-                ...oldProfile,
-                isTaken: true
-            });
-
-            await profilesRef.child(currentUserProfileUsername).remove();
-
-            currentUserProfileUsername = newName;
-
-            document.getElementById('welcomeMessage').innerText = `👋 WELCOME, ${newName}`;
-        }
-
-        if (newPhoto) {
-            const reader = new FileReader();
-
-            reader.onload = async function(e) {
-                const imageBase64 = e.target.result;
-
-                const existingProfile = profiles[currentUserProfileUsername] || {};
-
-                await profilesRef.child(currentUserProfileUsername).update({
-                    ...existingProfile,
-                    photo: imageBase64
-                });
-
-                document.getElementById('avatarImg').src = imageBase64;
-                document.getElementById('avatarImg').classList.remove('hidden');
-                document.getElementById('avatarPlaceholder').classList.add('hidden');
-            };
-
-            reader.readAsDataURL(newPhoto);
-        }
-
-        if (newPassword) {
-            await user.updatePassword(newPassword);
-        }
-
-        logUserActivity('PROFILE_UPDATED');
-        alert("Profile updated successfully!");
-
-        toggleProfileSettings();
-
-    } catch (error) {
-        alert(error.message);
-    }
-}
-
-</script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js">
-function toggleProfileSettings() {
-    const modal = document.getElementById('profileSettingsModal');
-
-    if (modal.classList.contains('hidden')) {
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-    } else {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-    }
-}
-
-async function saveProfileSettings() {
-    const user = auth.currentUser;
-
-    if (!user) {
-        alert("User not logged in");
-        return;
-    }
-
-    const newName = document.getElementById('newDisplayName').value.trim();
-    const newPassword = document.getElementById('newPassword').value.trim();
-    const newPhoto = document.getElementById('newProfilePhoto').files[0];
-
-    try {
-
-        if (newName) {
-            await user.updateProfile({
-                displayName: newName
-            });
-
-            const oldProfile = profiles[currentUserProfileUsername] || {};
-
-            await profilesRef.child(newName).set({
-                ...oldProfile,
-                isTaken: true
-            });
-
-            await profilesRef.child(currentUserProfileUsername).remove();
-
-            currentUserProfileUsername = newName;
-
-            document.getElementById('welcomeMessage').innerText = `👋 WELCOME, ${newName}`;
-        }
-
-        if (newPhoto) {
-            const reader = new FileReader();
-
-            reader.onload = async function(e) {
-                const imageBase64 = e.target.result;
-
-                const existingProfile = profiles[currentUserProfileUsername] || {};
-
-                await profilesRef.child(currentUserProfileUsername).update({
-                    ...existingProfile,
-                    photo: imageBase64
-                });
-
-                document.getElementById('avatarImg').src = imageBase64;
-                document.getElementById('avatarImg').classList.remove('hidden');
-                document.getElementById('avatarPlaceholder').classList.add('hidden');
-            };
-
-            reader.readAsDataURL(newPhoto);
-        }
-
-        if (newPassword) {
-            await user.updatePassword(newPassword);
-        }
-
-        logUserActivity('PROFILE_UPDATED');
-        alert("Profile updated successfully!");
-
-        toggleProfileSettings();
-
-    } catch (error) {
-        alert(error.message);
-    }
-}
-
-</script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;700;900&family=Inter:wght@400;700;900&display=swap');
@@ -365,7 +41,7 @@ async function saveProfileSettings() {
         .oswald { font-family: 'Oswald', sans-serif; }
         .star-glow { text-shadow: 0 0 8px rgba(251, 191, 36, 0.6); }
 
-        #reportModal, #historyModal, #voteListModal, #largeViewModal { display: none; position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); padding: 20px; align-items: center; justify-content: center; }
+        #reportModal, #voteListModal, #largeViewModal, #lockoutModal { display: none; position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); padding: 20px; align-items: center; justify-content: center; }
         .report-content { background: #0f172a; border: 2px solid rgba(251, 191, 36, 0.3); border-radius: 32px; max-width: 500px; width: 100%; padding: 32px; position: relative; }
 
         .chat-scroll::-webkit-scrollbar { width: 6px; }
@@ -416,6 +92,27 @@ async function saveProfileSettings() {
     </div>
 </div>
 
+<div id="lockoutModal" class="fixed inset-0 z-[150] bg-[#070707] flex items-center justify-center p-4">
+    <div class="glass-panel max-w-md w-full p-8 border border-red-500/30 text-center shadow-2xl bg-black">
+        <div class="w-16 h-16 rounded-full bg-red-600/10 border border-red-500/30 flex items-center justify-center mx-auto mb-6">
+            <span class="text-3xl text-red-500">⚠️</span>
+        </div>
+        <h2 class="text-4xl font-black oswald text-white tracking-tighter mb-4 uppercase">Fadlan bixi lacagta</h2>
+        <p class="text-sm text-gray-400 mb-6 font-semibold leading-relaxed">
+            Nidaamka waa lagaa xiray sababtoo ah lagama helin bixinta khidmadda bishaan profile-kaaga dhexdiisa. Guji badanka hoose si codsi ansixin ah loogu diro maamulka.
+        </p>
+        <div class="space-y-4">
+            <button id="lockoutIPaidBtn" onclick="submitPaymentApprovalRequest()" class="w-full py-4 bg-yellow-500 text-black font-black oswald uppercase tracking-widest hover:bg-yellow-400 transition rounded-xl">
+                I Paid
+            </button>
+            <p id="lockoutStatusMsg" class="text-xs text-yellow-500 font-bold tracking-wide mt-2 min-h-4"></p>
+            <button onclick="handleLogout()" class="w-full py-3 bg-white/5 text-gray-400 font-bold text-xs rounded-xl border border-white/10 hover:bg-white/10 transition uppercase">
+                🚪 Logout / Ka Bax
+            </button>
+        </div>
+    </div>
+</div>
+
 <div id="dashboardArea" class="hidden max-w-[1450px] mx-auto pb-24">
     <header class="mb-8 flex flex-col lg:flex-row justify-between items-center gap-8">
         <h1 class="text-6xl font-black oswald text-white tracking-tighter">GOLAHA <span class="text-yellow-500">LABA GOLE</span></h1>
@@ -429,7 +126,7 @@ async function saveProfileSettings() {
             </select>
             
             <button id="publicReportBtn" onclick="showLargeView()" class="hidden tab-btn bg-blue-600 text-white border-none hover:bg-blue-500 flex items-center gap-2">
-                📊 VIEW REPORT
+                📊 VIEW PAYMENT REPORT
             </button>
 
             <button onclick="handleLogout()" class="tab-btn bg-red-950/40 text-red-400 border border-red-500/20 hover:bg-red-900 hover:text-white">🚪 LOGOUT</button>
@@ -525,10 +222,10 @@ async function saveProfileSettings() {
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
-        <aside id="adminPanel" class="lg:col-span-3 admin-only">
+    <div class="grid grid-cols-1 lg:grid-cols-10 gap-10">
+        <aside id="adminPanel" class="lg:col-span-4 admin-only">
             <div id="formCard" class="glass-panel p-6 sticky top-6 border-white/5">
-                <div class="flex gap-2 mb-6 border-b border-white/10 pb-4">
+                <div class="flex gap-2 mb-6 border-b border-white/10 pb-4 overflow-x-auto whitespace-nowrap chat-scroll">
                     <button onclick="switchAdminTab('data')" id="tabData" class="text-[10px] font-bold uppercase text-yellow-500">Stats</button>
                     <span class="text-gray-700">|</span>
                     <button onclick="switchAdminTab('reg')" id="tabReg" class="text-[10px] font-bold uppercase text-gray-500">Registry</button>
@@ -536,6 +233,10 @@ async function saveProfileSettings() {
                     <button onclick="switchAdminTab('pay')" id="tabPay" class="text-[10px] font-bold uppercase text-gray-500">Payments</button>
                     <span class="text-gray-700">|</span>
                     <button onclick="switchAdminTab('payAn')" id="tabPayAn" class="text-[10px] font-bold uppercase text-gray-500">Analytics</button>
+                    <span class="text-gray-700">|</span>
+                    <button onclick="switchAdminTab('gan')" id="tabGan" class="text-[10px] font-bold uppercase text-gray-500">Ganaax</button>
+                    <span class="text-gray-700">|</span>
+                    <button onclick="switchAdminTab('fasax')" id="tabFasax" class="text-[10px] font-bold uppercase text-gray-500">Fasax</button>
                 </div>
                 
                 <div id="regForm" class="hidden space-y-4">
@@ -551,6 +252,11 @@ async function saveProfileSettings() {
                     </div>
                     <select id="payPlayerSelect" class="w-full p-4 rounded-xl bg-black/40 border border-white/10 font-bold text-white"></select>
                     <button onclick="togglePaymentStatus()" class="w-full py-4 rounded-xl bg-green-600 text-white font-black oswald uppercase">Toggle Paid Status</button>
+                    
+                    <div class="border-t border-white/10 pt-4 mt-4">
+                        <h4 class="text-[10px] font-black text-yellow-500 uppercase tracking-widest mb-2">Pending Approval Requests</h4>
+                        <div id="adminApprovalRequestsList" class="space-y-2 max-h-[220px] overflow-y-auto chat-scroll pr-1 text-xs"></div>
+                    </div>
                 </div>
 
                 <div id="payAnForm" class="hidden space-y-4">
@@ -585,6 +291,109 @@ async function saveProfileSettings() {
                     </div>
                 </div>
 
+                <div id="ganForm" class="hidden space-y-4">
+                    <h4 class="text-[10px] font-black text-yellow-500 uppercase tracking-widest mb-2">Add Ganaax Entry</h4>
+                    <select id="ganPlayerSelect" class="w-full p-4 rounded-xl bg-black/40 border border-white/10 font-bold text-white"></select>
+                    
+                    <div class="bg-yellow-500/10 p-3 rounded-xl border border-yellow-500/20">
+                        <label class="text-[10px] font-bold text-yellow-500 uppercase">Editable Price ($)</label>
+                        <input type="number" id="ganPriceInput" class="w-full bg-transparent text-xl font-black text-white focus:outline-none" placeholder="5">
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2">
+                        <select id="ganYearSelect" class="p-3 rounded-xl bg-black/40 text-xs text-white"></select>
+                        <select id="ganMonthSelect" class="p-3 rounded-xl bg-black/40 text-xs text-white"></select>
+                        <select id="ganDaySelect" class="p-3 rounded-xl bg-black/40 text-xs text-white"></select>
+                    </div>
+
+                    <div>
+                        <label class="text-[10px] uppercase text-gray-400 font-bold ml-1">Initial Status</label>
+                        <select id="ganStatusInput" class="w-full mt-1 p-4 rounded-xl bg-black/40 border border-white/10 font-bold text-white focus:outline-none">
+                            <option value="PAID">PAID</option>
+                            <option value="UNPAID">UNPAID</option>
+                            <option value="APPROVED">APPROVED</option>
+                        </select>
+                    </div>
+
+                    <button onclick="saveGanaax()" class="w-full py-4 rounded-xl bg-yellow-500 text-black font-black oswald uppercase hover:bg-yellow-400 transition">Save Ganaax</button>
+                    
+                    <div class="border-t border-white/10 pt-4 mt-6 space-y-3">
+                        <h4 class="text-[10px] font-black text-yellow-500 uppercase tracking-widest mb-2">Search Ganaax History & Filter</h4>
+                        
+                        <input type="text" id="ganSearchName" placeholder="Search Athlete Name..." class="w-full p-3 rounded-xl bg-black/40 border border-white/10 font-bold text-white text-xs uppercase focus:outline-none focus:border-yellow-500/50">
+                        
+                        <div class="grid grid-cols-4 gap-2">
+                            <select id="ganSearchYear" class="p-3 rounded-xl bg-black/40 text-xs text-white">
+                                <option value="">-- ALL YEARS --</option>
+                            </select>
+                            <select id="ganSearchMonth" class="p-3 rounded-xl bg-black/40 text-xs text-white">
+                                <option value="">-- ALL MONTHS --</option>
+                            </select>
+                            <select id="ganSearchDay" class="p-3 rounded-xl bg-black/40 text-xs text-white">
+                                <option value="">-- ALL DAYS --</option>
+                            </select>
+                            <select id="ganSearchStatus" class="p-3 rounded-xl bg-black/40 text-xs text-white font-bold">
+                                <option value="">-- STATUS --</option>
+                                <option value="PAID">PAID</option>
+                                <option value="UNPAID">UNPAID</option>
+                            </select>
+                        </div>
+                        
+                        <button onclick="renderGanaaxTable(true)" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-black oswald uppercase text-xs tracking-widest rounded-xl transition">
+                            View Filtered Search
+                        </button>
+
+                        <div class="overflow-x-auto mt-4 max-h-[300px] chat-scroll border border-white/5 rounded-xl bg-black/20">
+                            <table class="w-full text-left border-collapse text-[11px]">
+                                <thead class="text-yellow-500 bg-neutral-950/60 uppercase text-[9px] sticky top-0 backdrop-blur-sm border-b border-white/10 z-10">
+                                    <tr>
+                                        <th class="p-3">Athlete Name</th>
+                                        <th class="p-3 text-center">Amount</th>
+                                        <th class="p-3 text-center">Date & Time</th>
+                                        <th class="p-3 text-center">Status</th>
+                                        <th class="p-3 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ganTableBody" class="divide-y divide-white/5 font-semibold">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="fasaxForm" class="hidden space-y-4">
+                    <h4 class="text-[10px] font-black text-yellow-500 uppercase tracking-widest mb-2">Fasax / Leave Control Portal</h4>
+                    <div>
+                        <label class="text-[10px] uppercase text-gray-400 font-bold ml-1">Dooro Ciyaaryahanka</label>
+                        <select id="fasaxPlayerSelect" class="w-full mt-1 p-4 rounded-xl bg-black/40 border border-white/10 font-bold text-white"></select>
+                    </div>
+                    <div>
+                        <label class="text-[10px] uppercase text-gray-400 font-bold ml-1">Xaaladda Fasaxa</label>
+                        <select id="fasaxStatusSelect" class="w-full mt-1 p-4 rounded-xl bg-black/40 border border-white/10 font-bold text-white focus:outline-none">
+                            <option value="fasax">Fasax (Leave)</option>
+                            <option value="kasoo noqo">Kasoo Noqo (Return)</option>
+                        </select>
+                    </div>
+                    <button onclick="saveFasax()" class="w-full py-4 rounded-xl bg-yellow-500 text-black font-black oswald uppercase hover:bg-yellow-400 transition">Submit Record</button>
+                    
+                    <div class="border-t border-white/10 pt-4 mt-6 space-y-3">
+                        <h4 class="text-[10px] font-black text-yellow-500 uppercase tracking-widest mb-2">Active Leave Tracker</h4>
+                        <div class="overflow-x-auto max-h-[250px] chat-scroll border border-white/5 rounded-xl bg-black/20">
+                            <table class="w-full text-left border-collapse text-[11px]">
+                                <thead class="text-yellow-500 bg-neutral-950/60 uppercase text-[9px] sticky top-0 backdrop-blur-sm border-b border-white/10 z-10">
+                                    <tr>
+                                        <th class="p-3">Athlete Name</th>
+                                        <th class="p-3 text-center">Status</th>
+                                        <th class="p-3 text-right">Date & Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="fasaxTableBody" class="divide-y divide-white/5 font-semibold text-white">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="statsForm" class="space-y-4">
                     <select id="pNameSelect" class="w-full p-4 rounded-xl bg-black/40 border border-white/10 font-bold text-white"></select>
                     <div class="grid grid-cols-2 gap-2">
@@ -600,19 +409,20 @@ async function saveProfileSettings() {
                         <input type="number" id="s6" onchange="validateSkill('s6')" placeholder="Ref" class="p-3 rounded-xl bg-black/40 text-center text-[10px] text-white">
                         <input type="number" id="s7" onchange="validateSkill('s7')" placeholder="Def" class="p-3 rounded-xl bg-black/40 text-center text-[10px] text-white">
                     </div>
-                    <div class="grid grid-cols-2 gap-2">
+                    <div class="grid grid-cols-2 gap-2 hidden">
                         <input type="number" id="yCard" placeholder="Yellow" class="p-3 rounded-xl bg-yellow-500/10 text-yellow-500 text-center font-bold">
                         <input type="number" id="rCard" placeholder="Red" class="p-3 rounded-xl bg-red-600/10 text-red-600 text-center font-bold">
                     </div>
-                    <div class="grid grid-cols-2 gap-2">
+                    <div class="grid grid-cols-2 gap-2 hidden">
                         <input type="number" id="gA" placeholder="Goals" class="p-3 rounded-xl bg-red-500/10 text-red-500 text-center">
                         <input type="number" id="aA" placeholder="Assists" class="p-3 rounded-xl bg-green-500/10 text-green-500 text-center">
                     </div>
-                    <button onclick="saveStats()" id="btnSave" class="w-full py-4 rounded-xl bg-yellow-500 text-black font-black oswald">SAVE RECORD</button>
+                    <button onclick="saveStats()" id="btnSave" class="w-full py-4 rounded-xl bg-yellow-500 text-black font-black oswald hover:bg-yellow-400 transition">SAVE RECORD</button>
                 </div>
 
                 <div class="border-t border-white/10 mt-6 pt-4 space-y-4">
-                    <button onclick="showUserAccess()" class="w-full py-2 mb-3 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded-xl font-bold text-[10px] uppercase">User Access & Logs</button><h4 class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Poll Management</h4>
+                    <button onclick="showUserAccess()" class="w-full py-2 mb-3 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded-xl font-bold text-[10px] uppercase transition hover:bg-blue-600 hover:text-white">User Access & Logs</button>
+                    <h4 class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Poll Management</h4>
                     <button onclick="resetAllVotes()" class="w-full py-2 bg-red-600/20 hover:bg-red-600 text-red-500 hover:text-white border border-red-500/30 rounded-xl font-bold text-[10px] uppercase tracking-widest transition">Reset All Votes</button>
                     <div class="flex items-center gap-2 px-2">
                         <input type="checkbox" id="pollVisibilityToggle" onchange="togglePollVisibility(this.checked)" class="w-4 h-4 accent-yellow-500">
@@ -622,19 +432,19 @@ async function saveProfileSettings() {
             </div>
         </aside>
 
-        <div id="mainTableArea" class="lg:col-span-12 overflow-x-auto">
-            <div class="glass-panel min-w-[1100px]">
+        <div id="mainTableArea" class="lg:col-span-6 overflow-x-auto">
+            <div class="glass-panel min-w-[600px]">
                 <table>
                     <thead class="oswald text-[10px] text-gray-500 uppercase">
                         <tr>
                             <th class="p-4 text-left">Athlete</th>
                             <th class="text-center">Skill Rating</th>
                             <th class="text-blue-500">MP</th> 
-                            <th class="text-red-500">G</th>
-                            <th class="text-green-500">A</th>
+                            <th class="hidden text-red-500">G</th>
+                            <th class="hidden text-green-500">A</th>
                             <th class="hidden text-indigo-500">Defense</th>
-                            <th class="admin-only text-yellow-500">Y</th>
-                            <th class="admin-only text-red-600">R</th>
+                            <th class="hidden admin-only text-yellow-500">Y</th>
+                            <th class="hidden admin-only text-red-600">R</th>
                             <th>Total</th>
                             <th class="p-4">Rank</th>
                             <th class="admin-only">Action</th>
@@ -644,6 +454,53 @@ async function saveProfileSettings() {
                 </table>
             </div>
         </div>
+    </div>
+</div>
+
+<div id="editGanaaxModal" class="hidden fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm justify-center items-center p-4">
+    <div class="bg-[#0f172a] border border-yellow-500/30 p-6 rounded-3xl shadow-2xl w-full max-w-md relative">
+        <button type="button" onclick="xirEditGanaax()" class="absolute top-4 right-5 text-2xl text-gray-400 hover:text-white transition">&times;</button>
+        <h2 class="text-2xl font-black text-yellow-500 mb-6 oswald uppercase text-center">Wax Ka Beddel Ganaaxa</h2>
+        
+        <form id="editGanaaxForm" onsubmit="kaydiGanaax(event)" class="space-y-4">
+            <input type="hidden" id="editGanaaxId">
+
+            <div>
+                <label class="text-[10px] uppercase text-gray-400 font-bold ml-1">Magaca Ciyaaryahanka</label>
+                <input type="text" id="editGanaaxMagaca" class="w-full mt-1 p-4 rounded-xl bg-black/40 border border-white/10 text-white font-bold cursor-not-allowed" readonly>
+            </div>
+
+            <div>
+                <label class="text-[10px] uppercase text-gray-400 font-bold ml-1">Lacagta ($)</label>
+                <input type="number" id="editGanaaxLacagta" class="w-full mt-1 p-4 rounded-xl bg-black/40 border border-white/10 text-white font-bold focus:outline-none focus:border-yellow-500/50" required>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2">
+                <div>
+                    <label class="text-[10px] uppercase text-gray-400 font-bold ml-1">Sanadka</label>
+                    <select id="editGanaaxYear" class="w-full mt-1 p-3 rounded-xl bg-black/40 border border-white/10 text-white text-xs"></select>
+                </div>
+                <div>
+                    <label class="text-[10px] uppercase text-gray-400 font-bold ml-1">Bisha</label>
+                    <select id="editGanaaxMonth" class="w-full mt-1 p-3 rounded-xl bg-black/40 border border-white/10 text-white text-xs"></select>
+                </div>
+                <div>
+                    <label class="text-[10px] uppercase text-gray-400 font-bold ml-1">Maalinta</label>
+                    <select id="editGanaaxDay" class="w-full mt-1 p-3 rounded-xl bg-black/40 border border-white/10 text-white text-xs"></select>
+                </div>
+            </div>
+            
+            <div>
+                <label class="text-[10px] uppercase text-gray-400 font-bold ml-1">Status / Bixiyay</label>
+                <select id="editGanaaxStatus" class="w-full mt-1 p-3 rounded-xl bg-black/40 border border-white/10 text-white text-xs font-bold focus:outline-none">
+                    <option value="PAID">PAID</option>
+                    <option value="UNPAID">UNPAID</option>
+                    <option value="APPROVED">APPROVED</option>
+                </select>
+            </div>
+
+            <button type="submit" class="w-full py-4 bg-yellow-500 hover:bg-yellow-400 text-black font-black oswald rounded-2xl uppercase tracking-widest transition mt-4">Kaydi Isbeddelka</button>
+        </form>
     </div>
 </div>
 
@@ -756,6 +613,53 @@ async function saveProfileSettings() {
     </div>
 </div>
 
+<div id="profileSettingsModal" class="hidden fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm items-center justify-center p-4">
+    <div class="bg-[#0f172a] border border-yellow-500/30 rounded-3xl w-full max-w-md p-6 relative">
+        <button onclick="toggleProfileSettings()" class="absolute top-4 right-5 text-2xl text-gray-400 hover:text-white">&times;</button>
+        <h2 class="text-2xl font-black oswald text-yellow-500 uppercase mb-6 text-center">Profile Settings</h2>
+        <div class="space-y-4">
+            <div>
+                <label class="text-[10px] uppercase text-gray-400 font-bold">Change Name</label>
+                <input type="text" id="newDisplayName" placeholder="Enter new name" class="w-full mt-1 p-4 rounded-xl bg-black/40 border border-white/10 text-white font-bold">
+            </div>
+            <div>
+                <label class="text-[10px] uppercase text-gray-400 font-bold">Change Profile Picture</label>
+                <input type="file" id="newProfilePhoto" accept="image/*" class="w-full mt-1 text-xs text-white">
+            </div>
+            <div>
+                <label class="text-[10px] uppercase text-gray-400 font-bold">New Password</label>
+                <input type="password" id="newPassword" placeholder="Enter new password" class="w-full mt-1 p-4 rounded-xl bg-black/40 border border-white/10 text-white font-bold">
+            </div>
+            <button onclick="saveProfileSettings()" class="w-full py-4 bg-yellow-500 hover:bg-yellow-400 text-black font-black oswald rounded-2xl uppercase tracking-widest transition">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<div id="userAccessModal" class="hidden fixed inset-0 z-[120] bg-black/80 flex items-center justify-center p-4">
+    <div class="bg-[#0f172a] w-full max-w-6xl rounded-3xl p-6 border border-yellow-500/30">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-black text-yellow-500">Full User Management</h3>
+            <button onclick="document.getElementById('userAccessModal').classList.add('hidden')" class="px-4 py-2 bg-red-600 hover:bg-red-500 transition rounded-xl text-xs font-bold text-white">Close</button>
+        </div>
+        <div class="grid md:grid-cols-2 gap-4 mb-4">
+            <input id="userSearchInput" onkeyup="showUserAccess()" placeholder="Search user/email/action" class="p-3 rounded-xl bg-black/40 border border-white/10 text-white text-xs focus:outline-none focus:border-yellow-500/50">
+            <select id="logFilterSelect" onchange="showUserAccess()" class="p-3 rounded-xl bg-black/40 border border-white/10 text-white text-xs">
+                <option value="ALL">All Actions</option>
+                <option value="LOGIN">LOGIN</option>
+                <option value="LOGOUT">LOGOUT</option>
+                <option value="PROFILE_UPDATED">PROFILE UPDATED</option>
+                <option value="PLAYER_REGISTERED">PLAYER REGISTERED</option>
+                <option value="ATHLETE_EDITED">ATHLETE EDITED</option>
+                <option value="ATHLETE_DELETED">ATHLETE EDITED</option>
+                <option value="GANAAX_ADDED">GANAAX ADDED</option>
+                <option value="GANAAX_UPDATED">GANAAX UPDATED</option>
+                <option value="GANAAX_DELETED">GANAAX DELETED</option>
+            </select>
+        </div>
+        <div id="userAccessList" class="max-h-[500px] overflow-y-auto text-xs chat-scroll pr-2"></div>
+    </div>
+</div>
+
 <script>
     const validationRules = {
         's1': { max: 2, text: '0 or 2' }, 
@@ -801,6 +705,8 @@ async function saveProfileSettings() {
     const presenceRef = firebase.database().ref('golaha_presence');
     const paymentsRef = firebase.database().ref('golaha_payments');
     const logsRef = firebase.database().ref('golaha_user_logs');
+    const ganaaxRef = firebase.database().ref('golaha_ganaaxyada'); 
+    const fasaxRef = firebase.database().ref('golaha_fasax');
     const auth = firebase.auth();
 
     const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -811,9 +717,12 @@ async function saveProfileSettings() {
     let currentUserProfileUsername = "Anonymous";
     let currentFee = 10;
     let paymentData = {};
+    let ganaaxData = {}; 
+    let fasaxData = {};
     let chatIsOpen = false;
     let unreadCount = 0;
     let lastSeenMsgTimestamp = parseInt(localStorage.getItem('lastSeenMsg')) || 0;
+    let globalPaymentDataRaw = {};
 
     auth.onAuthStateChanged(user => {
         const loginScreen = document.getElementById('loginScreen');
@@ -868,48 +777,79 @@ async function saveProfileSettings() {
             if (isUserAdmin || isLimitedAdmin) {
                 mainBody.setAttribute('data-role', 'admin');
                 adminPanel.classList.remove('admin-only');
-                mainTableArea.classList.replace('lg:col-span-12', 'lg:col-span-9');
+                mainTableArea.classList.replace('lg:col-span-10', 'lg:col-span-6'); 
+                mainTableArea.classList.replace('lg:col-span-12', 'lg:col-span-6');
+                mainTableArea.classList.replace('lg:col-span-7', 'lg:col-span-6');
 
                 if (isLimitedAdmin) {
-
-                    // Hide payment + analytics + attendance poll controls
                     document.getElementById('tabPay').style.display = 'none';
                     document.getElementById('tabPayAn').style.display = 'none';
+                    document.getElementById('tabGan').style.display = 'none';
+                    document.getElementById('tabFasax').style.display = 'none';
 
-                    const pollSection = document.querySelector('.border-t.border-white\/10.mt-6.pt-4.space-y-4');
+                    const pollSection = document.querySelector('.border-t.border-white\\/10.mt-6.pt-4.space-y-4');
                     if (pollSection) pollSection.style.display = 'none';
 
                     setTimeout(() => {
                         document.getElementById('payForm').classList.add('hidden');
                         document.getElementById('payAnForm').classList.add('hidden');
+                        document.getElementById('ganForm').classList.add('hidden');
+                        document.getElementById('fasaxForm').classList.add('hidden');
                     }, 50);
                 }
 
             } else {
                 mainBody.removeAttribute('data-role');
                 adminPanel.classList.add('admin-only');
-                mainTableArea.classList.replace('lg:col-span-9', 'lg:col-span-12');
+                mainTableArea.classList.replace('lg:col-span-6', 'lg:col-span-10'); 
+                mainTableArea.classList.replace('lg:col-span-7', 'lg:col-span-10'); 
+                mainTableArea.classList.replace('lg:col-span-9', 'lg:col-span-10');
                 if (isFinanceUser) {
                     adminPanel.classList.remove('admin-only');
-                    mainTableArea.classList.replace('lg:col-span-12', 'lg:col-span-9');
+                    mainTableArea.classList.replace('lg:col-span-10', 'lg:col-span-6'); 
+                    mainTableArea.classList.replace('lg:col-span-12', 'lg:col-span-6');
+                    mainTableArea.classList.replace('lg:col-span-7', 'lg:col-span-6');
                     switchAdminTab('pay');
                     setTimeout(() => {
                         document.getElementById('statsForm').classList.add('hidden');
                         document.getElementById('regForm').classList.add('hidden');
                         document.getElementById('payForm').classList.remove('hidden');
+                        document.getElementById('ganForm').classList.add('hidden');
+                        document.getElementById('fasaxForm').classList.add('hidden');
                     }, 50);
                 }
             }
 
             dbRef.on('value', snapshot => { db = snapshot.val() || {}; render(); });
             votesRef.on('value', s => { votes = s.val() || {}; updateAttendancePollUI(); });
+            
             paymentsRef.on('value', s => {
                 const data = s.val() || {};
                 currentFee = data.globalFee || 10;
                 paymentData = data.records || {};
                 const inputFee = document.getElementById('monthlyFeeInput');
                 if (inputFee && document.activeElement !== inputFee) inputFee.value = currentFee;
+                
                 updatePaymentReport();
+                globalPaymentDataRaw = data;
+                handleLockoutCheck();
+                updateAdminApprovalList(data);
+            });
+
+            ganaaxRef.on('value', s => {
+                ganaaxData = s.val() || {};
+                if(typeof renderGanaaxTable === 'function') {
+                    renderGanaaxTable(false); 
+                }
+                if(typeof handleLockoutCheck === 'function') {
+                    handleLockoutCheck();
+                }
+            });
+
+            fasaxRef.on('value', s => {
+                fasaxData = s.val() || {};
+                updateAttendancePollUI();
+                renderFasaxTable();
             });
 
             settingsRef.on('value', s => {
@@ -936,14 +876,199 @@ async function saveProfileSettings() {
                 else reportBtn.classList.add('hidden');
             });
 
-            listenToGlobalPublicChatroom();
+            // Initialize chat stream (with Edit/Delete support via 'value' listener)
+            let seenMessages = new Set();
+            chatRef.limitToLast(50).on('value', snapshot => {
+                const stream = document.getElementById('chatMessageStream');
+                if (!stream) return;
+                stream.innerHTML = ''; // Clear stream to prevent duplicates on edit/delete
+                
+                snapshot.forEach(childSnap => {
+                    const msg = childSnap.val();
+                    const msgId = childSnap.key;
+                    
+                    const isMe = msg.sender === currentUserProfileUsername;
+                    const safeText = encodeURIComponent(msg.text || "");
+                    const editedTag = msg.isEdited ? `<span class="text-[8px] opacity-70 ml-1 italic">(edited)</span>` : "";
+                    
+                    let actionBtns = '';
+                    
+                    // Only the sender can edit
+                    let editBtn = isMe ? `<button onclick="editMessage('${msgId}', '${safeText}')" class="hover:text-black transition">Edit</button>` : '';
+                    
+                    // Senders AND Admins can delete
+                    let deleteBtn = (isMe || isUserAdmin) ? `<button onclick="deleteMessage('${msgId}')" class="${isMe ? 'hover:text-red-800' : 'text-red-400 hover:text-red-300'} transition">Delete</button>` : '';
+                    
+                    if (editBtn || deleteBtn) {
+                        actionBtns = `
+                            <div class="flex gap-3 mt-2 justify-end opacity-70 text-[9px] font-bold">
+                                ${editBtn}
+                                ${deleteBtn}
+                            </div>
+                        `;
+                    }
+
+                    // Outer wrapper guarantees proper left/right alignment in the flex column
+                    const wrapperDiv = document.createElement('div');
+                    wrapperDiv.className = `w-full flex ${isMe ? 'justify-end' : 'justify-start'} mb-2`;
+
+                    // Inner bubble styling
+                    const innerDiv = document.createElement('div');
+                    innerDiv.className = `p-3 rounded-2xl max-w-[80%] flex flex-col ${isMe ? 'bg-yellow-500 text-black rounded-br-none shadow-md' : 'bg-[#1e293b] text-white border border-white/10 rounded-bl-none shadow-md'}`;
+                    
+                    innerDiv.innerHTML = `
+                        <div class="text-[9px] font-black uppercase mb-1 ${isMe ? 'opacity-60' : 'text-yellow-500 opacity-80'}">${msg.sender}</div>
+                        <div class="text-xs font-semibold break-words">${msg.text} ${editedTag}</div>
+                        ${actionBtns}
+                    `;
+                    
+                    wrapperDiv.appendChild(innerDiv);
+                    stream.appendChild(wrapperDiv);
+                    
+                    if (!seenMessages.has(msgId)) {
+                        seenMessages.add(msgId);
+                        if (!chatIsOpen && !isMe) {
+                            unreadCount++;
+                            updateBadgeUI();
+                        }
+                    }
+                });
+                
+                stream.scrollTop = stream.scrollHeight;
+            });
+
         } else {
             loginScreen.style.display = 'flex';
             dashboardArea.classList.add('hidden');
             chatSystemWidget.classList.add('hidden');
+            document.getElementById('lockoutModal').style.display = 'none';
             profilesRef.on('value', s => { profiles = s.val() || {}; updateDropdowns(); });
         }
     });
+
+    function handleLockoutCheck() {
+        const user = auth.currentUser;
+        if (!user) return;
+        
+        const admins = ["admin@golaha.com", "admin@gmail.com", "moha@golaha.com", "labagole@admin.com", "ahmedgurey@golaha.com"];
+        const financeUsers = ["cashier@golaha.com"];
+        if (admins.includes(user.email.toLowerCase()) || financeUsers.includes(user.email.toLowerCase())) {
+            document.getElementById('lockoutModal').style.display = 'none';
+            return;
+        }
+
+        const today = new Date();
+        const currentMonthKey = `${today.getFullYear()}-${today.getMonth()}`;
+        const records = globalPaymentDataRaw.records || {};
+        const requests = globalPaymentDataRaw.requests || {};
+        
+        const hasPaidMonthly = records[currentMonthKey]?.[currentUserProfileUsername] === true;
+        
+        let hasUnpaidGanaax = false;
+        let unpaidGanaaxCount = 0;
+        for (let key in ganaaxData) {
+            const item = ganaaxData[key];
+            if ((item.name || '').toUpperCase() === currentUserProfileUsername.toUpperCase() && item.status === 'UNPAID') {
+                hasUnpaidGanaax = true;
+                unpaidGanaaxCount++;
+            }
+        }
+
+        const lockoutModal = document.getElementById('lockoutModal');
+        const isLockedOut = !hasPaidMonthly || hasUnpaidGanaax;
+        
+        if (isLockedOut) {
+            lockoutModal.style.display = 'flex';
+            document.getElementById('dashboardArea').classList.add('hidden');
+            document.getElementById('chatSystemWidget').classList.add('hidden');
+            
+            const btn = document.getElementById('lockoutIPaidBtn');
+            const statusMsg = document.getElementById('lockoutStatusMsg');
+            
+            if (hasUnpaidGanaax) {
+                btn.classList.add('hidden');
+                statusMsg.innerHTML = `<span class="text-red-500 font-black text-sm uppercase block mb-1">⚠️ GANAAX AAN LA BIXIN (${unpaidGanaaxCount})</span>Access-ka oo dhan waa xiran yahay ilaa Admin ama Cashier uu ganaaxa ka dhigo PAID ama APPROVED.`;
+            } else {
+                btn.classList.remove('hidden');
+                const isPending = requests[currentMonthKey]?.[currentUserProfileUsername] !== undefined;
+                if (isPending) {
+                    btn.disabled = true;
+                    btn.className = "w-full py-4 bg-gray-600 text-gray-400 font-black oswald uppercase tracking-widest cursor-not-allowed rounded-xl";
+                    statusMsg.innerText = "Codsigaaga oggolaanshaha waa la diray. Fadlan sug inta laga ansixinayo Cashier ama Ahmed Gurey.";
+                } else {
+                    btn.disabled = false;
+                    btn.className = "w-full py-4 bg-yellow-500 text-black font-black oswald uppercase tracking-widest hover:bg-yellow-400 transition rounded-xl";
+                    statusMsg.innerText = "";
+                }
+            }
+        } else {
+            lockoutModal.style.display = 'none';
+            document.getElementById('dashboardArea').classList.remove('hidden');
+            document.getElementById('chatSystemWidget').classList.remove('hidden');
+        }
+    }
+
+    function submitPaymentApprovalRequest() {
+        const today = new Date();
+        const currentMonthKey = `${today.getFullYear()}-${today.getMonth()}`;
+        paymentsRef.child('requests').child(currentMonthKey).child(currentUserProfileUsername).set({
+            email: auth.currentUser.email,
+            timestamp: firebase.database.ServerValue.TIMESTAMP,
+            status: 'PENDING'
+        }).then(() => {
+            logUserActivity('PAYMENT_REQUEST_SUBMITTED', { month: currentMonthKey });
+        });
+    }
+
+    function updateAdminApprovalList(data) {
+        const listContainer = document.getElementById('adminApprovalRequestsList');
+        if (!listContainer) return;
+        listContainer.innerHTML = "";
+        
+        const requests = data.requests || {};
+        let count = 0;
+        
+        for (let monthKey in requests) {
+            for (let username in requests[monthKey]) {
+                count++;
+                const div = document.createElement('div');
+                div.className = "p-3 bg-white/5 rounded-xl border border-white/10 flex flex-col gap-2 mb-2 text-left";
+                div.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <div class="font-bold text-white uppercase tracking-wide text-xs">${username}</div>
+                            <div class="text-[10px] text-gray-400">Requested: ${monthKey}</div>
+                        </div>
+                        <div class="flex gap-1">
+                            <button onclick="approvePaymentRequest('${monthKey}', '${username}')" class="px-2 py-1 bg-green-600 hover:bg-green-500 text-white rounded-lg font-bold text-[9px] uppercase tracking-tighter">Approve</button>
+                            <button onclick="rejectPaymentRequest('${monthKey}', '${username}')" class="px-2 py-1 bg-red-600 hover:bg-red-500 text-white rounded-lg font-bold text-[9px] uppercase tracking-tighter">Deny</button>
+                        </div>
+                    </div>
+                `;
+                listContainer.appendChild(div);
+            }
+        }
+        if (count === 0) {
+            listContainer.innerHTML = `<div class="text-gray-500 text-center py-3 text-[10px] uppercase font-bold tracking-wider">No pending payment requests</div>`;
+        }
+    }
+
+    function approvePaymentRequest(monthKey, username) {
+        if (!(isUserAdmin || isFinanceUser)) return;
+        paymentsRef.child('records').child(monthKey).child(username).set(true).then(() => {
+            paymentsRef.child('requests').child(monthKey).child(username).remove();
+            logUserActivity('PAYMENT_REQUEST_APPROVED', { player: username, month: monthKey });
+            alert(`Approved! User ${username} is now marked as PAID for this month.`);
+        });
+    }
+    
+    function rejectPaymentRequest(monthKey, username) {
+        if (!(isUserAdmin || isFinanceUser)) return;
+        if (confirm(`Deny and remove pending message request from ${username}?`)) {
+            paymentsRef.child('requests').child(monthKey).child(username).remove();
+            logUserActivity('PAYMENT_REQUEST_REJECTED', { player: username, month: monthKey });
+        }
+    }
 
     function toggleReportVisibility(isChecked) {
         if(!isUserAdmin) return;
@@ -981,6 +1106,8 @@ async function saveProfileSettings() {
               allPlayers = Object.keys(profiles).sort();
 
         allPlayers.forEach(name => {
+            if (name === "FULL CASHIER") return; 
+            
             const hasPaid = records[name] === true;
             let shouldDisplay = (statusType === 'ALL') || (statusType === 'PAID' && hasPaid) || (statusType === 'UNPAID' && !hasPaid);
             if (shouldDisplay) {
@@ -1018,7 +1145,6 @@ async function saveProfileSettings() {
         }
     }
 
-
     function logUserActivity(action, details = {}) {
         const user = auth.currentUser;
         if (!user) return;
@@ -1038,31 +1164,77 @@ async function saveProfileSettings() {
               inMonth = document.getElementById('inMonth'),
               selMonth = document.getElementById('selMonth'),
               anYear = document.getElementById('anYear'),
-              anMonth = document.getElementById('anMonth');
+              anMonth = document.getElementById('anMonth'),
+              ganYear = document.getElementById('ganYearSelect'),
+              ganMonth = document.getElementById('ganMonthSelect'),
+              ganDay = document.getElementById('ganDaySelect'),
+              editGanYear = document.getElementById('editGanaaxYear'),
+              editGanMonth = document.getElementById('editGanaaxMonth'),
+              editGanDay = document.getElementById('editGanaaxDay');
               
         viewYear.innerHTML = '';
         if(anYear) anYear.innerHTML = '';
+        if(ganYear) ganYear.innerHTML = '';
+        if(editGanYear) editGanYear.innerHTML = '';
         
         for (let y = 2026; y <= 2030; y++) {
             viewYear.innerHTML += `<option value="${y}">${y}</option>`;
             if(anYear) anYear.innerHTML += `<option value="${y}">${y}</option>`;
+            if(ganYear) ganYear.innerHTML += `<option value="${y}">${y}</option>`;
+            if(editGanYear) editGanYear.innerHTML += `<option value="${y}">${y}</option>`;
         }
         
         inMonth.innerHTML = '';
         selMonth.innerHTML = '<option value="">-- MONTH --</option>';
         if(anMonth) anMonth.innerHTML = '<option value="">-- MONTH --</option>';
+        if(ganMonth) ganMonth.innerHTML = '';
+        if(editGanMonth) editGanMonth.innerHTML = '';
         
         MONTHS.forEach((m, i) => {
             inMonth.innerHTML += `<option value="${i}">${m}</option>`;
             selMonth.innerHTML += `<option value="${i}">${m}</option>`;
             if(anMonth) anMonth.innerHTML += `<option value="${i}">${m}</option>`;
+            if(ganMonth) ganMonth.innerHTML += `<option value="${i}">${m}</option>`;
+            if(editGanMonth) editGanMonth.innerHTML += `<option value="${i}">${m}</option>`;
         });
+
+        if(ganDay && editGanDay) {
+            ganDay.innerHTML = '';
+            editGanDay.innerHTML = '';
+            for(let d = 1; d <= 31; d++) {
+                ganDay.innerHTML += `<option value="${d}">${d}</option>`;
+                editGanDay.innerHTML += `<option value="${d}">${d}</option>`;
+            }
+        }
+        
+        const sYear = document.getElementById('ganSearchYear');
+        const sMonth = document.getElementById('ganSearchMonth');
+        const sDay = document.getElementById('ganSearchDay');
+        
+        if(sYear && sMonth && sDay) {
+            sYear.innerHTML = '<option value="">-- ALL YEARS --</option>';
+            for (let y = 2026; y <= 2030; y++) {
+                sYear.innerHTML += `<option value="${y}">${y}</option>`;
+            }
+            
+            sMonth.innerHTML = '<option value="">-- ALL MONTHS --</option>';
+            MONTHS.forEach((m, i) => {
+                sMonth.innerHTML += `<option value="${i}">${m}</option>`;
+            });
+            
+            sDay.innerHTML = '<option value="">-- ALL DAYS --</option>';
+            for(let d = 1; d <= 31; d++) {
+                sDay.innerHTML += `<option value="${d}">${d}</option>`;
+            }
+        }
     }
     setup();
 
     function updateDropdowns() {
         const adminSel = document.getElementById('pNameSelect'),
               signUpSel = document.getElementById('signUpNameSelect'),
+              ganSel = document.getElementById('ganPlayerSelect'),
+              fasaxSel = document.getElementById('fasaxPlayerSelect'),
               allNames = Object.keys(profiles).sort();
               
         const adminOptions = '<option value="">-- SELECT NAME --</option>' + allNames.map(n => `<option value="${n}">${n}</option>`).join('');
@@ -1070,6 +1242,8 @@ async function saveProfileSettings() {
         
         if(adminSel) adminSel.innerHTML = adminOptions;
         if(signUpSel) signUpSel.innerHTML = signUpOptions;
+        if(ganSel) ganSel.innerHTML = adminOptions;
+        if(fasaxSel) fasaxSel.innerHTML = adminOptions;
     }
 
     function releaseName(name) {
@@ -1183,8 +1357,8 @@ async function saveProfileSettings() {
                 const asPhoto = typeof profiles[topAssist?.n] === 'string' ? profiles[topAssist?.n] : profiles[topAssist?.n]?.photo;
 
                 document.getElementById(`box-${t}`).innerHTML = mvpPhoto ? `<img src="${mvpPhoto}" class="award-img">` : `👑`;
-                document.getElementById(`img-goal-${t}`).innerHTML = (topScorer?.v > 0 && scPhoto) ? `<img src="${scPhoto}" class="award-img">` : `⚽`;
-                document.getElementById(`img-assist-${t}`).innerHTML = (topAssist?.v > 0 && asPhoto) ? `<img src="${asPhoto}" class="award-img">` : `🎯`;
+                document.getElementById(`img-goal-${t}`).innerHTML = (topScorer?.v > 0 && scPhoto) ? `<img src="${scPhoto}" class="award-img">` : `👤`;
+                document.getElementById(`img-assist-${t}`).innerHTML = (topAssist?.v > 0 && asPhoto) ? `<img src="${asPhoto}" class="award-img">` : `👤`;
                 
                 document.getElementById(`box-${t}`).innerHTML += `<span class="mini-badge">👑 MVP</span>`;
                 document.getElementById(`img-goal-${t}`).innerHTML += `<span class="mini-badge">⚽ GOALS</span>`;
@@ -1213,7 +1387,7 @@ async function saveProfileSettings() {
 
             const row = document.createElement('tr');
             row.setAttribute('onclick', `openReport("${p.n}")`);
-            row.innerHTML = `<td class="text-left oswald uppercase p-4">${p.n}</td><td class="text-center">${sH}</td><td class="text-blue-400">${p.count}</td><td class="text-red-400 font-bold">${p.g}</td><td class="text-green-400 font-bold">${p.a}</td><td class="hidden text-indigo-400 font-bold">${p.s[6] !== undefined ? p.s[6] : 0}</td><td class="admin-only text-yellow-500">${p.y}</td><td class="admin-only text-red-500">${p.r}</td><td class="total-col font-black oswald">${p.t}</td><td><span class="${i+1 === 1 ? 'rank-badge rank-badge-1' : 'rank-badge'}">${i+1 === 1 ? '🥇' : i+1}</span></td>${(isUserAdmin || ['sacadcabdale@golaha.com'].includes((auth.currentUser?.email||'').toLowerCase())) ? `<td class="admin-only space-x-2"><button onclick="event.stopPropagation(); releaseName('${p.n}')" class="text-green-500">🔓</button><button onclick="event.stopPropagation(); editEntry('${p.n}')" class="text-blue-400">✎</button><button onclick="event.stopPropagation(); deleteEntry('${p.n}')" class="text-red-500">✖</button></td>` : ''}`;
+            row.innerHTML = `<td class="text-left oswald uppercase p-4">${p.n}</td><td class="text-center">${sH}</td><td class="text-blue-400">${p.count}</td><td class="hidden text-red-400 font-bold">${p.g}</td><td class="hidden text-green-400 font-bold">${p.a}</td><td class="hidden text-indigo-400 font-bold">${p.s[6] !== undefined ? p.s[6] : 0}</td><td class="hidden admin-only text-yellow-500">${p.y}</td><td class="hidden admin-only text-red-500">${p.r}</td><td class="total-col font-black oswald">${p.t}</td><td><span class="${i+1 === 1 ? 'rank-badge rank-badge-1' : 'rank-badge'}">${i+1 === 1 ? '🥇' : i+1}</span></td>${(isUserAdmin || ['sacadcabdale@golaha.com'].includes((auth.currentUser?.email||'').toLowerCase())) ? `<td class="admin-only space-x-2"><button onclick="event.stopPropagation(); releaseName('${p.n}')" class="text-green-500">🔓</button><button onclick="event.stopPropagation(); editEntry('${p.n}')" class="text-blue-400">✎</button><button onclick="event.stopPropagation(); deleteEntry('${p.n}')" class="text-red-500">✖</button></td>` : ''}`;
             body.appendChild(row);
         });
     }
@@ -1241,6 +1415,206 @@ async function saveProfileSettings() {
             document.getElementById('yCard').value = "";
             document.getElementById('rCard').value = "";
         });
+    }
+
+    function saveGanaax() {
+        const name = document.getElementById('ganPlayerSelect').value,
+              price = document.getElementById('ganPriceInput').value,
+              yr = document.getElementById('ganYearSelect').value,
+              mo = document.getElementById('ganMonthSelect').value,
+              day = document.getElementById('ganDaySelect').value,
+              status = document.getElementById('ganStatusInput').value;
+              
+        if (!name || !price) return alert("Fadlan dooro ciyaaryahanka iyo qiimaha.");
+        
+        ganaaxRef.push({
+            name: name,
+            price: parseFloat(price),
+            year: yr,
+            month: mo,
+            day: day,
+            status: status,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        }).then(() => {
+            logUserActivity('GANAAX_ADDED', { player: name, price: price });
+            alert("Ganaax si guul leh ayaa loo kaydiyay!");
+            document.getElementById('ganPriceInput').value = "";
+        });
+    }
+
+    function saveFasax() {
+        const name = document.getElementById('fasaxPlayerSelect').value;
+        const status = document.getElementById('fasaxStatusSelect').value;
+        if(!name) return alert("Fadlan dooro magaca ciyaaryahanka.");
+
+        fasaxRef.child(name).set({
+            status: status,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        }).then(() => {
+            logUserActivity('FASAX_UPDATED', { player: name, status: status });
+            alert(`Xaaladda fasaxa ee ${name} waxaa loo badalay: ${status}`);
+        });
+    }
+
+    function renderFasaxTable() {
+        const tbody = document.getElementById('fasaxTableBody');
+        if (!tbody) return;
+        tbody.innerHTML = "";
+
+        let hasRecords = false;
+
+        for (let name in fasaxData) {
+            const data = fasaxData[name];
+            const status = typeof data === 'object' ? data.status : data;
+            const timestamp = typeof data === 'object' ? data.timestamp : null;
+
+            let timeStr = "N/A";
+            if (timestamp) {
+                const d = new Date(timestamp);
+                timeStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
+
+            const row = document.createElement('tr');
+            row.className = "hover:bg-white/5 transition";
+            
+            const statusHtml = status === 'fasax' 
+                ? `<span class="px-2 py-0.5 rounded text-[8px] font-black tracking-wider bg-red-500/20 text-red-400 uppercase">FASAX</span>` 
+                : `<span class="px-2 py-0.5 rounded text-[8px] font-black tracking-wider bg-green-500/20 text-green-400 uppercase">KASOO NOQDAY</span>`;
+
+            row.innerHTML = `
+                <td class="p-3 font-bold uppercase tracking-wide">${name}</td>
+                <td class="p-3 text-center">${statusHtml}</td>
+                <td class="p-3 text-right text-gray-400 text-[10px]">${timeStr}</td>
+            `;
+            tbody.appendChild(row);
+            hasRecords = true;
+        }
+
+        if (!hasRecords) {
+            tbody.innerHTML = `<tr><td colspan="3" class="text-center py-6 text-gray-500 uppercase font-bold text-[9px] tracking-widest">No Leave Records Found</td></tr>`;
+        }
+    }
+
+    function renderGanaaxTable(applyFilters = false) {
+        const tbody = document.getElementById('ganTableBody');
+        if (!tbody) return;
+        tbody.innerHTML = "";
+
+        const nameQuery = applyFilters ? (document.getElementById('ganSearchName').value || '').trim().toUpperCase() : "";
+        const yearQuery = applyFilters ? document.getElementById('ganSearchYear').value : "";
+        const monthQuery = applyFilters ? document.getElementById('ganSearchMonth').value : "";
+        const dayQuery = applyFilters ? document.getElementById('ganSearchDay').value : "";
+        const statusQuery = applyFilters ? document.getElementById('ganSearchStatus').value : "";
+
+        for (let key in ganaaxData) {
+            const item = ganaaxData[key];
+            const itemName = (item.name || '').toUpperCase();
+            const itemYear = item.year || "";
+            const itemMonth = item.month !== undefined ? String(item.month) : "";
+            const itemDay = item.day !== undefined ? String(item.day) : "";
+            const itemStatus = item.status || "UNPAID"; 
+            const price = parseFloat(item.price || 0);
+
+            if (applyFilters) {
+                if (nameQuery && !itemName.includes(nameQuery)) continue;
+                if (yearQuery && itemYear !== yearQuery) continue;
+                if (monthQuery && itemMonth !== monthQuery) continue;
+                if (dayQuery && itemDay !== dayQuery) continue;
+                if (statusQuery && itemStatus !== statusQuery) continue;
+            }
+
+            let timeStr = `${itemYear}-${MONTHS[itemMonth] || itemMonth}-${itemDay}`;
+            if (item.timestamp) {
+                const dateObj = new Date(item.timestamp);
+                timeStr += " @ " + dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
+
+            const row = document.createElement('tr');
+            row.className = "hover:bg-white/5 transition";
+            row.innerHTML = `
+                <td class="p-3 font-bold uppercase tracking-wide text-white">${item.name}</td>
+                <td class="p-3 text-center text-yellow-500 font-black">$${price}</td>
+                <td class="p-3 text-center text-gray-400 text-[10px]">${timeStr}</td>
+                <td class="p-3 text-center">
+                    <span class="px-2 py-0.5 rounded text-[8px] font-black tracking-wider ${itemStatus === 'PAID' || itemStatus === 'APPROVED' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}">
+                        ${itemStatus === "APPROVED" ? "APPROVED ✓" : itemStatus}
+                    </span>
+                </td>
+                <td class="p-3 text-right space-x-2">
+                    <button onclick="furEditGanaax('${key}', '${item.name}', ${price}, '${itemYear}', '${itemMonth}', '${itemDay}', '${itemStatus === "APPROVED" ? "APPROVED ✓" : itemStatus}')" class="text-blue-400 hover:text-white transition">✎</button>
+                    <button onclick="tirtirGanaax('${key}')" class="text-red-500 hover:text-white transition">✖</button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        if (tbody.innerHTML === "") {
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-gray-500 uppercase font-bold text-[9px] tracking-widest">No matching records found</td></tr>`;
+        }
+    }
+
+    async function tirtirGanaax(key) {
+        if (!isUserAdmin && !isFinanceUser) return alert("Fadlan la xiriir Admin-ka si aad u tirtirto.");
+        if (confirm("⚠️ Ma hubtaa inaad rabto inaad tirtirto ganaaxan?")) {
+            try {
+                await ganaaxRef.child(key).remove();
+                logUserActivity('GANAAX_DELETED', { key: key });
+                alert("✅ Ganaaxa waa la tirtiray.");
+            } catch (err) {
+                alert("Cillad: " + err.message);
+            }
+        }
+    }
+
+    function furEditGanaax(key, name, price, year, month, day, status = "UNPAID") {
+        if (!isUserAdmin && !isFinanceUser) return alert("Fadlan la xiriir Admin-ka si aad wax uga beddesho.");
+        
+        document.getElementById('editGanaaxId').value = key;
+        document.getElementById('editGanaaxMagaca').value = name;
+        document.getElementById('editGanaaxLacagta').value = price;
+        document.getElementById('editGanaaxYear').value = year;
+        document.getElementById('editGanaaxMonth').value = month;
+        document.getElementById('editGanaaxDay').value = day;
+        
+        const statusDropdown = document.getElementById('editGanaaxStatus');
+        if(statusDropdown) statusDropdown.value = status;
+        
+        const modal = document.getElementById('editGanaaxModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+
+    function xirEditGanaax() {
+        const modal = document.getElementById('editGanaaxModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+
+    async function kaydiGanaax(event) {
+        event.preventDefault();
+        
+        const key = document.getElementById('editGanaaxId').value;
+        const price = document.getElementById('editGanaaxLacagta').value;
+        const year = document.getElementById('editGanaaxYear').value;
+        const month = document.getElementById('editGanaaxMonth').value;
+        const day = document.getElementById('editGanaaxDay').value;
+        const status = document.getElementById('editGanaaxStatus')?.value || "UNPAID";
+
+        try {
+            await ganaaxRef.child(key).update({
+                price: parseFloat(price),
+                year: year,
+                month: month,
+                day: day,
+                status: status,
+                updatedAt: firebase.database.ServerValue.TIMESTAMP
+            });
+            logUserActivity('GANAAX_UPDATED', { key: key, newPrice: price });
+            alert("✅ Ganaaxa waa la cusbooneysiiyay!");
+            xirEditGanaax();
+        } catch (err) {
+            alert("Cillad: " + err.message);
+        }
     }
 
     function editEntry(playerName) {
@@ -1340,18 +1714,29 @@ async function saveProfileSettings() {
     function closeReport(e) { if(!e || e.target.id === 'reportModal') document.getElementById('reportModal').style.display = 'none'; }
 
     function switchAdminTab(t) {
-        if(isFinanceUser && !isUserAdmin && (t === 'data' || t === 'reg')) return;
+        if(isFinanceUser && !isUserAdmin && (t === 'data' || t === 'reg' || t === 'fasax')) return;
         document.getElementById('regForm').classList.toggle('hidden', t !== 'reg' || (isFinanceUser && !isUserAdmin));
         document.getElementById('statsForm').classList.toggle('hidden', t !== 'data' || (isFinanceUser && !isUserAdmin));
         document.getElementById('payForm').classList.toggle('hidden', t !== 'pay');
         document.getElementById('payAnForm').classList.toggle('hidden', t !== 'payAn');
-        const tabs = ['Data', 'Reg', 'Pay', 'PayAn'];
-        if(isFinanceUser && !isUserAdmin){ document.getElementById('tabData').style.display='none'; document.getElementById('tabReg').style.display='none'; }
+        document.getElementById('ganForm').classList.toggle('hidden', t !== 'gan');
+        document.getElementById('fasaxForm').classList.toggle('hidden', t !== 'fasax');
+        
+        const tabs = ['Data', 'Reg', 'Pay', 'PayAn', 'Gan', 'Fasax'];
+        if(isFinanceUser && !isUserAdmin){ document.getElementById('tabData').style.display='none'; document.getElementById('tabReg').style.display='none'; document.getElementById('tabFasax').style.display='none'; }
         tabs.forEach(tab => {
             const el = document.getElementById('tab' + tab);
             if(el) el.style.color = (t.toLowerCase() === tab.toLowerCase() || (t === 'payAn' && tab === 'PayAn')) ? '#fbbf24' : '#6b7280';
         });
-        if(t === 'pay') document.getElementById('payPlayerSelect').innerHTML = document.getElementById('pNameSelect').innerHTML;
+        
+        if(t === 'pay' || t === 'gan' || t === 'fasax') {
+            const pSel = document.getElementById('payPlayerSelect');
+            const gSel = document.getElementById('ganPlayerSelect');
+            const fSel = document.getElementById('fasaxPlayerSelect');
+            if(pSel) pSel.innerHTML = document.getElementById('pNameSelect').innerHTML;
+            if(gSel) gSel.innerHTML = document.getElementById('pNameSelect').innerHTML;
+            if(fSel) fSel.innerHTML = document.getElementById('pNameSelect').innerHTML;
+        }
         if(t === 'payAn') {
             document.getElementById('anYear').innerHTML = document.getElementById('viewYear').innerHTML;
             document.getElementById('anMonth').innerHTML = document.getElementById('selMonth').innerHTML;
@@ -1381,7 +1766,7 @@ async function saveProfileSettings() {
               records = paymentData[monthKey] || {},
               allPlayers = Object.keys(profiles).sort();
 
-        let tableRows = allPlayers.map(name => {
+        let tableRows = allPlayers.filter(name => name !== "FULL CASHIER").map(name => {
             const hasPaid = records[name] === true;
             return `
                 <tr class="hover:bg-white/5 transition">
@@ -1449,39 +1834,39 @@ async function saveProfileSettings() {
         });
     }
 
+    function showUserAccess(){
+        logsRef.limitToLast(300).once('value',snap=>{
+            const logs=snap.val()||{};
+            const box=document.getElementById('userAccessList');
+            const search=(document.getElementById('userSearchInput')?.value||'').toLowerCase();
+            const filter=(document.getElementById('logFilterSelect')?.value||'ALL');
+            box.innerHTML='';
+            const grouped={};
+            Object.values(logs).forEach(l=>{
+                if(!grouped[l.email]) grouped[l.email]={email:l.email,name:l.name,logs:[]};
+                grouped[l.email].logs.push(l);
+            });
+            Object.values(grouped).forEach(u=>{
+                const visible=u.logs.filter(l=>{
+                    const txt=((l.name||'')+' '+(l.email||'')+' '+(l.action||'')).toLowerCase();
+                    return (filter==='ALL'||l.action===filter) && (!search || txt.includes(search));
+                }).sort((a,b)=>(b.timestamp||0)-(a.timestamp||0));
+                if(!visible.length) return;
+                const latest=visible[0];
+                const latestDate=new Date(latest.timestamp||Date.now()).toLocaleString();
+                let logsHtml='';
+                visible.slice(0,10).forEach(l=>{
+                    const d=new Date(l.timestamp||Date.now()).toLocaleString();
+                    logsHtml += `<div class="text-[10px] border-t border-white/5 pt-1 mt-1"><span class="text-yellow-500">${l.action}</span> • ${d}</div>`;
+                });
+                box.innerHTML += `<div class="mb-3 p-4 rounded-2xl bg-white/5 border border-white/10"><div class="flex justify-between items-center"><div><div class="font-black text-white uppercase">${u.name||'Unknown'}</div><div class="text-gray-400">${u.email||''}</div><div class="text-[10px] text-green-400">Last Activity: ${latestDate}</div></div><div class="flex gap-2"><button onclick="copyUserEmail('${u.email}')" class="px-2 py-1 bg-blue-600/20 text-blue-400 rounded-lg text-[10px]">Copy Email</button></div></div>${logsHtml}</div>`;
+            });
+            if(box.innerHTML==='') box.innerHTML='<div class="text-center text-gray-500 py-6">No users found.</div>';
+            document.getElementById('userAccessModal').classList.remove('hidden');
+        });
+    }
     
-function showUserAccess(){
- logsRef.limitToLast(300).once('value',snap=>{
-  const logs=snap.val()||{};
-  const box=document.getElementById('userAccessList');
-  const search=(document.getElementById('userSearchInput')?.value||'').toLowerCase();
-  const filter=(document.getElementById('logFilterSelect')?.value||'ALL');
-  box.innerHTML='';
-  const grouped={};
-  Object.values(logs).forEach(l=>{
-    if(!grouped[l.email]) grouped[l.email]={email:l.email,name:l.name,logs:[]};
-    grouped[l.email].logs.push(l);
-  });
-  Object.values(grouped).forEach(u=>{
-    const visible=u.logs.filter(l=>{
-      const txt=((l.name||'')+' '+(l.email||'')+' '+(l.action||'')).toLowerCase();
-      return (filter==='ALL'||l.action===filter) && (!search || txt.includes(search));
-    }).sort((a,b)=>(b.timestamp||0)-(a.timestamp||0));
-    if(!visible.length) return;
-    const latest=visible[0];
-    const latestDate=new Date(latest.timestamp||Date.now()).toLocaleString();
-    let logsHtml='';
-    visible.slice(0,10).forEach(l=>{
-      const d=new Date(l.timestamp||Date.now()).toLocaleString();
-      logsHtml += `<div class="text-[10px] border-t border-white/5 pt-1 mt-1"><span class="text-yellow-500">${l.action}</span> • ${d}</div>`;
-    });
-    box.innerHTML += `<div class="mb-3 p-4 rounded-2xl bg-white/5 border border-white/10"><div class="flex justify-between items-center"><div><div class="font-black text-white uppercase">${u.name||'Unknown'}</div><div class="text-gray-400">${u.email||''}</div><div class="text-[10px] text-green-400">Last Activity: ${latestDate}</div></div><div class="flex gap-2"><button onclick="copyUserEmail('${u.email}')" class="px-2 py-1 bg-blue-600/20 text-blue-400 rounded-lg text-[10px]">Copy Email</button></div></div>${logsHtml}</div>`;
-  });
-  if(box.innerHTML==='') box.innerHTML='<div class="text-center text-gray-500 py-6">No users found.</div>';
-  document.getElementById('userAccessModal').classList.remove('hidden');
- });
-}
-function copyUserEmail(email){navigator.clipboard.writeText(email); alert('Email copied: '+email);}
+    function copyUserEmail(email){navigator.clipboard.writeText(email); alert('Email copied: '+email);}
 
     function resetAllVotes() {
         if(confirm("Permanently wipe ALL attendance votes?")) {
@@ -1496,13 +1881,21 @@ function copyUserEmail(email){navigator.clipboard.writeText(email); alert('Email
 
     function castVote(status) {
         if(!currentUserProfileUsername || currentUserProfileUsername === "Anonymous") return alert("Please authenticating session.");
+        
+        const fData = fasaxData[currentUserProfileUsername];
+        const isFasax = fData && (typeof fData === 'object' ? fData.status === 'fasax' : fData === 'fasax');
+        
+        if (isFasax) {
+            alert("Maku codeyn kartid sababtoo ah waxaad ku jirtaa Fasax!");
+            return;
+        }
+
         votesRef.child(currentUserProfileUsername).set({
             status: status,
             timestamp: firebase.database.ServerValue.TIMESTAMP
         });
     }
 
-    // Dynamic Live Inline Vote Feed populator with stacked name and detailed seconds-precise timestamp
     function updateAttendancePollUI() {
         let jooge = 0, maqane = 0;
         const feedContainer = document.getElementById('inlineVoteFeed');
@@ -1511,6 +1904,12 @@ function copyUserEmail(email){navigator.clipboard.writeText(email); alert('Email
         const voteArray = [];
         
         for(let key in votes) {
+            if (key === "FULL CASHIER") continue; 
+            
+            const fData = fasaxData[key];
+            const isFasax = fData && (typeof fData === 'object' ? fData.status === 'fasax' : fData === 'fasax');
+            if (isFasax) continue;
+            
             const voteData = typeof votes[key] === 'object' ? (votes[key].status ? votes[key] : { status: votes[key], timestamp: null }) : { status: votes[key], timestamp: null };
             const voteStatus = voteData.status;
             
@@ -1524,7 +1923,6 @@ function copyUserEmail(email){navigator.clipboard.writeText(email); alert('Email
         if(cJ) cJ.innerText = jooge;
         if(cM) cM.innerText = maqane;
         
-        // Sort with newest timestamps appearing first
         voteArray.sort((a, b) => (b.time || 0) - (a.time || 0));
         
         if (feedContainer) {
@@ -1532,7 +1930,6 @@ function copyUserEmail(email){navigator.clipboard.writeText(email); alert('Email
                 feedContainer.innerHTML = `<span class="text-xs text-gray-500 font-bold tracking-wide uppercase italic p-1">No responses captured for this session yet.</span>`;
             } else {
                 voteArray.forEach(v => {
-                    // Generates exact format with seconds included: e.g., 09:25:30 AM
                     let timeStr = '--:--:-- --';
                     if (v.time) {
                         const dateObj = new Date(v.time);
@@ -1541,7 +1938,7 @@ function copyUserEmail(email){navigator.clipboard.writeText(email); alert('Email
                         const seconds = String(dateObj.getSeconds()).padStart(2, '0');
                         const ampm = hours >= 12 ? 'PM' : 'AM';
                         hours = hours % 12;
-                        hours = hours ? hours : 12; // the hour '0' should be '12'
+                        hours = hours ? hours : 12;
                         const hoursStr = String(hours).padStart(2, '0');
                         timeStr = `${hoursStr}:${minutes}:${seconds} ${ampm}`;
                     }
@@ -1569,6 +1966,12 @@ function copyUserEmail(email){navigator.clipboard.writeText(email); alert('Email
         if (type === 'NONE') {
             title.innerText = "No Response";
             Object.keys(profiles).forEach(name => {
+                if (name === "FULL CASHIER") return; 
+                
+                const fData = fasaxData[name];
+                const isFasax = fData && (typeof fData === 'object' ? fData.status === 'fasax' : fData === 'fasax');
+                if (isFasax) return;
+                
                 if (!votes[name]) {
                     const profile = profiles[name], photo = typeof profile === 'string' ? profile : profile?.photo;
                     const div = document.createElement('div');
@@ -1580,10 +1983,17 @@ function copyUserEmail(email){navigator.clipboard.writeText(email); alert('Email
         } else {
             title.innerText = type === 'JOOGE' ? "Jooge Attendees" : "Maqane Absentees";
             for(let name in votes) {
+                if (name === "FULL CASHIER") continue; 
+                
+                const fData = fasaxData[name];
+                const isFasax = fData && (typeof fData === 'object' ? fData.status === 'fasax' : fData === 'fasax');
+                if (isFasax) continue;
+                
                 const voteData = typeof votes[name] === 'object' ? votes[name] : { status: votes[name], timestamp: null };
                 
                 if(voteData.status === type) {
                     const profile = profiles[name], photo = typeof profile === 'string' ? profile : profile?.photo;
+                    
                     let timeStr = '--:--';
                     if (voteData.timestamp) {
                         const d = new Date(voteData.timestamp);
@@ -1594,9 +2004,9 @@ function copyUserEmail(email){navigator.clipboard.writeText(email); alert('Email
                         h = h % 12 || 12;
                         timeStr = `${String(h).padStart(2,'0')}:${m}:${s} ${ampm}`;
                     }
-                    
+
                     const div = document.createElement('div');
-                    div.className = "flex items-center justify-between p-3 bg-white/5 rounded-2xl border border-white/5 mb-2";
+                    div.className = "flex items-center justify-between p-3 bg-white/5 rounded-2xl border border-white/10 mb-2";
                     div.innerHTML = `
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-full border-2 ${type==='JOOGE'?'border-green-500':'border-red-500'} overflow-hidden">
@@ -1631,7 +2041,7 @@ function copyUserEmail(email){navigator.clipboard.writeText(email); alert('Email
 
     function updateBadgeUI() {
         const badge = document.getElementById('unreadBadge');
-        if (unreadCount > 0) {
+        if (unreadCount > 0 && !chatIsOpen) {
             badge.innerText = unreadCount;
             badge.style.display = 'flex';
         } else {
@@ -1639,231 +2049,89 @@ function copyUserEmail(email){navigator.clipboard.writeText(email); alert('Email
         }
     }
 
-    function listenToGlobalPublicChatroom() {
-        chatRef.limitToLast(100).on('value', snapshot => {
-            const container = document.getElementById('chatMessageStream');
-            container.innerHTML = "";
-            const data = snapshot.val();
-            if(!data) return;
-            
-            Object.keys(data).sort().forEach(key => {
-                const msg = data[key], isMe = msg.sender === currentUserProfileUsername;
-                if (msg.timestamp > lastSeenMsgTimestamp && !isMe && !chatIsOpen) {
-                    unreadCount++;
-                    updateBadgeUI();
-                }
-                
-                const bubble = document.createElement('div');
-                bubble.className = `flex flex-col max-w-[85%] rounded-2xl p-3 gap-1 msg-container ${isMe ? 'bg-yellow-500 text-black self-end rounded-tr-none' : 'bg-white/5 text-white self-start rounded-tl-none border border-white/5'}`;
-                const formattedTime = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '';
-                const deleteBtnHtml = isUserAdmin ? `<span onclick="deleteChatMessage('${key}')" class="delete-msg-btn text-[8px] underline ml-2 text-red-500 cursor-pointer">Delete</span>` : "";
-                
-                let innerPayloadMarkup = `<span class="text-[9px] font-black uppercase tracking-wider ${isMe ? 'text-black/60' : 'text-yellow-500'}">${msg.sender} <span class="font-normal opacity-70 ml-1">${formattedTime}</span> ${deleteBtnHtml}</span>`;
-                
-                if (msg.type === "TEXT") {
-                    innerPayloadMarkup += `<p class="text-xs font-semibold leading-relaxed">${msg.content}</p>`;
-                } else if (msg.type === "IMAGE") {
-                    innerPayloadMarkup += `<img src="${msg.content}" class="rounded-xl max-h-[200px] object-cover cursor-zoom-in mt-1" onclick="window.open('${msg.content}', '_blank')">`;
-                } else if (msg.type === "VIDEO") {
-                    innerPayloadMarkup += `<video src="${msg.content}" controls class="rounded-xl max-h-[240px] mt-1"></video>`;
-                }
-                bubble.innerHTML = innerPayloadMarkup;
-                container.appendChild(bubble);
-            });
-            container.scrollTop = container.scrollHeight;
+    function toggleProfileSettings() {
+        const modal = document.getElementById('profileSettingsModal');
+        if (modal.classList.contains('hidden')) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            const nameInput = document.getElementById('newDisplayName');
+            if (nameInput) nameInput.value = currentUserProfileUsername !== "Anonymous" ? currentUserProfileUsername : "";
+        } else {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+    }
+
+    function saveProfileSettings() {
+        const newName = document.getElementById('newDisplayName').value.trim();
+        const newPass = document.getElementById('newPassword').value;
+        const photoFile = document.getElementById('newProfilePhoto').files[0];
+        const user = auth.currentUser;
+
+        if (!user) return alert("You must be logged in to change settings.");
+
+        let promises = [];
+
+        if (newName && newName !== currentUserProfileUsername) {
+             promises.push(user.updateProfile({ displayName: newName }));
+        }
+
+        if (newPass) {
+             promises.push(user.updatePassword(newPass));
+        }
+
+        if (photoFile) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                 profilesRef.child(currentUserProfileUsername).update({ photo: e.target.result });
+            };
+            reader.readAsDataURL(photoFile);
+        }
+
+        Promise.all(promises).then(() => {
+            logUserActivity('PROFILE_UPDATED');
+            alert("Profile settings updated successfully!");
+            toggleProfileSettings();
+        }).catch(err => {
+            alert("Error updating profile: " + err.message);
         });
     }
 
     function sendChatMessage() {
-        const input = document.getElementById('chatTextInput'), txt = input.value.trim();
-        if(!txt) return;
-        chatRef.push({ sender: currentUserProfileUsername, type: "TEXT", content: txt, timestamp: firebase.database.ServerValue.TIMESTAMP });
-        input.value = "";
+        const input = document.getElementById('chatTextInput');
+        const text = input.value.trim();
+        if(!text) return;
+        
+        chatRef.push({
+            sender: currentUserProfileUsername,
+            text: text,
+            timestamp: firebase.database.ServerValue.TIMESTAMP,
+            type: 'TEXT'
+        });
+        input.value = '';
+    }
+
+    // ADDED EDIT & DELETE FUNCTIONS HERE
+    function editMessage(messageId, currentText) {
+        const newText = prompt("Edit your message:", decodeURIComponent(currentText));
+        if (newText !== null && newText.trim() !== "") {
+            chatRef.child(messageId).update({
+                text: newText.trim(),
+                isEdited: true
+            }).catch(err => alert("Error editing: " + err.message));
+        }
+    }
+
+    function deleteMessage(messageId) {
+        if (confirm("Are you sure you want to delete this message?")) {
+            chatRef.child(messageId).remove()
+            .catch(err => alert("Error deleting: " + err.message));
+        }
     }
 
     function uploadChatMediaFile(type) {
-        const inputId = type === 'IMAGE' ? 'chatImageInput' : 'chatVideoInput';
-        const file = document.getElementById(inputId).files[0], loader = document.getElementById('chatUploadLoaderAlert');
-        if(!file) return;
-        
-        if (file.size > 2 * 1024 * 1024) {
-            alert("File sizes are limited to 2MB maximum inside Base64 inline database strings.");
-            return;
-        }
-        
-        if(loader) loader.classList.remove('hidden');
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            chatRef.push({ sender: currentUserProfileUsername, type: type, content: e.target.result, timestamp: firebase.database.ServerValue.TIMESTAMP }).then(() => {
-                if(loader) loader.classList.add('hidden');
-                document.getElementById(inputId).value = "";
-            });
-        };
-        reader.readAsDataURL(file);
+        alert("Media uploads require Firebase Storage configuration. Please use text chat for now.");
     }
-
-    function deleteChatMessage(key) {
-        if(!isUserAdmin) return;
-        if(confirm("Remove message object from room logs completely?")) chatRef.child(key).remove();
-    }
-
-function toggleProfileSettings() {
-    const modal = document.getElementById('profileSettingsModal');
-
-    if (modal.classList.contains('hidden')) {
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-    } else {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-    }
-}
-
-async function saveProfileSettings() {
-    const user = auth.currentUser;
-
-    if (!user) {
-        alert("User not logged in");
-        return;
-    }
-
-    const newName = document.getElementById('newDisplayName').value.trim();
-    const newPassword = document.getElementById('newPassword').value.trim();
-    const newPhoto = document.getElementById('newProfilePhoto').files[0];
-
-    try {
-
-        if (newName) {
-            await user.updateProfile({
-                displayName: newName
-            });
-
-            const oldProfile = profiles[currentUserProfileUsername] || {};
-
-            await profilesRef.child(newName).set({
-                ...oldProfile,
-                isTaken: true
-            });
-
-            await profilesRef.child(currentUserProfileUsername).remove();
-
-            currentUserProfileUsername = newName;
-
-            document.getElementById('welcomeMessage').innerText = `👋 WELCOME, ${newName}`;
-        }
-
-        if (newPhoto) {
-            const reader = new FileReader();
-
-            reader.onload = async function(e) {
-                const imageBase64 = e.target.result;
-
-                const existingProfile = profiles[currentUserProfileUsername] || {};
-
-                await profilesRef.child(currentUserProfileUsername).update({
-                    ...existingProfile,
-                    photo: imageBase64
-                });
-
-                document.getElementById('avatarImg').src = imageBase64;
-                document.getElementById('avatarImg').classList.remove('hidden');
-                document.getElementById('avatarPlaceholder').classList.add('hidden');
-            };
-
-            reader.readAsDataURL(newPhoto);
-        }
-
-        if (newPassword) {
-            await user.updatePassword(newPassword);
-        }
-
-        logUserActivity('PROFILE_UPDATED');
-        alert("Profile updated successfully!");
-
-        toggleProfileSettings();
-
-    } catch (error) {
-        alert(error.message);
-    }
-}
-
 </script>
-
-<div id="profileSettingsModal"
-     class="hidden fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm items-center justify-center p-4">
-
-    <div class="bg-[#0f172a] border border-yellow-500/30 rounded-3xl w-full max-w-md p-6 relative">
-
-        <button onclick="toggleProfileSettings()"
-                class="absolute top-4 right-5 text-2xl text-gray-400 hover:text-white">
-            &times;
-        </button>
-
-        <h2 class="text-2xl font-black oswald text-yellow-500 uppercase mb-6 text-center">
-            Profile Settings
-        </h2>
-
-        <div class="space-y-4">
-
-            <div>
-                <label class="text-[10px] uppercase text-gray-400 font-bold">
-                    Change Name
-                </label>
-                <input type="text"
-                       id="newDisplayName"
-                       placeholder="Enter new name"
-                       class="w-full mt-1 p-4 rounded-xl bg-black/40 border border-white/10 text-white font-bold">
-            </div>
-
-            <div>
-                <label class="text-[10px] uppercase text-gray-400 font-bold">
-                    Change Profile Picture
-                </label>
-                <input type="file"
-                       id="newProfilePhoto"
-                       accept="image/*"
-                       class="w-full mt-1 text-xs text-white">
-            </div>
-
-            <div>
-                <label class="text-[10px] uppercase text-gray-400 font-bold">
-                    New Password
-                </label>
-                <input type="password"
-                       id="newPassword"
-                       placeholder="Enter new password"
-                       class="w-full mt-1 p-4 rounded-xl bg-black/40 border border-white/10 text-white font-bold">
-            </div>
-
-            <button onclick="saveProfileSettings()"
-                    class="w-full py-4 bg-yellow-500 hover:bg-yellow-400 text-black font-black oswald rounded-2xl uppercase tracking-widest transition">
-                Save Changes
-            </button>
-        </div>
-    </div>
-</div>
-
-
-<div id="userAccessModal" class="hidden fixed inset-0 z-[120] bg-black/80 flex items-center justify-center p-4">
-<div class="bg-[#0f172a] w-full max-w-6xl rounded-3xl p-6 border border-yellow-500/30">
-<div class="flex justify-between items-center mb-4">
-<h3 class="text-xl font-black text-yellow-500">Full User Management</h3>
-<button onclick="document.getElementById('userAccessModal').classList.add('hidden')" class="px-4 py-2 bg-red-600 rounded-xl text-xs font-bold">Close</button>
-</div>
-<div class="grid md:grid-cols-2 gap-4 mb-4">
-<input id="userSearchInput" onkeyup="showUserAccess()" placeholder="Search user/email/action" class="p-3 rounded-xl bg-black/40 border border-white/10 text-white text-xs">
-<select id="logFilterSelect" onchange="showUserAccess()" class="p-3 rounded-xl bg-black/40 border border-white/10 text-white text-xs">
-<option value="ALL">All Actions</option>
-<option value="LOGIN">LOGIN</option>
-<option value="LOGOUT">LOGOUT</option>
-<option value="PROFILE_UPDATED">PROFILE UPDATED</option>
-<option value="PLAYER_REGISTERED">PLAYER REGISTERED</option>
-<option value="ATHLETE_EDITED">ATHLETE EDITED</option>
-<option value="ATHLETE_DELETED">ATHLETE DELETED</option>
-</select>
-</div>
-<div id="userAccessList" class="max-h-[500px] overflow-y-auto text-xs"></div>
-</div></div>
-
 </body>
 </html>
