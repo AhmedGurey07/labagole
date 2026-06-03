@@ -263,9 +263,15 @@
                     <h4 class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 text-center">Payment Analytics Report</h4>
                     
                     <div class="bg-blue-500/10 p-3 rounded-xl border border-blue-500/20 mb-4">
-                        <div class="flex items-center gap-2">
-                            <input type="checkbox" id="reportVisibilityToggle" onchange="toggleReportVisibility(this.checked)" class="w-4 h-4 accent-blue-500">
-                            <label for="reportVisibilityToggle" class="text-[10px] font-bold text-blue-400 uppercase cursor-pointer">Make Report Public</label>
+                        <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox" id="reportVisibilityToggle" onchange="toggleReportVisibility(this.checked)" class="w-4 h-4 accent-blue-500">
+                                <label for="reportVisibilityToggle" class="text-[10px] font-bold text-blue-400 uppercase cursor-pointer">Make Report Public</label>
+                            </div>
+                            <button type="button" onclick="printPaymentAnalytics()" class="bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold py-2 px-4 rounded-xl shadow flex items-center gap-2 uppercase tracking-widest transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                                Print Preview
+                            </button>
                         </div>
                     </div>
 
@@ -277,7 +283,7 @@
                         <option value="UNPAID">UNPAID ONLY</option>
                     </select>
                     
-                    <div class="mt-4 max-h-[250px] overflow-y-auto chat-scroll pr-1">
+                    <div id="paymentTableContainer" class="mt-4 max-h-[250px] overflow-y-auto chat-scroll pr-1">
                         <table class="w-full text-[10px]" id="paymentReportTable">
                             <thead class="text-yellow-500 uppercase border-b border-white/10">
                                 <tr>
@@ -311,7 +317,6 @@
                         <select id="ganStatusInput" class="w-full mt-1 p-4 rounded-xl bg-black/40 border border-white/10 font-bold text-white focus:outline-none">
                             <option value="PAID">PAID</option>
                             <option value="UNPAID">UNPAID</option>
-                            <option value="APPROVED">APPROVED</option>
                         </select>
                     </div>
 
@@ -342,6 +347,13 @@
                         <button onclick="renderGanaaxTable(true)" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-black oswald uppercase text-xs tracking-widest rounded-xl transition">
                             View Filtered Search
                         </button>
+
+                        
+<button onclick="printGanaaxPreview()"
+    class="w-full py-3 bg-green-600 hover:bg-green-500 text-white font-black oswald uppercase text-xs tracking-widest rounded-xl transition mt-2">
+    🖨 Print Preview / View All Results
+</button>
+
 
                         <div class="overflow-x-auto mt-4 max-h-[300px] chat-scroll border border-white/5 rounded-xl bg-black/20">
                             <table class="w-full text-left border-collapse text-[11px]">
@@ -409,11 +421,11 @@
                         <input type="number" id="s6" onchange="validateSkill('s6')" placeholder="Ref" class="p-3 rounded-xl bg-black/40 text-center text-[10px] text-white">
                         <input type="number" id="s7" onchange="validateSkill('s7')" placeholder="Def" class="p-3 rounded-xl bg-black/40 text-center text-[10px] text-white">
                     </div>
-                    <div class="grid grid-cols-2 gap-2 hidden">
+                    <div class="grid grid-cols-2 gap-2">
                         <input type="number" id="yCard" placeholder="Yellow" class="p-3 rounded-xl bg-yellow-500/10 text-yellow-500 text-center font-bold">
                         <input type="number" id="rCard" placeholder="Red" class="p-3 rounded-xl bg-red-600/10 text-red-600 text-center font-bold">
                     </div>
-                    <div class="grid grid-cols-2 gap-2 hidden">
+                    <div class="grid grid-cols-2 gap-2">
                         <input type="number" id="gA" placeholder="Goals" class="p-3 rounded-xl bg-red-500/10 text-red-500 text-center">
                         <input type="number" id="aA" placeholder="Assists" class="p-3 rounded-xl bg-green-500/10 text-green-500 text-center">
                     </div>
@@ -495,7 +507,7 @@
                 <select id="editGanaaxStatus" class="w-full mt-1 p-3 rounded-xl bg-black/40 border border-white/10 text-white text-xs font-bold focus:outline-none">
                     <option value="PAID">PAID</option>
                     <option value="UNPAID">UNPAID</option>
-                    <option value="APPROVED">APPROVED</option>
+                   
                 </select>
             </div>
 
@@ -685,6 +697,148 @@
             alert(`You entered an unallowed number. For this field, your entry must be ${rule.text}.`);
             el.value = ""; 
         }
+    }
+
+    
+function printGanaaxPreview() {
+    const searchName = document.getElementById('ganSearchName')?.value.toUpperCase() || '';
+    const year = document.getElementById('ganSearchYear')?.value || '';
+    const month = document.getElementById('ganSearchMonth')?.value || '';
+    const day = document.getElementById('ganSearchDay')?.value || '';
+    const status = document.getElementById('ganSearchStatus')?.value || '';
+
+    let rows = '';
+
+    Object.entries(ganaaxData || {}).forEach(([id, item]) => {
+        const athlete = (
+        item.player ||
+        item.playerName ||
+        item.name ||
+        item.athlete ||
+        item.athleteName ||
+        ''
+    ).toUpperCase();
+        const d = new Date(item.timestamp || Date.now());
+
+        const itemYear = (item.year || d.getFullYear()).toString();
+        const itemMonth = (item.month || (d.getMonth()+1)).toString();
+        const itemDay = (item.day || d.getDate()).toString();
+        const itemStatus = (item.status || '').toUpperCase();
+
+        if (
+            (searchName && !athlete.includes(searchName)) ||
+            (year && itemYear !== year) ||
+            (month && itemMonth !== month) ||
+            (day && itemDay !== day) ||
+            (status && itemStatus !== status)
+        ) return;
+
+        rows += `
+        <tr>
+            <td>${item.player || item.playerName || item.name || item.athlete || item.athleteName || '-'}</td>
+            <td>$${item.amount || item.price || 0}</td>
+            <td>${d.toLocaleString()}</td>
+            <td>${item.status || '-'}</td>
+        </tr>`;
+    });
+
+    const win = window.open('', '', 'width=1200,height=800');
+
+    win.document.write(`
+    <html>
+    <head>
+    <title>Ganaax Report</title>
+    <style>
+    body{font-family:Arial;padding:20px;}
+    h2{text-align:center;}
+    table{width:100%;border-collapse:collapse;}
+    th,td{border:1px solid #ccc;padding:10px;}
+    th{background:#f3f3f3;}
+    </style>
+    </head>
+    <body>
+    <h2>Filtered Ganaax Report</h2>
+    <table>
+    <thead>
+    <tr>
+    <th>Athlete Name</th>
+    <th>Amount</th>
+    <th>Date & Time</th>
+    <th>Status</th>
+    </tr>
+    </thead>
+    <tbody>${rows}</tbody>
+    </table>
+    </body>
+    </html>`);
+
+    win.document.close();
+    win.focus();
+}
+
+
+function printPaymentAnalytics() {
+        const tableContainer = document.getElementById('paymentTableContainer');
+        
+        if (!tableContainer) {
+            alert("Could not find the payment table. Please check the ID.");
+            return;
+        }
+
+        const tableContent = tableContainer.innerHTML;
+        const printWindow = window.open('', '', 'height=800,width=1000');
+
+        printWindow.document.write('<html><head><title>Payment Analytics Report - Print Preview</title>');
+        
+        printWindow.document.write(`
+            <style>
+                body { 
+                    font-family: 'Inter', sans-serif; 
+                    padding: 20px; 
+                    color: #000; 
+                    background: #fff;
+                }
+                h2 { 
+                    text-align: center; 
+                    border-bottom: 2px solid #000; 
+                    padding-bottom: 10px;
+                    margin-bottom: 20px;
+                    text-transform: uppercase;
+                }
+                table { 
+                    width: 100%; 
+                    border-collapse: collapse; 
+                }
+                th, td { 
+                    border: 1px solid #cbd5e1; 
+                    padding: 12px; 
+                    text-align: left; 
+                    font-size: 14px;
+                }
+                th { 
+                    background-color: #f8fafc; 
+                    font-weight: bold; 
+                }
+                /* Crucial: This forces scrollable areas to expand fully for printing */
+                div, table, tbody {
+                    overflow: visible !important;
+                    max-height: none !important;
+                    height: auto !important;
+                }
+            </style>
+        `);
+
+        printWindow.document.write('</head><body>');
+        printWindow.document.write('<h2>Payment Analytics Report</h2>');
+        printWindow.document.write(tableContent);
+        printWindow.document.write('</body></html>');
+
+        printWindow.document.close();
+        printWindow.focus();
+
+        setTimeout(() => {
+            printWindow.print();
+        }, 250);
     }
 
     const firebaseConfig = {
@@ -987,7 +1141,7 @@
             
             if (hasUnpaidGanaax) {
                 btn.classList.add('hidden');
-                statusMsg.innerHTML = `<span class="text-red-500 font-black text-sm uppercase block mb-1">⚠️ GANAAX AAN LA BIXIN (${unpaidGanaaxCount})</span>Access-ka oo dhan waa xiran yahay ilaa Admin ama Cashier uu ganaaxa ka dhigo PAID ama APPROVED.`;
+                statusMsg.innerHTML = `<span class="text-red-500 font-black text-sm uppercase block mb-1">⚠️ GANAAX AAN LA BIXIN (${unpaidGanaaxCount})</span>Access-ka oo dhan waa xiran yahay ilaa Admin ama Cashier uu ganaaxa ka dhigo PAID .`;
             } else {
                 btn.classList.remove('hidden');
                 const isPending = requests[currentMonthKey]?.[currentUserProfileUsername] !== undefined;
@@ -2062,35 +2216,115 @@
         }
     }
 
+    async function updateNameEverywhere(oldName, newName) {
+        const updates = {};
+
+        if (profiles[oldName]) {
+            updates[`golaha_profiles/${newName}`] = profiles[oldName];
+            updates[`golaha_profiles/${newName}`].isTaken = true; 
+            updates[`golaha_profiles/${oldName}`] = null;
+        } else {
+            updates[`golaha_profiles/${newName}`] = { isTaken: true };
+        }
+
+        for (let yr in db) {
+            if (db[yr][oldName]) {
+                updates[`golaha_data/${yr}/${newName}`] = db[yr][oldName];
+                updates[`golaha_data/${yr}/${oldName}`] = null;
+            }
+        }
+
+        if (votes[oldName]) {
+            updates[`golaha_votes/${newName}`] = votes[oldName];
+            updates[`golaha_votes/${oldName}`] = null;
+        }
+
+        if (fasaxData[oldName]) {
+            updates[`golaha_fasax/${newName}`] = fasaxData[oldName];
+            updates[`golaha_fasax/${oldName}`] = null;
+        }
+
+        if (globalPaymentDataRaw.records) {
+            for (let monthKey in globalPaymentDataRaw.records) {
+                if (globalPaymentDataRaw.records[monthKey][oldName] !== undefined) {
+                    updates[`golaha_payments/records/${monthKey}/${newName}`] = globalPaymentDataRaw.records[monthKey][oldName];
+                    updates[`golaha_payments/records/${monthKey}/${oldName}`] = null;
+                }
+            }
+        }
+        if (globalPaymentDataRaw.requests) {
+            for (let monthKey in globalPaymentDataRaw.requests) {
+                if (globalPaymentDataRaw.requests[monthKey][oldName] !== undefined) {
+                    updates[`golaha_payments/requests/${monthKey}/${newName}`] = globalPaymentDataRaw.requests[monthKey][oldName];
+                    updates[`golaha_payments/requests/${monthKey}/${oldName}`] = null;
+                }
+            }
+        }
+
+        for (let key in ganaaxData) {
+            if (ganaaxData[key].name === oldName) {
+                updates[`golaha_ganaaxyada/${key}/name`] = newName;
+            }
+        }
+
+        try {
+            const chatSnap = await firebase.database().ref('golaha_public_chatroom').orderByChild('sender').equalTo(oldName).once('value');
+            if (chatSnap.exists()) {
+                chatSnap.forEach(child => {
+                    updates[`golaha_public_chatroom/${child.key}/sender`] = newName;
+                });
+            }
+        } catch(e) {
+            console.warn("Chat update skipped/failed", e);
+        }
+
+        if (Object.keys(updates).length > 0) {
+            await firebase.database().ref().update(updates);
+        }
+    }
+
     function saveProfileSettings() {
-        const newName = document.getElementById('newDisplayName').value.trim();
+        const newNameInput = document.getElementById('newDisplayName').value.trim();
+        const newName = newNameInput ? newNameInput.toUpperCase() : "";
         const newPass = document.getElementById('newPassword').value;
         const photoFile = document.getElementById('newProfilePhoto').files[0];
         const user = auth.currentUser;
 
         if (!user) return alert("You must be logged in to change settings.");
 
+        const oldName = currentUserProfileUsername;
         let promises = [];
 
-        if (newName && newName !== currentUserProfileUsername) {
-             promises.push(user.updateProfile({ displayName: newName }));
+        if (newName && newName !== oldName) {
+            if (profiles[newName] && profiles[newName].isTaken) {
+                return alert("This name is already registered to another athlete.");
+            }
+            promises.push(user.updateProfile({ displayName: newName }));
+            promises.push(updateNameEverywhere(oldName, newName));
         }
 
         if (newPass) {
              promises.push(user.updatePassword(newPass));
         }
 
-        if (photoFile) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                 profilesRef.child(currentUserProfileUsername).update({ photo: e.target.result });
-            };
-            reader.readAsDataURL(photoFile);
-        }
-
         Promise.all(promises).then(() => {
-            logUserActivity('PROFILE_UPDATED');
-            alert("Profile settings updated successfully!");
+            const finalName = (newName && newName !== oldName) ? newName : oldName;
+            
+            if (photoFile) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                     profilesRef.child(finalName).update({ photo: e.target.result, isTaken: true });
+                };
+                reader.readAsDataURL(photoFile);
+            }
+
+            if (newName && newName !== oldName) {
+                currentUserProfileUsername = newName;
+                document.getElementById('welcomeMessage').innerText = `👋 WELCOME, ${newName}`;
+            }
+
+            logUserActivity('PROFILE_UPDATED', { oldName: oldName, newName: newName });
+            alert("Profile settings and all stadium records updated successfully!");
             toggleProfileSettings();
         }).catch(err => {
             alert("Error updating profile: " + err.message);
@@ -2111,7 +2345,6 @@
         input.value = '';
     }
 
-    // ADDED EDIT & DELETE FUNCTIONS HERE
     function editMessage(messageId, currentText) {
         const newText = prompt("Edit your message:", decodeURIComponent(currentText));
         if (newText !== null && newText.trim() !== "") {
