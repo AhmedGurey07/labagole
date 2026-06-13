@@ -1040,7 +1040,37 @@
         }
     });
 
-    auth.onAuthStateChanged(user => {
+    
+    async function loadAttendancePollFirst() {
+        try {
+            const pollContainer = document.getElementById('attendancePollContainer');
+            if (pollContainer) pollContainer.classList.remove('hidden');
+
+            const snapshots = await Promise.all([
+                votesRef.once('value'),
+                settingsRef.once('value'),
+                fasaxRef.once('value')
+            ]);
+
+            votes = snapshots[0].val() || {};
+            const settings = snapshots[1].val() || {};
+            fasaxData = snapshots[2].val() || {};
+
+            const displayEl = document.getElementById('attendancePollDescription');
+            if (displayEl) {
+                displayEl.innerText = settings.pollText || "Asc dhamaan akhyaarta caawa waa habeenkaan ciyaaraynay hore la loo xaadiro";
+            }
+
+            if (typeof updateAttendancePollUI === 'function') {
+                updateAttendancePollUI();
+            }
+        } catch(e) {
+            console.error('Attendance preload failed', e);
+        }
+    }
+
+
+    auth.onAuthStateChanged(async user => {
         const loginScreen = document.getElementById('loginScreen');
         const dashboardArea = document.getElementById('dashboardArea');
         const chatSystemWidget = document.getElementById('chatSystemWidget');
@@ -1058,6 +1088,8 @@
             currentUserProfileUsername = user.displayName || user.email.split('@')[0];
             welcomeMessage.innerText = `👋 WELCOME, ${currentUserProfileUsername}`;
             
+            await loadAttendancePollFirst();
+
             setupPresence(user);
 
             profilesRef.on('value', s => {
@@ -1203,8 +1235,8 @@
                 const pollToggle = document.getElementById('pollVisibilityToggle');
                 
                 if (pollToggle) pollToggle.checked = pollVis;
-                if (pollVis || isUserAdmin) pollContainer.classList.remove('hidden');
-                else pollContainer.classList.add('hidden');
+                // Always show attendance poll after login
+                pollContainer.classList.remove('hidden');
 
                 if (liveFeedSection) {
                     if (isUserAdmin) liveFeedSection.classList.remove('hidden');
@@ -2250,6 +2282,13 @@
             alert("Maku codeyn kartid sababtoo ah waxaad ku jirtaa Fasax!");
             return;
         }
+
+        // Instant UI update before Firebase responds
+        votes[currentUserProfileUsername] = {
+            status: status,
+            timestamp: Date.now()
+        };
+        updateAttendancePollUI();
 
         votesRef.child(currentUserProfileUsername).set({
             status: status,
