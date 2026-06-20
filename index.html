@@ -195,8 +195,8 @@
                     <p id="attendancePollDescription" class="text-sm font-black oswald text-white uppercase italic">Asc dhamaan akhyaarta caawa waa habeenkaan ciyaaraynay hore la loo xaadiro</p>
                 </div>
                 <div class="flex items-center gap-3">
-                    <button onclick="castVote('JOOGE')" class="px-6 py-3 bg-green-600/20 hover:bg-green-600 border border-green-500/30 rounded-2xl text-green-400 hover:text-white font-black oswald transition uppercase tracking-widest">Jooge</button>
-                    <button onclick="castVote('MAQANE')" class="px-6 py-3 bg-red-600/20 hover:bg-red-600 border border-red-500/30 rounded-2xl text-red-400 hover:text-white font-black oswald transition uppercase tracking-widest">Maqane</button>
+                    <button id="joogeBtn" onclick="castVote('JOOGE')" class="px-6 py-3 bg-green-600/20 hover:bg-green-600 border border-green-500/30 rounded-2xl text-green-400 hover:text-white font-black oswald transition uppercase tracking-widest">Jooge</button>
+                    <button id="maqaneBtn" onclick="castVote('MAQANE')" class="px-6 py-3 bg-red-600/20 hover:bg-red-600 border border-red-500/30 rounded-2xl text-red-400 hover:text-white font-black oswald transition uppercase tracking-widest">Maqane</button>
                 </div>
                 <div class="flex items-center gap-6 border-l border-white/10 pl-6">
                     <div class="text-center cursor-pointer group" onclick="showVoterList('JOOGE')">
@@ -1713,9 +1713,24 @@
             const hasData = filteredWinners.length > 0;
 
             if (shouldShow && hasData) {
-                const topMvp = filteredWinners.sort((a, b) => b.t - a.t)[0]?.n || "---";
-                const topScorer = winners[`G_${t}`].sort((a, b) => b.v - a.v)[0];
-                const topAssist = winners[`A_${t}`].sort((a, b) => b.v - a.v)[0];
+                const topMvpPlayer = filteredWinners.sort((a, b) =>
+                    (b.t - a.t) ||
+                    ((winners[`G_${t}`].find(x => x.n === b.n)?.v || 0) - (winners[`G_${t}`].find(x => x.n === a.n)?.v || 0)) ||
+                    ((winners[`A_${t}`].find(x => x.n === b.n)?.v || 0) - (winners[`A_${t}`].find(x => x.n === a.n)?.v || 0))
+                )[0];
+                const topMvp = topMvpPlayer?.n || "---";
+
+                const topScorer = winners[`G_${t}`].sort((a, b) =>
+                    (b.v - a.v) ||
+                    ((winners[`A_${t}`].find(x => x.n === b.n)?.v || 0) - (winners[`A_${t}`].find(x => x.n === a.n)?.v || 0)) ||
+                    ((filteredWinners.find(x => x.n === b.n)?.t || 0) - (filteredWinners.find(x => x.n === a.n)?.t || 0))
+                )[0];
+
+                const topAssist = winners[`A_${t}`].sort((a, b) =>
+                    (b.v - a.v) ||
+                    ((winners[`G_${t}`].find(x => x.n === b.n)?.v || 0) - (winners[`G_${t}`].find(x => x.n === a.n)?.v || 0)) ||
+                    ((filteredWinners.find(x => x.n === b.n)?.t || 0) - (filteredWinners.find(x => x.n === a.n)?.t || 0))
+                )[0];
 
                 document.getElementById(`name-${t}`).innerText = topMvp;
                 document.getElementById(`goal-${t}`).innerText = topScorer?.v > 0 ? `${topScorer.n} (${topScorer.v})` : "---";
@@ -1745,7 +1760,7 @@
         // Initialize Global Stats Cache
         currentCalculatedStats = {};
 
-        winners.LIST.sort((a, b) => b.t - a.t).forEach((p, i) => {
+        winners.LIST.sort((a, b) => (b.t-a.t) || (b.g-a.g) || (b.a-a.a)).forEach((p, i) => {
             // Populate Global Stats Cache for the showReport Modal pop up
             currentCalculatedStats[p.n] = p;
 
@@ -2283,6 +2298,12 @@
             return;
         }
 
+        let currentJooge = Object.values(votes).filter(v => (typeof v==='object'?v.status:v)==='JOOGE').length;
+        if(status==='JOOGE' && currentJooge >= 14){
+            alert('Jooge votes have reached the limit of 14.');
+            return;
+        }
+
         // Instant UI update before Firebase responds
         votes[currentUserProfileUsername] = {
             status: status,
@@ -2322,6 +2343,12 @@
         const cJ = document.getElementById('countJooge'), cM = document.getElementById('countMaqane');
         if(cJ) cJ.innerText = jooge;
         if(cM) cM.innerText = maqane;
+
+        const jb=document.getElementById('joogeBtn');
+        if(jb){
+            jb.disabled = jooge >= 14;
+            jb.classList.toggle('opacity-50', jooge >= 14);
+        }
         
         voteArray.sort((a, b) => (b.time || 0) - (a.time || 0));
         
@@ -2357,7 +2384,14 @@
         }
     }
 
-    function showVoterList(type) {
+    
+function deleteAttendanceVote(username){
+    if(!isUserAdmin) return;
+    if(!confirm('Delete vote for '+username+'?')) return;
+    votesRef.child(username).remove();
+}
+
+function showVoterList(type) {
         const title = document.getElementById('voteListTitle'),
               list = document.getElementById('voteListItems');
         if(!list || !title) return;
@@ -2414,7 +2448,10 @@
                             </div>
                             <span class="text-xs font-black text-white uppercase oswald">${name}</span>
                         </div>
-                        <span class="text-[10px] font-bold text-gray-400">${timeStr}</span>
+                        <div class="flex items-center gap-2">
+<span class="text-[10px] font-bold text-gray-400">${timeStr}</span>
+${isUserAdmin ? `<button onclick="deleteAttendanceVote('${name}')" class="px-2 py-1 bg-red-600 text-white rounded text-[9px]">Delete</button>` : ``}
+</div>
                     `;
                     list.appendChild(div);
                 }
