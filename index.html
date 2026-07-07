@@ -135,7 +135,7 @@
         </div>
         <h2 class="text-4xl font-black oswald text-white tracking-tighter mb-4 uppercase">Fadlan bixi lacagta</h2>
         <p class="text-sm text-gray-400 mb-6 font-semibold leading-relaxed">
-            Nidaamka waa lagaa xiray sababtoo ah lagama helin bixinta khidmadda bishaan profile-kaaga dhexdiisa. Guji badanka hoose si codsi ansixin ah loogu diro maamulka.
+            Systemka waa lagaa xiray sababtoo ah lagama helin bixinta lacagta bishaan profile-kaaga dhexdiisa. Markaad bixiso guji badhanka hoose si codsi ansixin ah loogu diro maamulka.
         </p>
         <div class="space-y-4">
             <button id="lockoutIPaidBtn" onclick="submitPaymentApprovalRequest()" class="w-full py-4 bg-yellow-500 text-black font-black oswald uppercase tracking-widest hover:bg-yellow-400 transition rounded-xl">
@@ -1319,6 +1319,7 @@
         const user = auth.currentUser;
         if (!user) return;
         
+        // Admins and Cashiers bypass all lockouts
         const admins = ["admin@golaha.com", "admin@gmail.com", "moha@golaha.com", "labagole@admin.com", "ahmedgurey@golaha.com"];
         const financeUsers = ["cashier@golaha.com"];
         if (admins.includes(user.email.toLowerCase()) || financeUsers.includes(user.email.toLowerCase())) {
@@ -1327,24 +1328,21 @@
         }
 
         const today = new Date();
+        const currentDay = today.getDate(); // 1 to 31
         const currentMonthKey = `${today.getFullYear()}-${today.getMonth()}`;
         const records = globalPaymentDataRaw.records || {};
         const requests = globalPaymentDataRaw.requests || {};
         
+        // Check Monthly Payment Status
         const hasPaidMonthly = records[currentMonthKey]?.[currentUserProfileUsername] === true;
         
-        let hasUnpaidGanaax = false;
-        let unpaidGanaaxCount = 0;
-        for (let key in ganaaxData) {
-            const item = ganaaxData[key];
-            if ((item.name || '').toUpperCase() === currentUserProfileUsername.toUpperCase() && item.status === 'UNPAID') {
-                hasUnpaidGanaax = true;
-                unpaidGanaaxCount++;
-            }
-        }
+        // 5-Day Grace Period Check
+        const isGracePeriod = currentDay <= 5;
 
         const lockoutModal = document.getElementById('lockoutModal');
-        const isLockedOut = !hasPaidMonthly || hasUnpaidGanaax;
+        
+        // Lock out ONLY if they haven't paid the monthly fee AND the grace period is over (Day 6+)
+        const isLockedOut = !hasPaidMonthly && !isGracePeriod;
         
         if (isLockedOut) {
             lockoutModal.style.display = 'flex';
@@ -1354,23 +1352,20 @@
             const btn = document.getElementById('lockoutIPaidBtn');
             const statusMsg = document.getElementById('lockoutStatusMsg');
             
-            if (hasUnpaidGanaax) {
-                btn.classList.add('hidden');
-                statusMsg.innerHTML = `<span class="text-red-500 font-black text-sm uppercase block mb-1">⚠️ GANAAX AAN LA BIXIN (${unpaidGanaaxCount})</span>Access-ka oo dhan waa xiran yahay ilaa Admin ama Cashier uu ganaaxa ka dhigo PAID .`;
+            btn.classList.remove('hidden');
+            const isPending = requests[currentMonthKey]?.[currentUserProfileUsername] !== undefined;
+            
+            if (isPending) {
+                btn.disabled = true;
+                btn.className = "w-full py-4 bg-gray-600 text-gray-400 font-black oswald uppercase tracking-widest cursor-not-allowed rounded-xl";
+                statusMsg.innerText = "Codsigaaga oggolaanshaha waa la diray. Fadlan sug inta laga ansixinayo Cashier ama Ahmed Gurey.";
             } else {
-                btn.classList.remove('hidden');
-                const isPending = requests[currentMonthKey]?.[currentUserProfileUsername] !== undefined;
-                if (isPending) {
-                    btn.disabled = true;
-                    btn.className = "w-full py-4 bg-gray-600 text-gray-400 font-black oswald uppercase tracking-widest cursor-not-allowed rounded-xl";
-                    statusMsg.innerText = "Codsigaaga oggolaanshaha waa la diray. Fadlan sug inta laga ansixinayo Cashier ama Ahmed Gurey.";
-                } else {
-                    btn.disabled = false;
-                    btn.className = "w-full py-4 bg-yellow-500 text-black font-black oswald uppercase tracking-widest hover:bg-yellow-400 transition rounded-xl";
-                    statusMsg.innerText = "";
-                }
+                btn.disabled = false;
+                btn.className = "w-full py-4 bg-yellow-500 text-black font-black oswald uppercase tracking-widest hover:bg-yellow-400 transition rounded-xl";
+                statusMsg.innerHTML = `<span class="text-red-500 font-black text-sm uppercase block mb-1">⚠️ Waqtiga (Grace Period) Wuu Dhamaaday</span>Nidaamka waa lagaa xiray sababtoo ah maanta waa bisha <b>${currentDay}-deeda</b>, mana aadan bixin khidmadda bishaan.`;
             }
         } else {
+            // Access Granted
             lockoutModal.style.display = 'none';
             document.getElementById('dashboardArea').classList.remove('hidden');
             document.getElementById('chatSystemWidget').classList.remove('hidden');
@@ -2287,36 +2282,6 @@
         }).catch(err => alert("Error saving text: " + err.message));
     }
 
-    function castVote(status) {
-        if(!currentUserProfileUsername || currentUserProfileUsername === "Anonymous") return alert("Please authenticating session.");
-        
-        const fData = fasaxData[currentUserProfileUsername];
-        const isFasax = fData && (typeof fData === 'object' ? fData.status === 'fasax' : fData === 'fasax');
-        
-        if (isFasax) {
-            alert("Maku codeyn kartid sababtoo ah waxaad ku jirtaa Fasax!");
-            return;
-        }
-
-        let currentJooge = Object.values(votes).filter(v => (typeof v==='object'?v.status:v)==='JOOGE').length;
-        if(status==='JOOGE' && currentJooge >= 14){
-            alert('Jooge votes have reached the limit of 14.');
-            return;
-        }
-
-        // Instant UI update before Firebase responds
-        votes[currentUserProfileUsername] = {
-            status: status,
-            timestamp: Date.now()
-        };
-        updateAttendancePollUI();
-
-        votesRef.child(currentUserProfileUsername).set({
-            status: status,
-            timestamp: firebase.database.ServerValue.TIMESTAMP
-        });
-    }
-
     function updateAttendancePollUI() {
         let jooge = 0, maqane = 0;
         const feedContainer = document.getElementById('inlineVoteFeed');
@@ -2346,8 +2311,25 @@
 
         const jb=document.getElementById('joogeBtn');
         if(jb){
-            jb.disabled = jooge >= 14;
-            jb.classList.toggle('opacity-50', jooge >= 14);
+            let hasUnpaidGanaax = false;
+            for (let key in ganaaxData) {
+                const item = ganaaxData[key];
+                if ((item.name || '').toUpperCase() === currentUserProfileUsername.toUpperCase() && item.status === 'UNPAID') {
+                    hasUnpaidGanaax = true;
+                    break;
+                }
+            }
+
+            if (hasUnpaidGanaax) {
+                jb.disabled = true;
+                jb.classList.add('opacity-50', 'cursor-not-allowed');
+                jb.innerText = "Jooge (Locked - Ganaax)";
+            } else {
+                jb.disabled = jooge >= 14;
+                jb.classList.toggle('opacity-50', jooge >= 14);
+                jb.classList.remove('cursor-not-allowed');
+                jb.innerText = "Jooge";
+            }
         }
         
         voteArray.sort((a, b) => (b.time || 0) - (a.time || 0));
@@ -2382,6 +2364,52 @@
                 });
             }
         }
+    }
+
+    function castVote(status) {
+        if(!currentUserProfileUsername || currentUserProfileUsername === "Anonymous") return alert("Please authenticating session.");
+        
+        const fData = fasaxData[currentUserProfileUsername];
+        const isFasax = fData && (typeof fData === 'object' ? fData.status === 'fasax' : fData === 'fasax');
+        
+        if (isFasax) {
+            alert("Maku codeyn kartid sababtoo ah waxaad ku jirtaa Fasax!");
+            return;
+        }
+
+        if (status === 'JOOGE') {
+            let hasUnpaidGanaax = false;
+            for (let key in ganaaxData) {
+                const item = ganaaxData[key];
+                if ((item.name || '').toUpperCase() === currentUserProfileUsername.toUpperCase() && item.status === 'UNPAID') {
+                    hasUnpaidGanaax = true;
+                    break;
+                }
+            }
+            
+            if (hasUnpaidGanaax) {
+                alert("⚠️ Kuma codeyn kartid 'Jooge' sababtoo ah waxaad qabtaa ganaax aan la bixin. Fadlan iska bixi ganaaxaaga!");
+                return;
+            }
+        }
+
+        let currentJooge = Object.values(votes).filter(v => (typeof v==='object'?v.status:v)==='JOOGE').length;
+        if(status==='JOOGE' && currentJooge >= 14){
+            alert('Jooge votes have reached the limit of 14.');
+            return;
+        }
+
+        // Instant UI update before Firebase responds
+        votes[currentUserProfileUsername] = {
+            status: status,
+            timestamp: Date.now()
+        };
+        updateAttendancePollUI();
+
+        votesRef.child(currentUserProfileUsername).set({
+            status: status,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        });
     }
 
     
