@@ -2394,7 +2394,7 @@
         }
 
         let currentJooge = Object.values(votes).filter(v => (typeof v==='object'?v.status:v)==='JOOGE').length;
-        if(status==='JOOGE' && currentJooge >= 14){
+        if(status==='JOOGE' && currentJooge >= 15){
             alert('Jooge votes have reached the limit of 14.');
             return;
         }
