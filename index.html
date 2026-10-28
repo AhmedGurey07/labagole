@@ -56,7 +56,7 @@
         #footballMatchSummary.match-summary-shell:not(.hidden) {
             width: 100%;
             max-width: 1600px;
-            aspect-ratio: 16 / 9;
+            aspect-ratio: auto;
             min-height: 0;
             overflow: visible;
             padding: clamp(16px, 2vw, 32px);
@@ -78,27 +78,28 @@
         #footballMatchSummary .match-summary-header h2 { font-size: clamp(0.9rem, 1.5vw, 1.35rem); }
         #footballMatchSummary .match-summary-header [id="matchSummaryDate"] { font-size: clamp(0.55rem, 0.8vw, 0.75rem); }
         #footballMatchSummary .match-summary-scoreboard {
-            flex: 0 0 30%;
+            flex: 0 0 auto;
             min-height: 0;
             margin: 0;
             align-items: center;
             gap: 12px;
             flex-direction: row !important;
-            overflow: hidden;
+            overflow: visible;
         }
         #footballMatchSummary .match-summary-scoreboard > div { min-width: 0; }
         .mobile-team-label { display: none; }
         #footballMatchSummary .match-summary-scoreboard h3 { font-size: clamp(0.7rem, 1vw, 1rem); }
         #footballMatchSummary .match-summary-scoreboard [class*="w-20"] { width: clamp(42px, 5vw, 72px); height: clamp(42px, 5vw, 72px); }
-        #footballMatchSummary .match-summary-scoreboard [id$="GoalsDisplay"] { height: 96px; max-height: 96px; overflow: visible; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); grid-template-rows: minmax(52px, 1fr) auto; align-items: center; gap: 5px; }
+        #footballMatchSummary .match-summary-scoreboard [id$="GoalsDisplay"] { height: auto; max-height: none; min-height: 0; overflow: visible; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); grid-auto-rows: minmax(42px, auto); align-items: center; gap: 5px; }
         #footballMatchSummary .match-summary-scoreboard [id$="GoalsDisplay"] .team-player-tile { min-width: 0; min-height: 42px; padding: 5px 3px; }
         #footballMatchSummary .match-summary-scoreboard [id$="GoalsDisplay"] .team-player-tile p:first-child { font-size: clamp(0.45rem, 0.7vw, 0.65rem); }
         #footballMatchSummary .match-summary-scoreboard [id$="GoalsDisplay"] .team-player-tile p:last-child { font-size: 0.48rem; }
-        #footballMatchSummary .match-summary-scoreboard [id$="GoalsDisplay"] > div:last-child { grid-column: 1 / -1; margin: 0 !important; line-height: 1.2; font-size: clamp(0.55rem, 0.75vw, 0.7rem); }
+        #footballMatchSummary .match-summary-scoreboard #redGoalsDisplay .team-total-red,
+        #footballMatchSummary .match-summary-scoreboard #yellowGoalsDisplay .team-total-yellow { grid-column: 1 / -1; margin: 0 !important; line-height: 1.2; font-size: clamp(0.55rem, 0.75vw, 0.7rem); }
         #footballMatchSummary .match-summary-scoreboard [id$="Score"] { font-size: clamp(2.2rem, 5vw, 5rem); line-height: 0.9; }
         #footballMatchSummary .match-summary-scoreboard .group { display: flex; flex-direction: column; align-items: center; gap: 7px; }
         #footballMatchSummary .match-summary-scoreboard .group > p { margin-top: 0 !important; line-height: 1.1; position: relative; z-index: 1; }
-        #footballMatchSummary .match-summary-discipline { flex: 0 0 18%; min-height: 0; margin: 4px 0 0; overflow: hidden; }
+        #footballMatchSummary .match-summary-discipline { flex: 0 0 auto; min-height: 0; margin: 4px 0 0; overflow: visible; }
         #footballMatchSummary .match-summary-discipline .disciplinary-section-title { margin: 0 0 6px; padding-bottom: 5px; }
         #footballMatchSummary .match-summary-discipline h3 { font-size: clamp(0.6rem, 0.85vw, 0.8rem); }
         #footballMatchSummary .match-summary-discipline h4 { font-size: clamp(0.5rem, 0.7vw, 0.65rem); margin-bottom: 5px; padding-bottom: 4px; }
@@ -108,38 +109,67 @@
         #footballMatchSummary .match-summary-discipline .card-player-name { font-size: clamp(0.58rem, 0.8vw, 0.75rem); }
         #footballMatchSummary .match-summary-discipline .card-player-role { font-size: 0.5rem; letter-spacing: 0.1em; }
         #footballMatchSummary .match-summary-discipline .award-tile > div:last-child { margin-top: 4px !important; padding: 4px 8px !important; }
-        #footballMatchSummary .match-summary-awards { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+        #footballMatchSummary .match-summary-awards { flex: 0 0 auto; min-height: 0; display: flex; flex-direction: column; }
         #footballMatchSummary .match-summary-awards > h3 { margin: 0 0 8px; padding-bottom: 6px; font-size: clamp(0.6rem, 0.85vw, 0.8rem); }
-        #footballMatchSummary .match-summary-awards-grid { flex: 1 1 auto; min-height: 0; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(84px, 1fr)); gap: 10px; overflow: visible; }
-        #footballMatchSummary .match-summary-awards-grid .award-tile { min-height: 84px; padding: 12px 14px; border-radius: 16px; display: flex; flex-direction: column; justify-content: space-evenly; gap: 4px; overflow: visible; }
+        #footballMatchSummary .match-summary-awards-grid { position: relative; flex: 0 0 auto; min-height: 0; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(116px, auto)); gap: 10px; overflow: visible; }
+        #footballMatchSummary .match-summary-awards-grid .award-tile { position: relative; z-index: 0; min-width: 0; min-height: 0; padding: 7px 10px; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; overflow: hidden; transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease; transform: scale(1); transform-origin: center; }
+        #footballMatchSummary .match-summary-awards-grid .award-tile.is-expanded { position: absolute; z-index: 20; top: 45%; left: 50%; width: min(360px, 80%); min-height: 150px; max-height: min(240px, calc(100vh - 32px)); padding: 14px; gap: 5px; overflow-y: auto; transform: translate(-50%, -50%); background: #171a22; border-color: rgba(251,191,36,0.8); box-shadow: 0 16px 36px rgba(0,0,0,0.75); }
+        #footballMatchSummary .match-summary-awards-grid .award-tile.is-expanded .card-player-photo { width: 52px; height: 52px; }
+        #footballMatchSummary .match-summary-awards-grid .award-tile.is-expanded h5 { font-size: 0.75rem; }
+        #footballMatchSummary .match-summary-awards-grid .award-tile.is-expanded .card-player-name { font-size: 1rem; line-height: 1.2; }
+        #footballMatchSummary .match-summary-awards-grid .award-tile.is-expanded p:last-child { font-size: 0.65rem; line-height: 1.2; }
         #footballMatchSummary .match-summary-awards-grid .award-tile > .bg-black\/90 { display: none; }
         #footballMatchSummary .match-summary-awards-grid .award-tile > .mt-3 { margin-top: 2px; }
-        #footballMatchSummary .match-summary-awards-grid .card-player-photo { width: clamp(38px, 4vw, 58px); height: clamp(38px, 4vw, 58px); min-width: 0; border-radius: 12px; margin-bottom: 5px; }
-        #footballMatchSummary .match-summary-awards-grid .card-player-photo,
-        #footballMatchSummary .match-summary-awards-grid .team-player-photo { display: none !important; }
-        #footballMatchSummary .match-summary-awards-grid .award-tile h5 { font-size: clamp(0.55rem, 0.72vw, 0.7rem); line-height: 1.2; padding-bottom: 5px; margin: 0; }
-        #footballMatchSummary .match-summary-awards-grid .card-player-name { display: block; font-size: clamp(0.7rem, 0.95vw, 0.9rem); line-height: 1.2; margin: 2px 0; }
-        #footballMatchSummary .match-summary-awards-grid p:last-child { font-size: clamp(0.48rem, 0.58vw, 0.6rem); line-height: 1.2; margin: 0; }
+        #footballMatchSummary .match-summary-awards-grid .award-icon { display: none; }
+        #footballMatchSummary .match-summary-awards-grid .card-player-photo { display: flex !important; flex: 0 0 auto; width: clamp(34px, 3vw, 42px); height: clamp(34px, 3vw, 42px); min-width: 0; margin: 0 0 2px !important; border-radius: 50%; border: 1px solid rgba(251,191,36,0.55); background: rgba(0,0,0,0.35); }
+        #footballMatchSummary .match-summary-awards-grid .card-player-photo:not(.has-player-photo) { display: none !important; }
+        #footballMatchSummary .match-summary-awards-grid .card-player-photo img { display: block !important; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+        #footballMatchSummary .match-summary-awards-grid .award-tile h5 { position: static; width: 100%; font-size: clamp(0.58rem, 0.72vw, 0.7rem); line-height: 1.15; padding-bottom: 5px; margin: 0; background: linear-gradient(rgba(251,191,36,0.8), rgba(251,191,36,0.8)) center bottom / 60% 2px no-repeat; overflow-wrap: anywhere; }
+        #footballMatchSummary .match-summary-awards-grid .award-tile h5::after { content: none; }
+        #footballMatchSummary .match-summary-awards-grid .card-player-name { display: block; width: 100%; min-width: 0; font-size: clamp(0.68rem, 0.9vw, 0.85rem); line-height: 1.15; margin: 0; overflow-wrap: anywhere; }
+        #footballMatchSummary .match-summary-awards-grid p:last-child { max-width: 100%; font-size: clamp(0.52rem, 0.62vw, 0.62rem); line-height: 1.15; margin: 0; overflow-wrap: anywhere; }
+        #footballMatchSummary.is-capturing-screenshot .match-summary-control,
+        #footballMatchSummary.is-capturing-screenshot .team-color-control,
+        #footballMatchSummary.is-capturing-screenshot .match-summary-final-score { display: none !important; }
         #footballMatchSummary .team-player-photo,
         #footballMatchSummary .team-player-tile { position: relative; overflow: hidden; }
-        #footballMatchSummary img { display: none !important; }
-        #footballMatchSummary .team-red { border-color: rgba(239, 68, 68, 0.9) !important; background: linear-gradient(145deg, rgba(127, 29, 29, 0.75), rgba(12, 15, 22, 0.95)) !important; }
-        #footballMatchSummary .team-yellow { border-color: rgba(250, 204, 21, 0.9) !important; background: linear-gradient(145deg, rgba(113, 63, 18, 0.72), rgba(12, 15, 22, 0.95)) !important; }
-        #footballMatchSummary .team-red::before,
-        #footballMatchSummary .team-yellow::before { content: ''; position: absolute; inset: 0 0 auto; height: 4px; z-index: 2; }
-        #footballMatchSummary .team-red::before { background: #ef4444; }
-        #footballMatchSummary .team-yellow::before { background: #facc15; }
+        #footballMatchSummary > img,
+        #footballMatchSummary .match-summary-scoreboard img,
+        #footballMatchSummary .match-summary-discipline img { display: none !important; }
+        #footballMatchSummary { --team-red-color: #ef4444; --team-yellow-color: #facc15; }
+        #footballMatchSummary .team-red:not(.award-tile):not(.disciplinary-card-tile) { border-color: color-mix(in srgb, var(--team-red-color) 90%, transparent) !important; background: linear-gradient(145deg, color-mix(in srgb, var(--team-red-color) 42%, transparent), rgba(12, 15, 22, 0.95)) !important; }
+        #footballMatchSummary .team-yellow:not(.award-tile):not(.disciplinary-card-tile) { border-color: color-mix(in srgb, var(--team-yellow-color) 90%, transparent) !important; background: linear-gradient(145deg, color-mix(in srgb, var(--team-yellow-color) 42%, transparent), rgba(12, 15, 22, 0.95)) !important; }
+        #footballMatchSummary .team-red:not(.award-tile):not(.disciplinary-card-tile)::before,
+        #footballMatchSummary .team-yellow:not(.award-tile):not(.disciplinary-card-tile)::before { content: ''; position: absolute; inset: 0 0 auto; height: 4px; z-index: 2; }
+        #footballMatchSummary .team-red:not(.award-tile):not(.disciplinary-card-tile)::before { background: var(--team-red-color); }
+        #footballMatchSummary .team-yellow:not(.award-tile):not(.disciplinary-card-tile)::before { background: var(--team-yellow-color); }
+        #footballMatchSummary .team-color-red { border-color: var(--team-red-color); background: color-mix(in srgb, var(--team-red-color) 20%, transparent); }
+        #footballMatchSummary .team-color-yellow { border-color: var(--team-yellow-color); background: color-mix(in srgb, var(--team-yellow-color) 20%, transparent); }
+        #footballMatchSummary .team-color-red span { color: var(--team-red-color); }
+        #footballMatchSummary .team-color-yellow span { color: var(--team-yellow-color); }
+        #footballMatchSummary .team-goal-count-red,
+        #footballMatchSummary .team-total-red,
+        #footballMatchSummary .mobile-team-label.red-label { color: var(--team-red-color); }
+        #footballMatchSummary .team-goal-count-yellow,
+        #footballMatchSummary .team-total-yellow,
+        #footballMatchSummary .mobile-team-label.yellow-label { color: var(--team-yellow-color); }
+        #footballMatchSummary .team-color-control { display: none; align-items: center; gap: 8px; color: #9ca3af; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; }
+        #footballMatchSummary .team-color-control select { padding: 5px 7px; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; background: #111827; cursor: pointer; }
+        .goal-team-select { --goal-team-color: var(--match-team-red-color, #ef4444); color: var(--goal-team-color) !important; }
+        .goal-team-select[data-team="YELLOW"] { --goal-team-color: var(--match-team-yellow-color, #facc15); }
+        .goal-team-select option.goal-team-red { color: var(--match-team-red-color, #ef4444) !important; }
+        .goal-team-select option.goal-team-yellow { color: var(--match-team-yellow-color, #facc15) !important; }
         @media (max-width: 1200px) {
-            #footballMatchSummary.match-summary-shell { display: block !important; aspect-ratio: auto; height: auto; min-height: 1050px; overflow: visible; border-radius: 12px; position: relative; z-index: 1; }
+            #footballMatchSummary.match-summary-shell { display: block !important; aspect-ratio: auto; height: auto; min-height: 0; overflow: visible; border-radius: 12px; position: relative; z-index: 1; }
             #footballMatchSummary .match-summary-header { display: flex !important; }
-            #footballMatchSummary .match-summary-scoreboard { display: grid !important; grid-template-columns: minmax(0, 1fr) minmax(80px, auto) minmax(0, 1fr); flex: none; min-height: 330px; margin-bottom: 24px !important; overflow: visible; }
+            #footballMatchSummary .match-summary-scoreboard { display: grid !important; grid-template-columns: minmax(0, 1fr) minmax(80px, auto) minmax(0, 1fr); flex: none; min-height: 0; margin-bottom: 24px !important; overflow: visible; }
             #footballMatchSummary .match-summary-scoreboard > div { width: auto; min-width: 0; }
             #footballMatchSummary .match-summary-scoreboard > div:first-child,
             #footballMatchSummary .match-summary-scoreboard > div:last-child { padding: 10px 6px; border-radius: 18px; background: rgba(2, 6, 23, 0.42); }
             #footballMatchSummary .mobile-team-label { display: block; margin: 4px 0 6px; font-size: 0.52rem; font-weight: 900; letter-spacing: 0.12em; text-transform: uppercase; }
-            #footballMatchSummary .mobile-team-label.red-label { color: #f87171; }
-            #footballMatchSummary .mobile-team-label.yellow-label { color: #facc15; }
-            #footballMatchSummary .match-summary-scoreboard [id$="GoalsDisplay"] { height: auto; max-height: none; min-height: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: auto; overflow: visible; }
+            #footballMatchSummary .mobile-team-label.red-label { color: var(--team-red-color); }
+            #footballMatchSummary .mobile-team-label.yellow-label { color: var(--team-yellow-color); }
+            #footballMatchSummary .match-summary-scoreboard [id$="GoalsDisplay"] { height: auto; max-height: none; min-height: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: none; grid-auto-rows: minmax(42px, auto); overflow: visible; }
             #footballMatchSummary .match-summary-discipline { display: block !important; flex: none; margin-bottom: 24px; overflow: visible; }
             #footballMatchSummary .match-summary-awards { display: block !important; flex: none; }
             #footballMatchSummary.match-summary-shell:not(.hidden) + .grid { margin-top: 48px !important; position: relative; z-index: 2; clear: both; }
@@ -155,18 +185,18 @@
             #footballMatchSummary .match-summary-header > div { min-width: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
             #footballMatchSummary .match-summary-header [id="matchSummaryDate"] { white-space: normal; display: flex; align-items: center; justify-content: center; text-align: center; }
             #footballMatchSummary .match-summary-header button { min-width: 0; padding: 8px 6px; font-size: 0.55rem; line-height: 1.1; white-space: normal; }
+            #footballMatchSummary .team-color-control { flex-direction: column; gap: 4px; text-align: center; }
             #footballMatchSummary .match-summary-scoreboard { flex: 0 0 auto; display: grid !important; grid-template-columns: minmax(0, 1fr) minmax(72px, auto) minmax(0, 1fr); align-items: center; overflow: visible; gap: 8px; }
             #footballMatchSummary .match-summary-scoreboard > div { width: auto; min-width: 0; flex: 0 0 auto; }
-            #footballMatchSummary .match-summary-scoreboard [id$="GoalsDisplay"] { height: auto; max-height: none; min-height: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: auto; overflow: visible; gap: 4px; }
-            #footballMatchSummary .match-summary-scoreboard [id$="GoalsDisplay"] > div:last-child { grid-column: 1 / -1; }
+            #footballMatchSummary .match-summary-scoreboard [id$="GoalsDisplay"] { height: auto; max-height: none; min-height: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: none; grid-auto-rows: minmax(42px, auto); overflow: visible; gap: 4px; }
             #footballMatchSummary .match-summary-discipline { flex: 0 0 auto; margin-top: 0; overflow: visible; }
             #footballMatchSummary .match-summary-discipline [id^="disciplinary"] { grid-template-columns: 1fr; }
             #footballMatchSummary .match-summary-awards { flex: 0 0 auto; }
-            #footballMatchSummary .match-summary-awards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: none; grid-auto-rows: minmax(96px, auto); overflow: visible; }
-            #footballMatchSummary .match-summary-awards-grid .award-tile { min-height: 96px; }
+            #footballMatchSummary .match-summary-awards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: none; grid-auto-rows: minmax(116px, auto); overflow: visible; }
+            #footballMatchSummary .match-summary-awards-grid .award-tile { min-height: 116px; }
         }
         @media (max-width: 1200px) {
-            #footballMatchSummary.match-summary-shell:not(.hidden) { aspect-ratio: auto !important; height: auto !important; min-height: 1050px !important; }
+            #footballMatchSummary.match-summary-shell:not(.hidden) { aspect-ratio: auto !important; height: auto !important; min-height: 0 !important; }
             .single-awards-strip { grid-template-columns: none !important; grid-auto-flow: column; grid-auto-columns: 160px; justify-content: start; overflow-x: auto; }
             .single-award-strip-item { min-width: 160px; padding-left: 10px; padding-right: 10px; }
             .single-award-strip-label { white-space: normal; overflow-wrap: anywhere; }
@@ -179,7 +209,6 @@
         .report-chart-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
         .report-chart-card { min-width: 0; height: 210px; padding: 12px; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; background: rgba(0,0,0,0.2); }
         .report-chart-card h4 { margin: 0 0 8px; color: #fbbf24; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.12em; }
-        #footballMatchSummary .award-icon { display: block; font-size: clamp(1.15rem, 2vw, 1.8rem); line-height: 1; margin-bottom: 4px; filter: drop-shadow(0 3px 5px rgba(0,0,0,0.35)); }
         .single-awards-strip { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 8px; padding: 10px; border: 1px solid rgba(34, 197, 94, 0.24); border-radius: 18px; background: rgba(15, 61, 58, 0.45); overflow-x: auto; }
         .single-award-strip-item { min-width: 120px; text-align: center; padding: 8px 6px; border-right: 1px solid rgba(255,255,255,0.1); }
         .single-award-strip-item:last-child { border-right: none; }
@@ -191,6 +220,10 @@
         @media (max-width: 640px) {
             .report-chart-grid { grid-template-columns: 1fr; }
             .report-chart-card { height: 190px; }
+        }
+        @media (max-width: 640px) {
+            #footballMatchSummary .match-summary-awards-grid { row-gap: 12px; }
+            #footballMatchSummary .match-summary-awards-grid .award-tile.is-expanded { width: min(300px, calc(100vw - 40px)); }
         }
 
         .chat-scroll::-webkit-scrollbar { width: 6px; }
@@ -304,12 +337,11 @@
     <header class="mb-8 flex flex-col lg:flex-row justify-between items-center gap-8">
         <h1 class="text-6xl font-black oswald text-white tracking-tighter">GOLAHA <span class="text-yellow-500">LABA GOLE</span></h1>
         <div class="glass-panel p-2 flex flex-wrap gap-2 justify-center shadow-2xl items-center">
-            <select id="viewYear" onchange="render()" class="tab-btn bg-transparent border-none font-bold text-yellow-500"></select>
+            <select id="viewYear" onchange="updateAvailableWeeks(); render()" class="tab-btn bg-transparent border-none font-bold text-yellow-500"></select>
             <button onclick="changeFilter('YEAR')" id="f-YEAR" class="tab-btn tab-active">🏆 SEASON</button>
-            <select id="selMonth" onchange="changeFilter('MONTH')" class="tab-btn bg-transparent border-none"></select>
+            <select id="selMonth" onchange="updateAvailableWeeks(); changeFilter('MONTH')" class="tab-btn bg-transparent border-none"></select>
             <select id="selWeek" onchange="changeFilter('WEEK')" class="tab-btn bg-transparent border-none">
                 <option value="">-- WEEK --</option>
-                <option value="1">Week 1</option><option value="2">Week 2</option><option value="3">Week 3</option><option value="4">Week 4</option>
             </select>
             
             <button id="publicReportBtn" onclick="showLargeView()" class="hidden tab-btn bg-blue-600 text-white border-none hover:bg-blue-500 flex items-center gap-2">
@@ -424,10 +456,11 @@
         <div class="flex flex-col xl:flex-row items-start justify-between gap-4 mb-12 match-summary-scoreboard">
             <!-- Red Team -->
             <div class="flex flex-col items-center gap-3 flex-1">
-                <div class="w-20 h-20 rounded-full border-4 border-red-600 bg-red-900/30 flex items-center justify-center">
-                    <span class="text-2xl font-black text-red-400">🛡️</span>
-                </div>
-                <h3 class="text-lg font-black text-white uppercase tracking-wide">RED</h3>
+                <div id="redTeamBadge" class="team-color-red w-20 h-20 rounded-full border-4 flex items-center justify-center" role="img" aria-label="Red team color badge"></div>
+                <h3 id="redTeamName" class="text-lg font-black text-white uppercase tracking-wide">RED</h3>
+                <label id="redTeamColorControl" class="team-color-control">TEAM COLOR <select id="redTeamColorPicker" aria-label="Choose red team's color" onchange="updateMatchTeamColor('RED', this.value)">
+                    <option value="#22c55e">GREEN</option><option value="#f8fafc">WHITE</option><option value="#ef4444" selected>RED</option><option value="#facc15">YELLOW</option><option value="#3b82f6">BLUE</option><option value="#a855f7">PURPLE</option>
+                </select></label>
                 <span class="mobile-team-label red-label">RED TEAM PLAYERS</span>
                 
                 <!-- Red Team Goals -->
@@ -442,7 +475,7 @@
                     <div class="text-6xl font-black text-white tracking-tighter font-mono transition">
                         <span id="redScore">--</span><span class="text-yellow-500">:</span><span id="yellowScore">--</span>
                     </div>
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2">FINAL SCORE</p>
+                    <p class="match-summary-final-score text-xs font-bold text-gray-400 uppercase tracking-widest mt-2">FINAL SCORE</p>
                 </div>
                 <div class="flex justify-center match-summary-control">
                     <button onclick="openEditGoalsModal()" class="mt-4 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold rounded-lg uppercase transition admin-only mx-auto">EDIT GOALS</button>
@@ -451,10 +484,11 @@
 
             <!-- Yellow Team -->
             <div class="flex flex-col items-center gap-3 flex-1">
-                <div class="w-20 h-20 rounded-full border-4 border-yellow-400 bg-yellow-900/30 flex items-center justify-center">
-                    <span class="text-2xl font-black text-yellow-300">🏵️</span>
-                </div>
-                <h3 class="text-lg font-black text-white uppercase tracking-wide">YELLOW</h3>
+                <div id="yellowTeamBadge" class="team-color-yellow w-20 h-20 rounded-full border-4 flex items-center justify-center" role="img" aria-label="Yellow team color badge"></div>
+                <h3 id="yellowTeamName" class="text-lg font-black text-white uppercase tracking-wide">YELLOW</h3>
+                <label id="yellowTeamColorControl" class="team-color-control">TEAM COLOR <select id="yellowTeamColorPicker" aria-label="Choose yellow team's color" onchange="updateMatchTeamColor('YELLOW', this.value)">
+                    <option value="#22c55e">GREEN</option><option value="#f8fafc">WHITE</option><option value="#ef4444">RED</option><option value="#facc15" selected>YELLOW</option><option value="#3b82f6">BLUE</option><option value="#a855f7">PURPLE</option>
+                </select></label>
                 <span class="mobile-team-label yellow-label">YELLOW TEAM PLAYERS</span>
                 
                 <!-- Yellow Team Goals -->
@@ -485,10 +519,9 @@
         <div class="match-summary-awards">
             <h3 class="text-sm font-black text-yellow-500 uppercase tracking-widest mb-8 pb-4 border-b border-white/10">SINGLE AWARDS</h3>
 
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 match-summary-awards-grid">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 match-summary-awards-grid" onclick="closeExpandedAwardTile(event)">
                 <!-- Man of the Match -->
-                <div class="award-tile text-center">
-                    <span class="award-icon" aria-hidden="true">🏆</span>
+                <div class="award-tile text-center" tabindex="0" role="button" aria-expanded="false" onclick="toggleAwardTile(this)" onkeydown="handleAwardTileKeydown(event, this)">
                     <div class="card-player-photo mx-auto mb-3 rounded-lg overflow-hidden">
                         <img id="manOfMatchImg" src="" alt="Man of Match" class="w-full h-full object-cover" style="display:none;">
                     </div>
@@ -498,8 +531,7 @@
                 </div>
 
                 <!-- Top Scorers -->
-                <div class="award-tile text-center">
-                    <span class="award-icon" aria-hidden="true">⚽</span>
+                <div class="award-tile text-center" tabindex="0" role="button" aria-expanded="false" onclick="toggleAwardTile(this)" onkeydown="handleAwardTileKeydown(event, this)">
                     <div class="card-player-photo mx-auto mb-3 rounded-lg overflow-hidden">
                         <img id="topScorer1Img" src="" alt="Top Scorer" class="w-full h-full object-cover" style="display:none;">
                     </div>
@@ -509,8 +541,7 @@
                 </div>
 
                 <!-- Best Goal -->
-                <div class="award-tile text-center">
-                    <span class="award-icon" aria-hidden="true">🎯</span>
+                <div class="award-tile text-center" tabindex="0" role="button" aria-expanded="false" onclick="toggleAwardTile(this)" onkeydown="handleAwardTileKeydown(event, this)">
                     <div class="card-player-photo mx-auto mb-3 rounded-lg overflow-hidden">
                         <img id="bestGoalImg" src="" alt="Best Goal" class="w-full h-full object-cover" style="display:none;">
                     </div>
@@ -520,8 +551,7 @@
                 </div>
 
                 <!-- Best Midfielder -->
-                <div class="award-tile text-center">
-                    <span class="award-icon" aria-hidden="true">🧠</span>
+                <div class="award-tile text-center" tabindex="0" role="button" aria-expanded="false" onclick="toggleAwardTile(this)" onkeydown="handleAwardTileKeydown(event, this)">
                     <div class="card-player-photo mx-auto mb-3 rounded-lg overflow-hidden">
                         <img id="bestMidfielderImg" src="" alt="Best Midfielder" class="w-full h-full object-cover" style="display:none;">
                     </div>
@@ -531,8 +561,7 @@
                 </div>
 
                 <!-- Best Defender -->
-                <div class="award-tile text-center">
-                    <span class="award-icon" aria-hidden="true">🛡️</span>
+                <div class="award-tile text-center" tabindex="0" role="button" aria-expanded="false" onclick="toggleAwardTile(this)" onkeydown="handleAwardTileKeydown(event, this)">
                     <div class="card-player-photo mx-auto mb-3 rounded-lg overflow-hidden">
                         <img id="bestDefenderImg" src="" alt="Best Defender" class="w-full h-full object-cover" style="display:none;">
                     </div>
@@ -542,8 +571,7 @@
                 </div>
 
                 <!-- Best Assist -->
-                <div class="award-tile text-center">
-                    <span class="award-icon" aria-hidden="true">🤝</span>
+                <div class="award-tile text-center" tabindex="0" role="button" aria-expanded="false" onclick="toggleAwardTile(this)" onkeydown="handleAwardTileKeydown(event, this)">
                     <div class="card-player-photo mx-auto mb-3 rounded-lg overflow-hidden">
                         <img id="bestAssistImg" src="" alt="Best Assist" class="w-full h-full object-cover" style="display:none;">
                     </div>
@@ -553,8 +581,7 @@
                 </div>
 
                 <!-- Top Assist -->
-                <div class="award-tile text-center">
-                    <span class="award-icon" aria-hidden="true">✨</span>
+                <div class="award-tile text-center" tabindex="0" role="button" aria-expanded="false" onclick="toggleAwardTile(this)" onkeydown="handleAwardTileKeydown(event, this)">
                     <div class="card-player-photo mx-auto mb-3 rounded-lg overflow-hidden">
                         <img id="topAssistImg" src="" alt="Top Assist" class="w-full h-full object-cover" style="display:none;">
                     </div>
@@ -564,8 +591,7 @@
                 </div>
 
                 <!-- Best Goalkeeper -->
-                <div class="award-tile text-center">
-                    <span class="award-icon" aria-hidden="true">🧤</span>
+                <div class="award-tile text-center" tabindex="0" role="button" aria-expanded="false" onclick="toggleAwardTile(this)" onkeydown="handleAwardTileKeydown(event, this)">
                     <div class="card-player-photo mx-auto mb-3 rounded-lg overflow-hidden">
                         <img id="bestGoalkeeperImg" src="" alt="Best Goalkeeper" class="w-full h-full object-cover" style="display:none;">
                     </div>
@@ -790,6 +816,7 @@
                         <label class="text-[10px] uppercase text-gray-400 font-bold ml-1">Xaaladda Fasaxa</label>
                         <select id="fasaxStatusSelect" class="w-full mt-1 p-4 rounded-xl bg-black/40 border border-white/10 font-bold text-white focus:outline-none">
                             <option value="fasax">Fasax (Leave)</option>
+                            <option value="fasax dheer">Fasax Dheer (Long Leave)</option>
                             <option value="kasoo noqo">Kasoo Noqo (Return)</option>
                         </select>
                     </div>
@@ -881,8 +908,8 @@
                 <div id="statsForm" class="space-y-4">
                     <select id="pNameSelect" class="w-full p-4 rounded-xl bg-black/40 border border-white/10 font-bold text-white"></select>
                     <div class="grid grid-cols-2 gap-2">
-                        <select id="inMonth" class="p-3 rounded-xl bg-black/40 text-xs text-white"></select>
-                        <select id="inWeek" class="p-3 rounded-xl bg-black/40 text-xs text-white"><option value="1">W1</option><option value="2">W2</option><option value="3">W3</option><option value="4">W4</option></select>
+                        <select id="inMonth" onchange="updateAvailableWeeks()" class="p-3 rounded-xl bg-black/40 text-xs text-white"></select>
+                        <select id="inWeek" class="p-3 rounded-xl bg-black/40 text-xs text-white"></select>
                     </div>
                     <div class="grid grid-cols-3 gap-2">
                         <input type="number" id="s1" onchange="validateSkill('s1')" placeholder="Time" class="p-3 rounded-xl bg-black/40 text-center text-[10px] text-white">
@@ -1122,9 +1149,9 @@
                 <h3 class="text-sm font-black text-yellow-400 uppercase mb-3">Add Guest / Invited Player</h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
                     <input type="text" id="guestPlayerName" placeholder="Guest Player Name" class="w-full p-3 rounded-xl bg-black/40 border border-white/10 text-white text-xs font-bold" />
-                    <select id="guestPlayerTeam" class="w-full p-3 rounded-xl bg-black/40 border border-white/10 text-white text-xs font-bold">
-                        <option value="RED">RED</option>
-                        <option value="YELLOW">YELLOW</option>
+                    <select id="guestPlayerTeam" class="goal-team-select w-full p-3 rounded-xl bg-black/40 border border-white/10 text-xs font-bold" onchange="updateGoalTeamSelectColor(this)">
+                        <option value="RED" class="goal-team-red">RED</option>
+                        <option value="YELLOW" class="goal-team-yellow">YELLOW</option>
                     </select>
                     <input type="number" id="guestPlayerGoals" placeholder="Goals" min="0" max="20" class="w-full p-3 rounded-xl bg-black/40 border border-white/10 text-white text-center text-xs font-bold" />
                 </div>
@@ -1137,7 +1164,7 @@
             <button type="button" onclick="closeEditGoalsModal()" class="flex-1 py-4 rounded-xl bg-gray-600 text-white font-black oswald uppercase hover:bg-gray-500 transition tracking-wider">
                 ✕ CANCEL
             </button>
-            <button type="button" onclick="saveEditedGoals()" class="flex-1 py-4 rounded-xl bg-yellow-500 text-black font-black oswald uppercase hover:bg-yellow-400 transition tracking-wider">
+            <button id="saveEditedGoalsBtn" type="button" onclick="saveEditedGoals()" class="flex-1 py-4 rounded-xl bg-yellow-500 text-black font-black oswald uppercase hover:bg-yellow-400 transition tracking-wider">
                 💾 SAVE GOALS
             </button>
         </div>
@@ -1449,9 +1476,7 @@
             Object.keys(profiles).forEach(name => {
                 if (name === "FULL CASHIER") return; 
                 
-                const fData = fasaxData[name];
-                const isFasax = fData && (typeof fData === 'object' ? fData.status === 'fasax' : fData === 'fasax');
-                if (isFasax) return;
+                if (isPlayerOnLeave(name)) return;
                 
                 if (!votes[name]) {
                     listHTML += `<tr><td style="border: 1px solid #cbd5e1; padding: 10px;">${name}</td><td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right; color: gray;">--:--</td></tr>`;
@@ -1464,9 +1489,7 @@
             for (let name in votes) {
                 if (name === "FULL CASHIER") continue; 
                 
-                const fData = fasaxData[name];
-                const isFasax = fData && (typeof fData === 'object' ? fData.status === 'fasax' : fData === 'fasax');
-                if (isFasax) continue;
+                if (isPlayerOnLeave(name)) continue;
                 
                 const voteData = typeof votes[name] === 'object' ? votes[name] : { status: votes[name], timestamp: null };
                 
@@ -1544,6 +1567,26 @@
     let paymentData = {};
     let ganaaxData = {}; 
     let fasaxData = {};
+    function getFasaxStatus(playerName) {
+        const record = fasaxData[playerName];
+        const status = record && typeof record === 'object' ? record.status : record;
+        return typeof status === 'string' ? status.trim().toLowerCase() : '';
+    }
+
+    function isPlayerOnLeave(playerName) {
+        return ['fasax', 'fasax dheer'].includes(getFasaxStatus(playerName));
+    }
+
+    function isPlayerOnLongLeave(playerName) {
+        return getFasaxStatus(playerName) === 'fasax dheer';
+    }
+
+    function getMonthlyPaymentPlayerNames() {
+        return Object.keys(profiles)
+            .filter(name => name !== 'FULL CASHIER' && !isPlayerOnLongLeave(name))
+            .sort();
+    }
+
     let chatIsOpen = false;
     let unreadCount = 0;
     let lastSeenMsgTimestamp = parseInt(localStorage.getItem('lastSeenMsg')) || 0;
@@ -1551,6 +1594,101 @@
     let currentCalculatedStats = {}; // Tracks stats globally for the modal
     let playerPointsChart = null;
     let playerContributionsChart = null;
+    const MATCH_TEAM_COLOR_NAMES = {
+        '#22c55e': 'GREEN',
+        '#f8fafc': 'WHITE',
+        '#ef4444': 'RED',
+        '#facc15': 'YELLOW',
+        '#3b82f6': 'BLUE',
+        '#a855f7': 'PURPLE'
+    };
+    const DEFAULT_MATCH_TEAM_COLORS = { RED: '#ef4444', YELLOW: '#facc15' };
+    let activeMatchTeamColors = { ...DEFAULT_MATCH_TEAM_COLORS };
+    let activeMatchColorKey = '';
+    let activeMatchTeamColorsRef = null;
+
+    function applyMatchTeamColors(colors = {}) {
+        const summary = document.getElementById('footballMatchSummary');
+        if (!summary) return;
+
+        ['RED', 'YELLOW'].forEach(team => {
+            const requestedColor = (colors[team] || '').toLowerCase();
+            const color = Object.prototype.hasOwnProperty.call(MATCH_TEAM_COLOR_NAMES, requestedColor)
+                ? requestedColor
+                : DEFAULT_MATCH_TEAM_COLORS[team];
+            activeMatchTeamColors[team] = color;
+            summary.style.setProperty(`--team-${team.toLowerCase()}-color`, color);
+            document.documentElement.style.setProperty(`--match-team-${team.toLowerCase()}-color`, color);
+            const picker = document.getElementById(`${team.toLowerCase()}TeamColorPicker`);
+            if (picker) picker.value = color;
+            const teamName = MATCH_TEAM_COLOR_NAMES[color];
+            const teamNameEl = document.getElementById(`${team.toLowerCase()}TeamName`);
+            if (teamNameEl) teamNameEl.innerText = teamName;
+            const mobileTeamLabel = summary.querySelector(`.mobile-team-label.${team.toLowerCase()}-label`);
+            if (mobileTeamLabel) mobileTeamLabel.innerText = `${teamName} TEAM PLAYERS`;
+        });
+        document.querySelectorAll('.goal-team-select').forEach(updateGoalTeamSelectColor);
+    }
+
+    function updateGoalTeamSelectColor(select) {
+        if (!select) return;
+        const team = select.value === 'YELLOW' ? 'YELLOW' : 'RED';
+        const selectedColor = activeMatchTeamColors[team];
+        select.dataset.team = team;
+        select.style.setProperty('color', selectedColor, 'important');
+        select.style.borderColor = selectedColor;
+        select.querySelectorAll('option').forEach(option => {
+            const optionTeam = option.value === 'YELLOW' ? 'YELLOW' : 'RED';
+            const optionColor = activeMatchTeamColors[optionTeam];
+            option.textContent = MATCH_TEAM_COLOR_NAMES[optionColor];
+            option.style.setProperty('color', optionColor, 'important');
+        });
+    }
+
+    function loadMatchTeamColors(scoreKey) {
+        if (activeMatchColorKey === scoreKey) return;
+        activeMatchColorKey = scoreKey;
+        activeMatchTeamColors = { ...DEFAULT_MATCH_TEAM_COLORS };
+        applyMatchTeamColors(activeMatchTeamColors);
+
+        if (activeMatchTeamColorsRef) activeMatchTeamColorsRef.off('value');
+        activeMatchTeamColorsRef = firebase.database().ref(`golaha_match_summary/${scoreKey}/teamColors`);
+        activeMatchTeamColorsRef.on('value', snapshot => {
+            if (activeMatchColorKey === scoreKey) applyMatchTeamColors(snapshot.val() || {});
+        }, error => {
+            console.error('Error loading match team colors:', error);
+        });
+    }
+
+    function updateMatchTeamColor(team, color) {
+        if (!isUserAdmin) {
+            alert('Only an administrator can change team colors.');
+            applyMatchTeamColors(activeMatchTeamColors);
+            return;
+        }
+        if (!['RED', 'YELLOW'].includes(team) || !Object.prototype.hasOwnProperty.call(MATCH_TEAM_COLOR_NAMES, (color || '').toLowerCase())) {
+            alert('Please choose a valid team color.');
+            applyMatchTeamColors(activeMatchTeamColors);
+            return;
+        }
+        if (!activeMatchColorKey) {
+            alert('The match week is not ready yet. Please try again.');
+            applyMatchTeamColors(activeMatchTeamColors);
+            return;
+        }
+
+        color = color.toLowerCase();
+        const previousColor = activeMatchTeamColors[team];
+        applyMatchTeamColors({ ...activeMatchTeamColors, [team]: color });
+        firebase.database().ref(`golaha_match_summary/${activeMatchColorKey}/teamColors/${team}`).set(color)
+            .catch(error => {
+                console.error(`Error saving ${team.toLowerCase()} team color:`, error);
+                if (activeMatchTeamColors[team] === color) {
+                    applyMatchTeamColors({ ...activeMatchTeamColors, [team]: previousColor });
+                }
+                alert('Could not save the team color. Please try again.');
+            });
+    }
 
     // --- THEME TOGGLE LOGIC ---
     function toggleTheme() {
@@ -1657,6 +1795,9 @@
             isUserAdmin = admins.includes(user.email.toLowerCase());
             isFinanceUser = financeUsers.includes(user.email.toLowerCase());
             const isLimitedAdmin = limitedAdmins.includes(user.email.toLowerCase());
+            document.querySelectorAll('.team-color-control').forEach(control => {
+                control.style.display = isUserAdmin ? 'flex' : 'none';
+            });
 
             // Toggles Print Preview in Poll based on auth role
             const printControls = document.getElementById('attendancePrintControls');
@@ -1747,8 +1888,11 @@
 
             fasaxRef.on('value', s => {
                 fasaxData = s.val() || {};
+                updatePaymentPlayerDropdown();
+                updatePaymentReport();
                 updateAttendancePollUI();
                 renderFasaxTable();
+                handleLockoutCheck();
             });
 
             settingsRef.on('value', s => {
@@ -1843,6 +1987,10 @@
             });
 
         } else {
+            isUserAdmin = false;
+            document.querySelectorAll('.team-color-control').forEach(control => {
+                control.style.display = 'none';
+            });
             loginScreen.style.display = 'flex';
             dashboardArea.classList.add('hidden');
             chatSystemWidget.classList.add('hidden');
@@ -1860,6 +2008,13 @@
         const financeUsers = ["cashier@golaha.com"];
         if (admins.includes(user.email.toLowerCase()) || financeUsers.includes(user.email.toLowerCase())) {
             document.getElementById('lockoutModal').style.display = 'none';
+            return;
+        }
+
+        if (isPlayerOnLongLeave(currentUserProfileUsername)) {
+            document.getElementById('lockoutModal').style.display = 'none';
+            document.getElementById('dashboardArea').classList.remove('hidden');
+            document.getElementById('chatSystemWidget').classList.remove('hidden');
             return;
         }
 
@@ -1909,6 +2064,10 @@
     }
 
     function submitPaymentApprovalRequest() {
+        if (isPlayerOnLongLeave(currentUserProfileUsername)) {
+            alert("Fasax Dheer awgiis lacag-bixin looma baahna.");
+            return;
+        }
         const today = new Date();
         const currentMonthKey = `${today.getFullYear()}-${today.getMonth()}`;
         paymentsRef.child('requests').child(currentMonthKey).child(currentUserProfileUsername).set({
@@ -1930,6 +2089,7 @@
         
         for (let monthKey in requests) {
             for (let username in requests[monthKey]) {
+                if (isPlayerOnLongLeave(username)) continue;
                 count++;
                 const div = document.createElement('div');
                 div.className = "p-3 bg-white/5 rounded-xl border border-white/10 flex flex-col gap-2 mb-2 text-left";
@@ -1985,6 +2145,7 @@
               yr = document.getElementById('viewYear').value,
               mo = document.getElementById('selMonth').value;
         if(!name || mo === "") return alert("Select Player and Month first");
+        if (isPlayerOnLongLeave(name)) return alert("Fasax Dheer players are excluded from monthly payments.");
         const monthKey = `${yr}-${mo}`;
         const currentStatus = paymentData[monthKey]?.[name] || false;
         paymentsRef.child('records').child(monthKey).child(name).set(!currentStatus);
@@ -2003,11 +2164,9 @@
         }
         const monthKey = `${yr}-${mo}`,
               records = paymentData[monthKey] || {},
-              allPlayers = Object.keys(profiles).sort();
+              allPlayers = getMonthlyPaymentPlayerNames();
 
         allPlayers.forEach(name => {
-            if (name === "FULL CASHIER") return; 
-            
             const hasPaid = records[name] === true;
             let shouldDisplay = (statusType === 'ALL') || (statusType === 'PAID' && hasPaid) || (statusType === 'UNPAID' && !hasPaid);
             if (shouldDisplay) {
@@ -2069,29 +2228,44 @@
         }
 
         const screenshotBtn = document.getElementById('matchSummaryScreenshotBtn');
-        const controls = summaryEl.querySelectorAll('#matchSummaryScreenshotBtn, [onclick="showMyPerformance()"], [onclick="openEditGoalsModal()"], [onclick="openAwardsEditModal()"]');
-        const originalDisplay = [];
-
-        // Hide the capture and editing buttons; keep the match result and other content visible.
-        controls.forEach((el, index) => {
-            originalDisplay[index] = el.style.display;
-            el.style.display = 'none';
-        });
-
-        if (screenshotBtn) {
-            screenshotBtn.disabled = true;
-        }
+        if (screenshotBtn?.dataset.captureInProgress === 'true') return;
+        if (screenshotBtn) screenshotBtn.dataset.captureInProgress = 'true';
 
         try {
-            // Give the browser a moment to reflow after hiding controls.
-            await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-
             const canvas = await html2canvas(summaryEl, {
                 backgroundColor: null,
                 useCORS: true,
                 allowTaint: false,
-                scale: Math.max(3, window.devicePixelRatio || 1),
-                logging: false
+                scale: 4,
+                logging: false,
+                windowWidth: window.innerWidth,
+                windowHeight: window.innerHeight,
+                onclone: clonedDocument => {
+                    const clonedSummary = clonedDocument.getElementById('footballMatchSummary');
+                    if (!clonedSummary) return;
+
+                    clonedSummary.classList.add('is-capturing-screenshot');
+                    clonedDocument.body.style.width = `${document.documentElement.clientWidth}px`;
+                    const clonedElements = [clonedSummary, ...clonedSummary.querySelectorAll('*')];
+                    const colorFunction = /color\(srgb\s+(-?(?:\d*\.?\d+))\s+(-?(?:\d*\.?\d+))\s+(-?(?:\d*\.?\d+))(?:\s*\/\s*(-?(?:\d*\.?\d+)))?\s*\)/gi;
+
+                    clonedElements.forEach(clonedElement => {
+                        const computedStyle = clonedDocument.defaultView.getComputedStyle(clonedElement);
+                        const properties = Array.from({ length: computedStyle.length }, (_, index) => {
+                            const property = computedStyle[index];
+                            return [property, computedStyle.getPropertyValue(property)];
+                        });
+
+                        properties.forEach(([property, value]) => {
+                            if (!/color\(srgb\b/i.test(value)) return;
+
+                            const compatibleValue = value.replace(colorFunction, (_, red, green, blue, alpha = '1') =>
+                                `rgba(${Math.round(Number(red) * 255)}, ${Math.round(Number(green) * 255)}, ${Math.round(Number(blue) * 255)}, ${alpha})`
+                            );
+                            clonedElement.style.setProperty(property, compatibleValue, 'important');
+                        });
+                    });
+                }
             });
 
             const link = document.createElement('a');
@@ -2099,19 +2273,24 @@
                 .trim()
                 .replace(/[^a-z0-9_-]+/gi, '-');
             link.download = `football-match-summary-${dateText || 'match'}.png`;
-            link.href = canvas.toDataURL('image/png');
+            const screenshotBlob = await new Promise((resolve, reject) => {
+                canvas.toBlob(blob => {
+                    if (blob) {
+                        resolve(blob);
+                    } else {
+                        reject(new Error('The screenshot image could not be encoded.'));
+                    }
+                }, 'image/png');
+            });
+            const screenshotUrl = URL.createObjectURL(screenshotBlob);
+            link.href = screenshotUrl;
             link.click();
+            setTimeout(() => URL.revokeObjectURL(screenshotUrl), 1000);
         } catch (error) {
             console.error('Error taking football match summary screenshot:', error);
             alert('Unable to take the screenshot. Please try again.');
         } finally {
-            // Restore the page exactly as it was before the screenshot.
-            controls.forEach((el, index) => {
-                el.style.display = originalDisplay[index];
-            });
-            if (screenshotBtn) {
-                screenshotBtn.disabled = false;
-            }
+            if (screenshotBtn) delete screenshotBtn.dataset.captureInProgress;
         }
     }
 
@@ -2138,6 +2317,38 @@
         if (!summaryEl.classList.contains('hidden')) {
             populateMatchSummary();
         }
+    }
+
+    function updateAvailableWeeks() {
+        const year = parseInt(document.getElementById('viewYear').value, 10);
+        const selectedMonth = document.getElementById('selMonth').value;
+        const inputMonth = document.getElementById('inMonth').value;
+
+        const supportsWeekFive = month => {
+            if (month === '') return false;
+            if (year === 2026) return parseInt(month, 10) === 11;
+            if (year < 2027 || year > 2030) return false;
+            return new Date(year, parseInt(month, 10) + 1, 0).getDate() === 31;
+        };
+
+        const updateSelect = (selectId, month, hasPlaceholder) => {
+            const select = document.getElementById(selectId);
+            if (!select) return;
+
+            const previousValue = select.value;
+            const maxWeek = supportsWeekFive(month) ? 5 : 4;
+            const options = hasPlaceholder ? ['<option value="">-- WEEK --</option>'] : [];
+            for (let week = 1; week <= maxWeek; week++) {
+                options.push(`<option value="${week}">${hasPlaceholder ? 'Week ' + week : 'W' + week}</option>`);
+            }
+            select.innerHTML = options.join('');
+            if (previousValue && parseInt(previousValue, 10) <= maxWeek) {
+                select.value = previousValue;
+            }
+        };
+
+        updateSelect('selWeek', selectedMonth, true);
+        updateSelect('inWeek', inputMonth, false);
     }
 
     function setup() {
@@ -2178,6 +2389,7 @@
             if(ganMonth) ganMonth.innerHTML += `<option value="${i}">${m}</option>`;
             if(editGanMonth) editGanMonth.innerHTML += `<option value="${i}">${m}</option>`;
         });
+        updateAvailableWeeks();
 
         if(ganDay && editGanDay) {
             ganDay.innerHTML = '';
@@ -2225,6 +2437,18 @@
         if(signUpSel) signUpSel.innerHTML = signUpOptions;
         if(ganSel) ganSel.innerHTML = adminOptions;
         if(fasaxSel) fasaxSel.innerHTML = adminOptions;
+        updatePaymentPlayerDropdown();
+    }
+
+    function updatePaymentPlayerDropdown() {
+        const paySel = document.getElementById('payPlayerSelect');
+        if (!paySel) return;
+
+        const currentSelection = paySel.value;
+        const eligibleNames = getMonthlyPaymentPlayerNames();
+        paySel.innerHTML = '<option value="">-- SELECT NAME --</option>' +
+            eligibleNames.map(name => `<option value="${name}">${name}</option>`).join('');
+        if (eligibleNames.includes(currentSelection)) paySel.value = currentSelection;
     }
 
     function releaseName(name) {
@@ -2519,6 +2743,9 @@
         const name = document.getElementById('fasaxPlayerSelect').value;
         const status = document.getElementById('fasaxStatusSelect').value;
         if(!name) return alert("Fadlan dooro magaca ciyaaryahanka.");
+        if (!['fasax', 'fasax dheer', 'kasoo noqo'].includes(status)) {
+            return alert("Fadlan dooro xaalad fasax oo sax ah.");
+        }
 
         fasaxRef.child(name).set({
             status: status,
@@ -2526,6 +2753,9 @@
         }).then(() => {
             logUserActivity('FASAX_UPDATED', { player: name, status: status });
             alert(`Xaaladda fasaxa ee ${name} waxaa loo badalay: ${status}`);
+        }).catch(error => {
+            console.error('Unable to update player leave status:', error);
+            alert("Fasax status-ka lama kaydin. Fadlan mar kale isku day.");
         });
     }
 
@@ -2550,9 +2780,11 @@
             const row = document.createElement('tr');
             row.className = "hover:bg-white/5 transition";
             
-            const statusHtml = status === 'fasax' 
-                ? `<span class="px-2 py-0.5 rounded text-[8px] font-black tracking-wider bg-red-500/20 text-red-400 uppercase">FASAX</span>` 
-                : `<span class="px-2 py-0.5 rounded text-[8px] font-black tracking-wider bg-green-500/20 text-green-400 uppercase">KASOO NOQDAY</span>`;
+            const statusHtml = status === 'fasax dheer'
+                ? `<span class="px-2 py-0.5 rounded text-[8px] font-black tracking-wider bg-orange-500/20 text-orange-400 uppercase">FASAX DHEER</span>`
+                : status === 'fasax'
+                    ? `<span class="px-2 py-0.5 rounded text-[8px] font-black tracking-wider bg-red-500/20 text-red-400 uppercase">FASAX</span>`
+                    : `<span class="px-2 py-0.5 rounded text-[8px] font-black tracking-wider bg-green-500/20 text-green-400 uppercase">KASOO NOQDAY</span>`;
 
             row.innerHTML = `
                 <td class="p-3 font-bold uppercase tracking-wide">${name}</td>
@@ -2574,6 +2806,7 @@
         const vW = document.getElementById('selWeek').value;
 
         if (!yr || !vM || !vW) return;
+        loadMatchTeamColors(`${yr}-${vM}-${vW}`);
 
         const dateLabel = document.getElementById('matchSummaryDate');
         if (dateLabel) {
@@ -2590,7 +2823,7 @@
         document.getElementById('topAssistName').innerText = '';
 
         let redGoals = {}, yellowGoals = {}, allAssists = {}, playerStats = {};
-        let topMvpPlayer = null, topMvpScore = 0;
+        let topMvpPlayer = null;
 
         console.log('Loading data for:', yr, vM, vW);
         console.log('Available players in profiles:', Object.keys(profiles).slice(0, 5));
@@ -2625,11 +2858,6 @@
                         totalScore
                     };
 
-                    if (totalScore > topMvpScore) {
-                        topMvpScore = totalScore;
-                        topMvpPlayer = playerName;
-                    }
-
                     let playerTeam = 'YELLOW';
                     if (stats.team) {
                         playerTeam = stats.team;
@@ -2658,6 +2886,14 @@
             }
         }
 
+        topMvpPlayer = Object.values(playerStats)
+            .filter(player => player.totalScore > 0)
+            .sort((a, b) =>
+                (b.totalScore - a.totalScore) ||
+                (b.goals - a.goals) ||
+                (b.assists - a.assists)
+            )[0]?.name || null;
+
         // Find top scorers (including ties)
         const topGoalCount = Math.max(...Object.values(redGoals).concat(Object.values(yellowGoals)), 0);
         const topScorers = Object.entries(redGoals).concat(Object.entries(yellowGoals))
@@ -2682,11 +2918,11 @@
                         return `
                             <div class="team-player-tile team-red flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-xl border border-red-500/50">
                                 <p class="text-[11px] font-bold text-white text-center leading-tight">${name}</p>
-                                <p class="text-[9px] text-red-400 font-black">⚽ x${count}</p>
+                                <p class="team-goal-count-red text-[9px] font-black">⚽ x${count}</p>
                             </div>
                         `;
                     }).join('');
-                redGoalsDisplay.innerHTML += `<div class="mt-3 text-xs text-red-400 font-bold uppercase">Team Total: ${totalRedGoals}</div>`;
+                redGoalsDisplay.innerHTML += `<div class="team-total-red mt-3 text-xs font-bold uppercase">Team Total: ${totalRedGoals}</div>`;
             } else {
                 redGoalsDisplay.innerHTML = '<div class="text-gray-500 text-xs">No goals</div>';
             }
@@ -2701,11 +2937,11 @@
                         return `
                             <div class="team-player-tile team-yellow flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-xl border border-yellow-500/50">
                                 <p class="text-[11px] font-bold text-white text-center leading-tight">${name}</p>
-                                <p class="text-[9px] text-yellow-400 font-black">⚽ x${count}</p>
+                                <p class="team-goal-count-yellow text-[9px] font-black">⚽ x${count}</p>
                             </div>
                         `;
                     }).join('');
-                yellowGoalsDisplay.innerHTML += `<div class="mt-3 text-xs text-yellow-400 font-bold uppercase">Team Total: ${totalYellowGoals}</div>`;
+                yellowGoalsDisplay.innerHTML += `<div class="team-total-yellow mt-3 text-xs font-bold uppercase">Team Total: ${totalYellowGoals}</div>`;
             } else {
                 yellowGoalsDisplay.innerHTML = '<div class="text-gray-500 text-xs">No goals</div>';
             }
@@ -2746,7 +2982,7 @@
 
             const renderSmall = (player) => {
                 return `
-                    <div class="team-player-tile ${player.rV > 0 ? 'team-red' : 'team-yellow'} flex flex-col items-center gap-1 px-3 py-2 rounded-xl border border-white/10">
+                    <div class="team-player-tile disciplinary-card-tile ${player.rV > 0 ? 'team-red' : 'team-yellow'} flex flex-col items-center gap-1 px-3 py-2 rounded-xl border border-white/10">
                         <p class="text-[11px] font-bold text-white text-center leading-tight">${player.name}</p>
                         <div class="flex items-center gap-2 mt-1">
                             ${player.rV > 0 ? `<span class="text-[10px] px-2 py-1 rounded-full bg-red-600/20 text-red-100 border border-red-500">🟥 ${player.rV}</span>` : ''}
@@ -2785,7 +3021,7 @@
         try {
             const scoreKey = `${yr}-${vM}-${vW}`;
             const summaryRef = firebase.database().ref(`golaha_match_summary/${scoreKey}`);
-            const manOfMatch = document.getElementById('manOfMatchName')?.innerText || '';
+            const manOfMatch = topMvpPlayer || document.getElementById('manOfMatchName')?.innerText || '';
             const summaryData = {
                 year: yr,
                 month: vM,
@@ -2858,7 +3094,10 @@
             if (!name) {
                 imgEl.style.display = 'none';
                 imgEl.src = '';
-                if (wrapper) wrapper.style.display = 'none';
+                if (wrapper) {
+                    wrapper.classList.remove('has-player-photo');
+                    wrapper.style.display = 'none';
+                }
                 return;
             }
             applyTeamClass(wrapper, getSummaryTeam(name));
@@ -2866,11 +3105,17 @@
             if (photo) {
                 imgEl.src = photo;
                 imgEl.style.display = '';
-                if (wrapper) wrapper.style.display = '';
+                if (wrapper) {
+                    wrapper.classList.add('has-player-photo');
+                    wrapper.style.display = '';
+                }
             } else {
                 imgEl.style.display = 'none';
                 imgEl.src = '';
-                if (wrapper) wrapper.style.display = 'none';
+                if (wrapper) {
+                    wrapper.classList.remove('has-player-photo');
+                    wrapper.style.display = 'none';
+                }
             }
         };
 
@@ -2904,7 +3149,7 @@
         };
 
         const applySavedAwards = (savedAwards = {}) => {
-            const manOfMatchName = savedAwards?.manOfMatch || topMvpPlayer || '';
+            const manOfMatchName = topMvpPlayer || savedAwards?.manOfMatch || '';
             const topScorerNames = Array.isArray(savedAwards?.topScorers) && savedAwards.topScorers.length > 0 ? savedAwards.topScorers : topScorers;
             const topAssistNames = Array.isArray(savedAwards?.topAssisters) && savedAwards.topAssisters.length > 0 ? savedAwards.topAssisters : topAssisters;
 
@@ -2912,7 +3157,7 @@
             setAwardImage('manOfMatchImg', manOfMatchName);
 
             setWinnerNames(topScorerNames, 'topScorersList', topGoalCount > 0 ? topGoalCount : null);
-            setAwardImage('topScorer1Img', '');
+            setAwardImage('topScorer1Img', topScorerNames[0] || '');
 
             if (savedAwards?.bestGoal) {
                 document.getElementById('bestGoalName').innerText = savedAwards.bestGoal;
@@ -2936,7 +3181,7 @@
             }
 
             setWinnerNames(topAssistNames, 'topAssistName', topAssistCount > 0 ? topAssistCount : null);
-            setAwardImage('topAssistImg', '');
+            setAwardImage('topAssistImg', topAssistNames[0] || '');
         };
 
         Promise.all([awardsRef.once('value'), summaryRef.once('value')])
@@ -2960,6 +3205,40 @@
             topScorers: topScorers,
             topAssisters: topAssisters
         };
+    }
+
+    function toggleAwardTile(tile) {
+        const grid = tile?.closest('.match-summary-awards-grid');
+        if (!grid) return;
+
+        const wasExpanded = tile.classList.contains('is-expanded');
+        grid.querySelectorAll('.award-tile.is-expanded').forEach(expandedTile => {
+            expandedTile.classList.remove('is-expanded');
+            expandedTile.setAttribute('aria-expanded', 'false');
+        });
+        if (!wasExpanded) {
+            tile.classList.add('is-expanded');
+            tile.setAttribute('aria-expanded', 'true');
+        }
+    }
+
+    function closeExpandedAwardTile(event) {
+        if (event.target.closest('.award-tile')) return;
+        const grid = event.currentTarget;
+        grid.querySelectorAll('.award-tile.is-expanded').forEach(tile => {
+            tile.classList.remove('is-expanded');
+            tile.setAttribute('aria-expanded', 'false');
+        });
+    }
+
+    function handleAwardTileKeydown(event, tile) {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            toggleAwardTile(tile);
+        } else if (event.key === 'Escape') {
+            tile.classList.remove('is-expanded');
+            tile.setAttribute('aria-expanded', 'false');
+        }
     }
 
     function populateAwardsForm() {
@@ -3161,38 +3440,42 @@
         if (!yr || !vM || !vW) return alert('Please select Year, Month, and Week first');
 
         document.getElementById('editGoalsWeekDisplay').innerText = `WEEK ${vW}`;
+        loadMatchTeamColors(`${yr}-${vM}-${vW}`);
 
         document.getElementById('guestPlayerName').value = '';
         document.getElementById('guestPlayerGoals').value = '';
         document.getElementById('guestPlayerTeam').value = 'RED';
+        updateGoalTeamSelectColor(document.getElementById('guestPlayerTeam'));
 
         const container = document.getElementById('editGoalsContainer');
         container.innerHTML = '';
 
-        // Load only the goal scorers from the selected week
-        const scorerPlayers = Object.keys(profiles).sort().filter(playerName => {
-            const playerData = db[yr] && db[yr][playerName] && db[yr][playerName][vM] && db[yr][playerName][vM][vW];
-            return playerData && (playerData.gV || 0) > 0;
+        const weekPlayers = db[yr] || {};
+        const scorerPlayers = [...new Set([...Object.keys(profiles), ...Object.keys(weekPlayers)])].sort().filter(playerName => {
+            const playerData = weekPlayers[playerName]?.[vM]?.[vW];
+            return playerData && ((playerData.gV || 0) > 0 || playerData.guest === true || !profiles[playerName]);
         });
 
         if (scorerPlayers.length === 0) {
             container.innerHTML = '<p class="text-gray-400 text-sm">No goal scorers found for the selected week. You can still add a guest player below.</p>';
         } else {
             scorerPlayers.forEach(playerName => {
-                const playerData = db[yr][playerName][vM][vW];
+                const playerData = weekPlayers[playerName][vM][vW];
                 const currentGoals = playerData.gV || 0;
                 const currentYellow = playerData.yV || 0;
                 const currentRed = playerData.rV || 0;
                 const storedTeam = playerData.team || (playerName.includes('(R)') ? 'RED' : 'YELLOW');
                 const entryId = playerName.replace(/[^a-zA-Z0-9_\-]/g, '_');
+                const isGuest = playerData.guest === true || !profiles[playerName];
+                const escapedPlayerName = escapeGoalEntryText(playerName);
 
                 container.innerHTML += `
-                    <div class="goal-entry p-4 bg-black/40 rounded-lg border border-white/20" data-player-name="${playerName}">
+                    <div class="goal-entry p-4 bg-black/40 rounded-lg border border-white/20" data-player-name="${escapedPlayerName}" data-guest="${isGuest}" data-saved="true">
                         <div class="flex items-center justify-between gap-4 mb-3">
-                            <p class="text-sm font-bold text-white">${playerName}</p>
-                            <select id="team_${entryId}" class="px-3 py-2 rounded-lg bg-black/60 border border-white/20 font-bold text-white text-xs focus:outline-none">
-                                <option value="RED" ${storedTeam === 'RED' ? 'selected' : ''}>RED</option>
-                                <option value="YELLOW" ${storedTeam === 'YELLOW' ? 'selected' : ''}>YELLOW</option>
+                            <p class="text-sm font-bold text-white">${escapedPlayerName}${isGuest ? ' <span class="text-xs text-gray-400">(Guest)</span>' : ''}</p>
+                            <select id="team_${entryId}" class="goal-team-select px-3 py-2 rounded-lg bg-black/60 border border-white/20 font-bold text-xs focus:outline-none" onchange="updateGoalTeamSelectColor(this)">
+                                <option value="RED" class="goal-team-red" ${storedTeam === 'RED' ? 'selected' : ''}>RED</option>
+                                <option value="YELLOW" class="goal-team-yellow" ${storedTeam === 'YELLOW' ? 'selected' : ''}>YELLOW</option>
                             </select>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
@@ -3209,10 +3492,13 @@
                                 <input type="number" id="red_${entryId}" value="${currentRed}" min="0" max="10" class="w-full p-2 rounded-lg bg-black/60 border border-red-600/30 font-bold text-red-600 text-center focus:outline-none">
                             </div>
                         </div>
+                        ${isGuest ? '<button type="button" onclick="deleteGuestGoalEntry(this)" class="mt-3 px-3 py-2 rounded-lg bg-red-600/20 border border-red-500/40 text-red-300 text-xs font-black uppercase hover:bg-red-600 hover:text-white transition">Delete Guest</button>' : ''}
                     </div>
                 `;
             });
         }
+
+        container.querySelectorAll('.goal-team-select').forEach(updateGoalTeamSelectColor);
 
         const modal = document.getElementById('editGoalsModal');
         modal.classList.remove('hidden');
@@ -3232,15 +3518,16 @@
         if (!guestName) return alert('Please enter the guest player name.');
         if (guestGoals < 0) return alert('Please enter a valid goal count.');
 
-        const sanitizedId = guestName.replace(/[^a-zA-Z0-9_\- ]/g, '').replace(/\s+/g, '_');
+        const sanitizedId = `${guestName.replace(/[^a-zA-Z0-9_\- ]/g, '').replace(/\s+/g, '_')}_${Date.now()}`;
+        const escapedGuestName = escapeGoalEntryText(guestName);
 
         container.insertAdjacentHTML('beforeend', `
-            <div class="goal-entry p-4 bg-black/40 rounded-lg border border-white/20" data-player-name="${guestName}">
+            <div class="goal-entry p-4 bg-black/40 rounded-lg border border-white/20" data-player-name="${escapedGuestName}" data-guest="true" data-saved="false">
                 <div class="flex items-center justify-between gap-4 mb-3">
-                    <p class="text-sm font-bold text-white">${guestName} <span class="text-xs text-gray-400">(Guest)</span></p>
-                    <select id="team_${sanitizedId}" class="px-3 py-2 rounded-lg bg-black/60 border border-white/20 font-bold text-white text-xs focus:outline-none">
-                        <option value="RED" ${guestTeam === 'RED' ? 'selected' : ''}>RED</option>
-                        <option value="YELLOW" ${guestTeam === 'YELLOW' ? 'selected' : ''}>YELLOW</option>
+                    <p class="text-sm font-bold text-white">${escapedGuestName} <span class="text-xs text-gray-400">(Guest)</span></p>
+                    <select id="team_${sanitizedId}" class="goal-team-select px-3 py-2 rounded-lg bg-black/60 border border-white/20 font-bold text-xs focus:outline-none" onchange="updateGoalTeamSelectColor(this)">
+                        <option value="RED" class="goal-team-red" ${guestTeam === 'RED' ? 'selected' : ''}>RED</option>
+                        <option value="YELLOW" class="goal-team-yellow" ${guestTeam === 'YELLOW' ? 'selected' : ''}>YELLOW</option>
                     </select>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
@@ -3257,12 +3544,52 @@
                         <input type="number" id="red_${sanitizedId}" value="0" min="0" max="10" class="w-full p-2 rounded-lg bg-black/60 border border-red-600/30 font-bold text-red-600 text-center focus:outline-none">
                     </div>
                 </div>
+                <button type="button" onclick="deleteGuestGoalEntry(this)" class="mt-3 px-3 py-2 rounded-lg bg-red-600/20 border border-red-500/40 text-red-300 text-xs font-black uppercase hover:bg-red-600 hover:text-white transition">Delete Guest</button>
             </div>
         `);
+        updateGoalTeamSelectColor(container.lastElementChild.querySelector('.goal-team-select'));
 
         guestNameInput.value = '';
         guestGoalsInput.value = '';
         guestTeamSelect.value = 'RED';
+    }
+
+    function escapeGoalEntryText(value) {
+        return String(value).replace(/[&<>"']/g, character => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        })[character]);
+    }
+
+    async function deleteGuestGoalEntry(button) {
+        const entry = button?.closest('.goal-entry');
+        const playerName = entry?.dataset.playerName;
+        if (!entry || !playerName) return alert('Could not identify this guest player.');
+        if (!confirm(`Delete guest player "${playerName}" from this match week?`)) return;
+
+        if (entry.dataset.saved === 'true') {
+            const yr = document.getElementById('viewYear').value;
+            const vM = document.getElementById('selMonth').value;
+            const vW = document.getElementById('selWeek').value;
+            try {
+                await firebase.database().ref(`golaha_data/${yr}/${playerName}/${vM}/${vW}`).remove();
+                logUserActivity('ATHLETE_DELETED', { player: playerName, year: yr, month: vM, week: vW });
+                if (db[yr]?.[playerName]?.[vM]) delete db[yr][playerName][vM][vW];
+            } catch (error) {
+                console.error(`Error deleting guest player ${playerName}:`, error);
+                alert(`Could not delete guest player "${playerName}". Please try again.`);
+                return;
+            }
+        }
+
+        entry.remove();
+        if (!document.querySelector('#editGoalsContainer .goal-entry')) {
+            document.getElementById('editGoalsContainer').innerHTML = '<p class="text-gray-400 text-sm">No goal scorers found for the selected week. You can still add a guest player below.</p>';
+        }
+        populateMatchSummary();
     }
 
     function closeEditGoalsModal() {
@@ -3271,15 +3598,15 @@
         modal.classList.remove('flex');
     }
 
-    function saveEditedGoals() {
+    async function saveEditedGoals() {
         const yr = document.getElementById('viewYear').value;
         const vM = document.getElementById('selMonth').value;
         const vW = document.getElementById('selWeek').value;
 
-        const goalEntries = document.querySelectorAll('.goal-entry');
+        const goalEntries = [...document.querySelectorAll('#editGoalsContainer .goal-entry')];
         if (goalEntries.length === 0) return alert('No goal entries to save.');
 
-        let updateCount = 0;
+        const updates = [];
 
         goalEntries.forEach(entry => {
             const goalsInput = entry.querySelector('input[id^="goals_"]');
@@ -3296,24 +3623,34 @@
             const team = teamSelect.value;
 
             const playerRef = firebase.database().ref(`golaha_data/${yr}/${playerName}/${vM}/${vW}`);
-            playerRef.update({
+            const playerUpdate = {
                 gV: goals,
                 yV: yellow,
                 rV: red,
                 team: team,
                 timestamp: firebase.database.ServerValue.TIMESTAMP
-            }).then(() => {
-                updateCount++;
-            }).catch(err => {
-                console.error(`Error updating ${playerName}:`, err);
-            });
+            };
+            if (entry.dataset.guest === 'true') playerUpdate.guest = true;
+            updates.push(playerRef.update(playerUpdate).then(() => {
+                entry.dataset.saved = 'true';
+            }));
         });
 
-        setTimeout(() => {
-            alert(`✅ Goals Updated! (${updateCount} players)`);
+        if (updates.length === 0) return alert('No valid goal entries to save.');
+
+        const saveButton = document.getElementById('saveEditedGoalsBtn');
+        if (saveButton) saveButton.disabled = true;
+        try {
+            await Promise.all(updates);
+            alert(`✅ Goals Updated! (${updates.length} players)`);
             closeEditGoalsModal();
             populateMatchSummary();
-        }, 1000);
+        } catch (error) {
+            console.error('Error saving edited goals:', error);
+            alert('Could not save all goal entries. Please check your connection and try again.');
+        } finally {
+            if (saveButton) saveButton.disabled = false;
+        }
     }
 
     function openEditScoreModal() {
@@ -3856,11 +4193,10 @@
         });
 
         if(t === 'pay' || t === 'gan' || t === 'fasax') {
-            const pSel = document.getElementById('payPlayerSelect');
             const gSel = document.getElementById('ganPlayerSelect');
             const fSel = document.getElementById('fasaxPlayerSelect');
             const mainSelHTML = document.getElementById('pNameSelect').innerHTML;
-            if(pSel) pSel.innerHTML = mainSelHTML;
+            updatePaymentPlayerDropdown();
             if(gSel) gSel.innerHTML = mainSelHTML;
             if(fSel) fSel.innerHTML = mainSelHTML;
         }
@@ -3901,9 +4237,9 @@
         document.getElementById('largeViewSubtitle').innerText = `${MONTHS[mo]} ${yr} Ledger`;
         const monthKey = `${yr}-${mo}`,
               records = paymentData[monthKey] || {},
-              allPlayers = Object.keys(profiles).sort();
+              allPlayers = getMonthlyPaymentPlayerNames();
 
-        let tableRows = allPlayers.filter(name => name !== "FULL CASHIER").map(name => {
+        let tableRows = allPlayers.map(name => {
             const hasPaid = records[name] === true;
             return `
                 <tr class="hover:bg-white/5 transition">
@@ -4035,9 +4371,7 @@
         for(let key in votes) {
             if (key === "FULL CASHIER") continue; 
             
-            const fData = fasaxData[key];
-            const isFasax = fData && (typeof fData === 'object' ? fData.status === 'fasax' : fData === 'fasax');
-            if (isFasax) continue;
+            if (isPlayerOnLeave(key)) continue;
             
             const voteData = typeof votes[key] === 'object' ? (votes[key].status ? votes[key] : { status: votes[key], timestamp: null }) : { status: votes[key], timestamp: null };
             const voteStatus = voteData.status;
@@ -4112,10 +4446,7 @@
     function castVote(status) {
         if(!currentUserProfileUsername || currentUserProfileUsername === "Anonymous") return alert("Please authenticating session.");
         
-        const fData = fasaxData[currentUserProfileUsername];
-        const isFasax = fData && (typeof fData === 'object' ? fData.status === 'fasax' : fData === 'fasax');
-        
-        if (isFasax) {
+        if (isPlayerOnLeave(currentUserProfileUsername)) {
             alert("Maku codeyn kartid sababtoo ah waxaad ku jirtaa Fasax!");
             return;
         }
@@ -4136,7 +4467,9 @@
             }
         }
 
-        let currentJooge = Object.values(votes).filter(v => (typeof v==='object'?v.status:v)==='JOOGE').length;
+        let currentJooge = Object.entries(votes).filter(([name, vote]) =>
+            !isPlayerOnLeave(name) && (typeof vote === 'object' ? vote.status : vote) === 'JOOGE'
+        ).length;
         if(status==='JOOGE' && currentJooge >= 15){
             alert('Jooge votes have reached the limit of 14.');
             return;
@@ -4173,9 +4506,7 @@ function showVoterList(type) {
             Object.keys(profiles).forEach(name => {
                 if (name === "FULL CASHIER") return; 
                 
-                const fData = fasaxData[name];
-                const isFasax = fData && (typeof fData === 'object' ? fData.status === 'fasax' : fData === 'fasax');
-                if (isFasax) return;
+                if (isPlayerOnLeave(name)) return;
                 
                 if (!votes[name]) {
                     const profile = profiles[name], photo = typeof profile === 'string' ? profile : profile?.photo;
@@ -4190,9 +4521,7 @@ function showVoterList(type) {
             for(let name in votes) {
                 if (name === "FULL CASHIER") continue; 
                 
-                const fData = fasaxData[name];
-                const isFasax = fData && (typeof fData === 'object' ? fData.status === 'fasax' : fData === 'fasax');
-                if (isFasax) continue;
+                if (isPlayerOnLeave(name)) continue;
                 
                 const voteData = typeof votes[name] === 'object' ? votes[name] : { status: votes[name], timestamp: null };
                 
