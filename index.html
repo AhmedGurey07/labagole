@@ -43,8 +43,9 @@
         .star-glow { text-shadow: 0 0 8px rgba(251, 191, 36, 0.6); }
         .card-player-tile { background: linear-gradient(180deg, rgba(10,10,10,0.98), rgba(20,20,20,0.95)); border: 1px solid rgba(251,191,36,0.25); box-shadow: 0 15px 35px rgba(0,0,0,0.35); border-radius: 28px; }
         .award-tile { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(251,191,36,0.24); box-shadow: 0 14px 30px rgba(0,0,0,0.25); border-radius: 28px; }
+        .award-tile:focus { outline: 2px solid var(--award-frame-color, rgba(251,191,36,0.8)) !important; outline-offset: -3px; }
         .award-tile h5 { position: relative; display: inline-block; padding-bottom: 6px; margin-bottom: 12px; }
-        .award-tile h5::after { content: ''; position: absolute; left: 50%; transform: translateX(-50%); bottom: 0; width: 60%; height: 2px; background: rgba(251,191,36,0.8); border-radius: 999px; }
+        .award-tile h5::after { content: ''; position: absolute; left: 50%; transform: translateX(-50%); bottom: 0; width: 60%; height: 2px; background: var(--award-frame-color, rgba(251,191,36,0.8)); border-radius: 999px; }
         .disciplinary-section-title { display: inline-flex; align-items: center; gap: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.12); padding-bottom: 0.75rem; margin-bottom: 1rem; }
         .card-player-photo { width: 72px; height: 72px; min-width: 72px; border-radius: 24px; border: 2px solid rgba(251,191,36,0.35); overflow: hidden; background: #090909; display: flex; align-items: center; justify-content: center; }
         .card-player-name { color: #facc15; font-size: 0.95rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.04em; }
@@ -124,7 +125,7 @@
         #footballMatchSummary .match-summary-awards-grid .card-player-photo { display: flex !important; flex: 0 0 auto; width: clamp(34px, 3vw, 42px); height: clamp(34px, 3vw, 42px); min-width: 0; margin: 0 0 2px !important; border-radius: 50%; border: 1px solid rgba(251,191,36,0.55); background: rgba(0,0,0,0.35); }
         #footballMatchSummary .match-summary-awards-grid .card-player-photo:not(.has-player-photo) { display: none !important; }
         #footballMatchSummary .match-summary-awards-grid .card-player-photo img { display: block !important; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
-        #footballMatchSummary .match-summary-awards-grid .award-tile h5 { position: static; width: 100%; font-size: clamp(0.58rem, 0.72vw, 0.7rem); line-height: 1.15; padding-bottom: 5px; margin: 0; background: linear-gradient(rgba(251,191,36,0.8), rgba(251,191,36,0.8)) center bottom / 60% 2px no-repeat; overflow-wrap: anywhere; }
+        #footballMatchSummary .match-summary-awards-grid .award-tile h5 { position: static; width: 100%; font-size: clamp(0.58rem, 0.72vw, 0.7rem); line-height: 1.15; padding-bottom: 5px; margin: 0; background: linear-gradient(var(--award-frame-color, rgba(251,191,36,0.8)), var(--award-frame-color, rgba(251,191,36,0.8))) center bottom / 60% 2px no-repeat; overflow-wrap: anywhere; }
         #footballMatchSummary .match-summary-awards-grid .award-tile h5::after { content: none; }
         #footballMatchSummary .match-summary-awards-grid .card-player-name { display: block; width: 100%; min-width: 0; font-size: clamp(0.68rem, 0.9vw, 0.85rem); line-height: 1.15; margin: 0; overflow-wrap: anywhere; }
         #footballMatchSummary .match-summary-awards-grid p:last-child { max-width: 100%; font-size: clamp(0.52rem, 0.62vw, 0.62rem); line-height: 1.15; margin: 0; overflow-wrap: anywhere; }
@@ -210,13 +211,35 @@
         .report-chart-card { min-width: 0; height: 210px; padding: 12px; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; background: rgba(0,0,0,0.2); }
         .report-chart-card h4 { margin: 0 0 8px; color: #fbbf24; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.12em; }
         .single-awards-strip { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 8px; padding: 10px; border: 1px solid rgba(34, 197, 94, 0.24); border-radius: 18px; background: rgba(15, 61, 58, 0.45); overflow-x: auto; }
-        .single-award-strip-item { min-width: 120px; text-align: center; padding: 8px 6px; border-right: 1px solid rgba(255,255,255,0.1); }
+        .single-award-strip-item { min-width: 120px; text-align: center; padding: 8px 6px; border: 2px solid transparent; border-radius: 14px; background: rgba(15, 23, 42, 0.28); }
         .single-award-strip-item:last-child { border-right: none; }
+        #singleAwardsStrip.awards-carousel { display: flex; align-items: stretch; gap: 8px; padding: 18px max(12px, calc(50% - 90px)); overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none; }
+        #singleAwardsStrip.awards-carousel::-webkit-scrollbar { display: none; }
+        #singleAwardsStrip.awards-carousel > .single-award-strip-item { position: relative; isolation: isolate; box-sizing: border-box; flex: 0 0 180px; width: 180px; min-width: 180px; margin: 0; scroll-snap-align: center; transform: scale(0.94); transition: transform 650ms cubic-bezier(0.2, 0.75, 0.25, 1), border-color 400ms ease, background 400ms ease, box-shadow 400ms ease; }
+        #singleAwardsStrip.awards-carousel > .single-award-strip-item::after { position: absolute; z-index: -1; inset: -2px; border: 2px solid rgba(74, 222, 128, 0.28); border-radius: inherit; box-shadow: 0 0 0 1px rgba(74, 222, 128, 0.08); content: ""; pointer-events: none; transition: inset 400ms ease, border-color 400ms ease, box-shadow 400ms ease; }
+        #singleAwardsStrip.awards-carousel > .single-award-strip-item.is-centered { z-index: 1; transform: scale(1.14); background: linear-gradient(145deg, rgba(19, 63, 55, 0.96), rgba(15, 23, 42, 0.96)); box-shadow: 0 14px 32px rgba(0,0,0,0.42), 0 0 28px rgba(34,197,94,0.18), inset 0 1px rgba(255,255,255,0.08); }
+        #singleAwardsStrip.awards-carousel > .single-award-strip-item.is-centered::after { inset: -4px; border-color: rgba(110, 231, 183, 0.9); box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.28), 0 0 22px rgba(52, 211, 153, 0.28), inset 0 0 14px rgba(52, 211, 153, 0.08); }
+        @media (prefers-reduced-motion: reduce) {
+            #singleAwardsStrip.awards-carousel > .single-award-strip-item { transition: none; }
+        }
         .single-award-strip-icon { display: block; font-size: 1.25rem; line-height: 1; margin-bottom: 4px; }
         .single-award-strip-label { color: #86efac; font-size: 0.55rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; }
         .single-award-strip-photo { width: 42px; height: 42px; margin: 5px auto 2px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(134, 239, 172, 0.7); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .single-award-strip-name { color: #f8fafc; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; line-height: 1.1; margin-top: 4px; }
+        .single-award-strip-name { color: #facc15; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; line-height: 1.1; margin-top: 4px; }
         #myAwardsModal { display: none; position: fixed; inset: 0; z-index: 220; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); padding: 20px; align-items: center; justify-content: center; }
+        .my-awards-panel { background: linear-gradient(145deg, #101b32, #0c1729 68%, #102522); border: 1px solid rgba(74, 222, 128, 0.3); box-shadow: 0 24px 80px rgba(0,0,0,0.55), inset 0 1px rgba(255,255,255,0.05); }
+        .my-awards-ranking-header, .my-awards-ranking-row { display: grid; grid-template-columns: 58px minmax(0, 1fr) 86px; align-items: center; gap: 12px; }
+        .my-awards-ranking-row { min-height: 54px; padding: 9px 12px; border: 1px solid rgba(148, 163, 184, 0.16); border-radius: 15px; background: linear-gradient(100deg, rgba(20, 45, 59, 0.92), rgba(15, 35, 44, 0.72)); color: #d1fae5; transition: border-color 160ms ease, transform 160ms ease, background 160ms ease; }
+        .my-awards-ranking-row:hover { transform: translateY(-1px); border-color: rgba(74, 222, 128, 0.42); background: linear-gradient(100deg, rgba(25, 61, 64, 0.96), rgba(18, 45, 50, 0.86)); }
+        .my-awards-rank-number { display: grid; width: 34px; height: 34px; place-items: center; border: 1px solid rgba(134, 239, 172, 0.28); border-radius: 11px; background: rgba(34, 197, 94, 0.13); color: #86efac; font-size: 13px; font-weight: 900; font-variant-numeric: tabular-nums; }
+        .my-awards-player-name { min-width: 0; color: #e2e8f0; font-size: 12px; font-weight: 900; line-height: 1.35; overflow-wrap: anywhere; }
+        .my-awards-wins { justify-self: end; min-width: 72px; padding: 7px 10px; border: 1px solid rgba(52, 211, 153, 0.25); border-radius: 999px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.24), rgba(20, 83, 74, 0.55)); color: #a7f3d0; text-align: center; font-size: 10px; font-weight: 900; white-space: nowrap; }
+        #myAwardsList { scrollbar-color: rgba(74, 222, 128, 0.45) rgba(15, 23, 42, 0.65); scrollbar-width: thin; }
+        @media (max-width: 420px) {
+            .my-awards-ranking-header, .my-awards-ranking-row { grid-template-columns: 44px minmax(0, 1fr) 72px; gap: 8px; }
+            .my-awards-ranking-row { padding: 8px; }
+            .my-awards-wins { min-width: 66px; padding: 7px 6px; font-size: 9px; }
+        }
         @media (max-width: 640px) {
             .report-chart-grid { grid-template-columns: 1fr; }
             .report-chart-card { height: 190px; }
@@ -236,7 +259,9 @@
             body { background: white !important; color: black !important; margin: 0; padding: 0; }
             body * { visibility: hidden; }
             #printPreviewModal, #printPreviewModal * { visibility: visible; }
-            #printPreviewModal { position: absolute; left: 0; top: 0; width: 100%; background: transparent !important; padding: 0 !important; border: none !important; box-shadow: none !important; }
+            #printPreviewModal { position: absolute; left: 0; top: 0; width: 100%; height: auto !important; max-height: none !important; overflow: visible !important; background: transparent !important; padding: 0 !important; border: none !important; box-shadow: none !important; }
+            #printPreviewModal > div { height: auto !important; min-height: 0 !important; max-height: none !important; overflow: visible !important; box-shadow: none !important; }
+            #printPreviewContent { overflow: visible !important; }
             .no-print { display: none !important; }
         }
 
@@ -586,7 +611,7 @@
                         <img id="topAssistImg" src="" alt="Top Assist" class="w-full h-full object-cover" style="display:none;">
                     </div>
                     <h5 class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">TOP ASSIST</h5>
-                    <div id="topAssistName" class="card-player-name text-sm font-black text-white uppercase">---</div>
+                    <div id="topAssistName" class="card-player-name text-sm font-black uppercase">---</div>
                     <p class="text-[9px] text-gray-400 uppercase font-bold">MOST CREATIVE PLAY</p>
                 </div>
 
@@ -991,9 +1016,9 @@
     </div>
 </div>
 
-<div id="printPreviewModal" class="hidden fixed inset-0 z-[300] bg-black/90 backdrop-blur-sm justify-center p-4 overflow-y-auto">
-    <div class="bg-white text-black w-full max-w-4xl min-h-screen my-4 p-8 relative shadow-2xl flex flex-col">
-        <div class="no-print border-b-2 border-gray-300 pb-4 mb-6 flex justify-between items-center sticky top-0 bg-white/90 backdrop-blur py-2 z-10">
+<div id="printPreviewModal" class="hidden fixed inset-0 z-[300] bg-black/90 backdrop-blur-sm justify-center p-4 overflow-hidden">
+    <div class="bg-white text-black w-full max-w-4xl h-[calc(100vh-2rem)] min-h-0 my-auto p-8 relative shadow-2xl flex flex-col overflow-hidden">
+        <div class="no-print shrink-0 border-b-2 border-gray-300 pb-4 mb-6 flex justify-between items-center bg-white py-2 z-10">
             <h2 class="text-2xl font-black text-gray-800 uppercase tracking-widest oswald">Print Preview</h2>
             <div class="flex gap-4">
                 <button onclick="window.print()" class="px-6 py-2 bg-blue-600 text-white font-bold rounded hover:bg-blue-700 transition uppercase tracking-wider flex items-center gap-2">
@@ -1003,7 +1028,7 @@
                 <button onclick="closePrintPreview()" class="px-6 py-2 bg-red-600 text-white font-bold rounded hover:bg-red-700 transition uppercase tracking-wider">Cancel</button>
             </div>
         </div>
-        <div id="printPreviewContent" class="text-black flex-1">
+        <div id="printPreviewContent" class="text-black flex-1 min-h-0 overflow-y-auto">
             </div>
     </div>
 </div>
@@ -1064,41 +1089,56 @@
             <!-- Best Goalkeeper -->
             <div>
                 <label class="text-[10px] font-bold text-blue-400 uppercase ml-1 block mb-2">Best Goalkeeper</label>
-                <select id="editAwardsGK" class="w-full p-4 rounded-xl bg-black/40 border border-white/10 font-bold text-white focus:outline-none focus:border-yellow-500/50">
-                    <option value="">-- SELECT PLAYER --</option>
-                </select>
+                <div class="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_auto] gap-2">
+                    <select id="editAwardsGK" class="w-full p-4 rounded-xl bg-black/40 border border-white/10 font-bold text-white focus:outline-none focus:border-yellow-500/50">
+                        <option value="">-- SELECT PLAYER --</option>
+                    </select>
+                    <select id="editAwardsGKColor" aria-label="Best goalkeeper name color" onchange="this.style.color=this.value" class="p-4 rounded-xl bg-black/40 border border-white/10 font-bold text-white focus:outline-none focus:border-yellow-500/50"></select>
+                </div>
             </div>
 
             <!-- Best Defender -->
             <div>
                 <label class="text-[10px] font-bold text-blue-400 uppercase ml-1 block mb-2">Best Defender</label>
-                <select id="editAwardsDefender" class="w-full p-4 rounded-xl bg-black/40 border border-white/10 font-bold text-white focus:outline-none focus:border-yellow-500/50">
-                    <option value="">-- SELECT PLAYER --</option>
-                </select>
+                <div class="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_auto] gap-2">
+                    <select id="editAwardsDefender" class="w-full p-4 rounded-xl bg-black/40 border border-white/10 font-bold text-white focus:outline-none focus:border-yellow-500/50">
+                        <option value="">-- SELECT PLAYER --</option>
+                    </select>
+                    <select id="editAwardsDefenderColor" aria-label="Best defender name color" onchange="this.style.color=this.value" class="p-4 rounded-xl bg-black/40 border border-white/10 font-bold text-white focus:outline-none focus:border-yellow-500/50"></select>
+                </div>
             </div>
 
             <!-- Best Midfielder -->
             <div>
                 <label class="text-[10px] font-bold text-blue-400 uppercase ml-1 block mb-2">Best Midfielder</label>
-                <select id="editAwardsMidfield" class="w-full p-4 rounded-xl bg-black/40 border border-white/10 font-bold text-white focus:outline-none focus:border-yellow-500/50">
-                    <option value="">-- SELECT PLAYER --</option>
-                </select>
+                <div class="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_auto] gap-2">
+                    <select id="editAwardsMidfield" class="w-full p-4 rounded-xl bg-black/40 border border-white/10 font-bold text-white focus:outline-none focus:border-yellow-500/50">
+                        <option value="">-- SELECT PLAYER --</option>
+                    </select>
+                    <select id="editAwardsMidfieldColor" aria-label="Best midfielder name color" onchange="this.style.color=this.value" class="p-4 rounded-xl bg-black/40 border border-white/10 font-bold text-white focus:outline-none focus:border-yellow-500/50"></select>
+                </div>
             </div>
 
             <!-- Best Goal -->
             <div>
                 <label class="text-[10px] font-bold text-orange-400 uppercase ml-1 block mb-2">Best Goal</label>
-                <select id="editAwardsBestGoal" class="w-full p-4 rounded-xl bg-black/40 border border-white/10 font-bold text-white focus:outline-none focus:border-yellow-500/50">
-                    <option value="">-- SELECT PLAYER --</option>
-                </select>
+                <div class="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_auto] gap-2">
+                    <select id="editAwardsBestGoal" class="w-full p-4 rounded-xl bg-black/40 border border-white/10 font-bold text-white focus:outline-none focus:border-yellow-500/50">
+                        <option value="">-- SELECT PLAYER --</option>
+                    </select>
+                    <select id="editAwardsBestGoalColor" aria-label="Best goal winner name color" onchange="this.style.color=this.value" class="p-4 rounded-xl bg-black/40 border border-white/10 font-bold text-white focus:outline-none focus:border-yellow-500/50"></select>
+                </div>
             </div>
 
             <!-- Best Assist -->
             <div>
                 <label class="text-[10px] font-bold text-green-400 uppercase ml-1 block mb-2">Best Assist (Most Creative Play)</label>
-                <select id="editAwardsBestAssist" class="w-full p-4 rounded-xl bg-black/40 border border-white/10 font-bold text-white focus:outline-none focus:border-yellow-500/50">
-                    <option value="">-- SELECT PLAYER --</option>
-                </select>
+                <div class="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_auto] gap-2">
+                    <select id="editAwardsBestAssist" class="w-full p-4 rounded-xl bg-black/40 border border-white/10 font-bold text-white focus:outline-none focus:border-yellow-500/50">
+                        <option value="">-- SELECT PLAYER --</option>
+                    </select>
+                    <select id="editAwardsBestAssistColor" aria-label="Best assist winner name color" onchange="this.style.color=this.value" class="p-4 rounded-xl bg-black/40 border border-white/10 font-bold text-white focus:outline-none focus:border-yellow-500/50"></select>
+                </div>
             </div>
 
             <div class="flex gap-3 pt-4">
@@ -1292,11 +1332,14 @@
 </div>
 
 <div id="myAwardsModal" onclick="closeMyAwards(event)">
-    <div class="bg-[#0f172a] border border-green-500/30 rounded-3xl w-full max-w-md p-6 shadow-2xl relative" onclick="event.stopPropagation()">
-        <button onclick="closeMyAwards(null)" class="absolute top-4 right-5 text-2xl text-gray-400 hover:text-white">&times;</button>
-        <h2 id="myAwardsModalTitle" class="text-2xl font-black oswald text-green-400 uppercase text-center">MY AWARDS</h2>
-        <p id="myAwardsPeriod" class="text-[10px] text-gray-400 font-bold uppercase tracking-widest text-center mt-2"></p>
-        <div id="myAwardsRankingHeader" class="hidden grid grid-cols-[1fr_2fr_1fr] gap-3 mt-5 px-4 text-[10px] font-black uppercase tracking-widest text-green-300"><span>Rank</span><span>Player</span><span class="text-right">Wins</span></div>
+    <div class="my-awards-panel rounded-3xl w-full max-w-lg max-h-[90vh] p-6 sm:p-7 relative flex flex-col" onclick="event.stopPropagation()">
+        <button onclick="closeMyAwards(null)" aria-label="Close awards" class="absolute top-4 right-5 grid h-9 w-9 place-items-center rounded-full border border-white/10 bg-white/5 text-xl text-gray-400 transition hover:border-green-400/40 hover:bg-green-400/10 hover:text-white">&times;</button>
+        <div class="text-center pr-8">
+            <p class="mb-1 text-[9px] font-black uppercase tracking-[0.28em] text-emerald-300/80">Season leaderboard</p>
+            <h2 id="myAwardsModalTitle" class="text-2xl font-black oswald uppercase tracking-wide text-emerald-300">MY AWARDS</h2>
+            <p id="myAwardsPeriod" class="text-[10px] text-slate-400 font-bold uppercase tracking-widest text-center mt-2"></p>
+        </div>
+        <div id="myAwardsRankingHeader" class="my-awards-ranking-header hidden mt-5 px-3 text-[9px] font-black uppercase tracking-[0.18em] text-emerald-200/75"><span>Rank</span><span>Player</span><span class="text-right">Wins</span></div>
         <div id="myAwardsList" class="mt-3 max-h-[65vh] overflow-y-auto pr-1 space-y-2"></div>
     </div>
 </div>
@@ -1382,6 +1425,37 @@
         modal.classList.remove('flex');
     }
 
+    function buildPrintReportHeader(title, count) {
+        const reportDate = new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+        return `
+            <style>
+                @media print {
+                    #printPreviewContent table { page-break-inside:auto; }
+                    #printPreviewContent thead { display:table-header-group; }
+                    #printPreviewContent tr { break-inside:avoid; page-break-inside:avoid; }
+                }
+            </style>
+            <header style="display:flex; justify-content:space-between; align-items:flex-end; gap:16px; padding:0 0 18px; margin-bottom:22px; border-bottom:3px solid #172033;">
+                <div>
+                    <p style="margin:0 0 6px; color:#b7791f; font-size:11px; font-weight:800; letter-spacing:2px; text-transform:uppercase;">Golaha Laba Gool Stadium</p>
+                    <h2 style="margin:0; font-size:25px; line-height:1.15; font-weight:900; text-transform:uppercase;">${escapeGoalEntryText(title)}</h2>
+                    <p style="margin:8px 0 0; color:#64748b; font-size:11px; font-weight:700;">Generated ${reportDate}</p>
+                </div>
+                <div style="flex:0 0 auto; padding:10px 14px; border:1px solid #d7dee8; border-radius:12px; background:#f8fafc; text-align:center;">
+                    <div style="font-size:22px; font-weight:900; line-height:1.1;">${count}</div>
+                    <div style="margin-top:3px; color:#64748b; font-size:9px; font-weight:800; letter-spacing:1px; text-transform:uppercase;">Records</div>
+                </div>
+            </header>`;
+    }
+
+    function openPrintPreview(html) {
+        document.getElementById('printPreviewContent').innerHTML = html;
+        const modal = document.getElementById('printPreviewModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.getElementById('printPreviewContent').scrollTop = 0;
+    }
+
     function printGanaaxPreview() {
         const searchName = document.getElementById('ganSearchName')?.value.toUpperCase() || '';
         const year = document.getElementById('ganSearchYear')?.value || '';
@@ -1389,10 +1463,11 @@
         const day = document.getElementById('ganSearchDay')?.value || '';
         const status = document.getElementById('ganSearchStatus')?.value || '';
 
-        let rows = '';
+        const records = [];
 
         Object.entries(ganaaxData || {}).forEach(([id, item]) => {
-            const athlete = (item.player || item.playerName || item.name || item.athlete || item.athleteName || '').toUpperCase();
+            const playerName = item.player || item.playerName || item.name || item.athlete || item.athleteName || '-';
+            const athlete = playerName.toUpperCase();
             const d = new Date(item.timestamp || Date.now());
 
             const itemYear = (item.year || d.getFullYear()).toString();
@@ -1408,91 +1483,114 @@
                 (status && itemStatus !== status)
             ) return;
 
-            rows += `
-            <tr>
-                <td style="border: 1px solid #cbd5e1; padding: 10px;">${item.player || item.playerName || item.name || item.athlete || item.athleteName || '-'}</td>
-                <td style="border: 1px solid #cbd5e1; padding: 10px; text-align:center;">$${item.amount || item.price || 0}</td>
-                <td style="border: 1px solid #cbd5e1; padding: 10px; text-align:center;">${d.toLocaleString()}</td>
-                <td style="border: 1px solid #cbd5e1; padding: 10px; text-align:center;">${item.status || '-'}</td>
-            </tr>`;
+            records.push({ playerName, amount: item.amount || item.price || 0, date: d.toLocaleString(), status: item.status || '-' });
         });
 
+        records.sort((a, b) => a.playerName.localeCompare(b.playerName));
+        const rows = records.map(({ playerName, amount, date, status: recordStatus }, index) => `
+            <tr style="break-inside:avoid; page-break-inside:avoid;">
+                <td style="width:7%; border:1px solid #d7dee8; padding:10px 8px; text-align:center; color:#64748b; font-weight:700;">${index + 1}</td>
+                <td style="width:35%; border:1px solid #d7dee8; padding:10px 14px; text-align:left; font-weight:700; overflow-wrap:anywhere; white-space:normal;">${escapeGoalEntryText(playerName)}</td>
+                <td style="width:15%; border:1px solid #d7dee8; padding:10px; text-align:center;">$${escapeGoalEntryText(amount)}</td>
+                <td style="width:28%; border:1px solid #d7dee8; padding:10px; text-align:center; overflow-wrap:anywhere;">${escapeGoalEntryText(date)}</td>
+                <td style="width:15%; border:1px solid #d7dee8; padding:10px; text-align:center;">${escapeGoalEntryText(recordStatus)}</td>
+            </tr>`).join('');
+        const title = 'Filtered Ganaax Report';
         const html = `
-            <div style="text-align:center; margin-bottom: 20px;">
-                <h2 style="font-size:24px; font-weight:bold; text-transform:uppercase;">Golaha Laba Gool Stadium</h2>
-                <h3 style="font-size:18px; color:#555; text-transform:uppercase; border-bottom: 2px solid #000; padding-bottom: 10px;">Filtered Ganaax Report</h3>
-            </div>
-            <table style="width:100%; border-collapse:collapse; color:black;">
+            ${buildPrintReportHeader(title, records.length)}
+            <table style="width:100%; table-layout:fixed; border-collapse:collapse; color:#172033; font-size:13px;">
                 <thead>
                     <tr>
-                        <th style="border:1px solid #cbd5e1; padding:12px; background:#f8fafc; text-align:left;">Athlete Name</th>
-                        <th style="border:1px solid #cbd5e1; padding:12px; background:#f8fafc; text-align:center;">Amount</th>
-                        <th style="border:1px solid #cbd5e1; padding:12px; background:#f8fafc; text-align:center;">Date & Time</th>
-                        <th style="border:1px solid #cbd5e1; padding:12px; background:#f8fafc; text-align:center;">Status</th>
+                        <th style="width:7%; border:1px solid #cbd5e1; padding:11px 8px; background:#eef2f7; text-align:center;">#</th>
+                        <th style="width:35%; border:1px solid #cbd5e1; padding:11px 14px; background:#eef2f7; text-align:left;">Athlete Name</th>
+                        <th style="width:15%; border:1px solid #cbd5e1; padding:11px 10px; background:#eef2f7; text-align:center;">Amount</th>
+                        <th style="width:28%; border:1px solid #cbd5e1; padding:11px 10px; background:#eef2f7; text-align:center;">Date &amp; Time</th>
+                        <th style="width:15%; border:1px solid #cbd5e1; padding:11px 10px; background:#eef2f7; text-align:center;">Status</th>
                     </tr>
                 </thead>
                 <tbody>${rows}</tbody>
             </table>
+            <footer style="display:flex; justify-content:space-between; gap:12px; margin-top:14px; padding-top:10px; border-top:1px solid #d7dee8; color:#526078; font-size:11px; font-weight:700;">
+                <span>${records.length} record${records.length === 1 ? '' : 's'} listed</span>
+                <span>${escapeGoalEntryText(title)}</span>
+            </footer>
         `;
-        document.getElementById('printPreviewContent').innerHTML = html;
-        document.getElementById('printPreviewModal').classList.remove('hidden');
-        document.getElementById('printPreviewModal').classList.add('flex');
+        openPrintPreview(html);
     }
 
     function printPaymentAnalytics() {
-        const tableContainer = document.getElementById('paymentTableContainer');
-        if (!tableContainer) {
+        const sourceTable = document.getElementById('paymentReportTable');
+        if (!sourceTable) {
             alert("Could not find the payment table.");
             return;
         }
 
-        const tableContent = tableContainer.innerHTML;
+        const table = sourceTable.cloneNode(true);
+        const headerRow = table.tHead?.rows[0];
+        const body = table.tBodies[0];
+        if (!headerRow || !body) {
+            alert('Could not read the payment report rows.');
+            return;
+        }
+
+        const allRows = Array.from(body.rows);
+        const records = allRows.filter(row => !row.querySelector('[colspan]'));
+        const emptyStateRow = allRows.find(row => row.querySelector('[colspan]'));
+        const numberHeader = document.createElement('th');
+        numberHeader.textContent = '#';
+        headerRow.insertBefore(numberHeader, headerRow.firstChild);
+        if (records.length === 0 && emptyStateRow) {
+            emptyStateRow.cells[0].colSpan = headerRow.cells.length;
+            emptyStateRow.cells[0].style.cssText = 'border:1px solid #d7dee8;padding:18px 12px;text-align:center;color:#64748b;font-weight:700;';
+        }
+        records.forEach((row, index) => {
+            const numberCell = document.createElement('td');
+            numberCell.textContent = String(index + 1);
+            row.insertBefore(numberCell, row.firstChild);
+            row.style.cssText = 'break-inside:avoid;page-break-inside:avoid;';
+            Array.from(row.cells).forEach((cell, cellIndex) => {
+                cell.style.cssText = `border:1px solid #d7dee8;padding:10px 12px;text-align:${cellIndex === 0 ? 'center' : cellIndex === 1 ? 'left' : 'right'};overflow-wrap:anywhere;white-space:normal;`;
+                if (cellIndex === 0) cell.style.color = '#64748b';
+                if (cellIndex === 1) cell.style.fontWeight = '700';
+            });
+        });
+        Array.from(headerRow.cells).forEach((cell, index) => {
+            cell.style.cssText = `border:1px solid #cbd5e1;padding:11px 12px;background:#eef2f7;text-align:${index === 0 ? 'center' : index === 1 ? 'left' : 'right'};font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;`;
+        });
+        table.removeAttribute('class');
+        table.style.cssText = 'width:100%;table-layout:fixed;border-collapse:collapse;color:#172033;font-size:13px;';
+        const title = 'Payment Analytics Report';
         const html = `
-            <div style="text-align:center; margin-bottom: 20px;">
-                <h2 style="font-size:24px; font-weight:bold; text-transform:uppercase;">Golaha Laba Gool Stadium</h2>
-                <h3 style="font-size:18px; color:#555; text-transform:uppercase; border-bottom: 2px solid #000; padding-bottom: 10px;">Payment Analytics Report</h3>
-            </div>
-            <style>
-                #printPreviewContent table { width: 100%; border-collapse: collapse; color: black; }
-                #printPreviewContent th, #printPreviewContent td { border: 1px solid #cbd5e1; padding: 12px; text-align: left; font-size: 14px; color: black !important; background: transparent !important; }
-                #printPreviewContent th { background-color: #f8fafc !important; font-weight: bold; }
-                #printPreviewContent span { color: black !important; }
-            </style>
-            <div>${tableContent}</div>
+            ${buildPrintReportHeader(title, records.length)}
+            ${table.outerHTML}
+            <footer style="display:flex; justify-content:space-between; gap:12px; margin-top:14px; padding-top:10px; border-top:1px solid #d7dee8; color:#526078; font-size:11px; font-weight:700;">
+                <span>${records.length} record${records.length === 1 ? '' : 's'} listed</span>
+                <span>${escapeGoalEntryText(title)}</span>
+            </footer>
         `;
-        document.getElementById('printPreviewContent').innerHTML = html;
-        document.getElementById('printPreviewModal').classList.remove('hidden');
-        document.getElementById('printPreviewModal').classList.add('flex');
+        openPrintPreview(html);
     }
 
     function printAttendanceReport() {
         const type = document.getElementById('printAttendanceSelect').value;
-        let title = "";
-        let listHTML = "";
-        let count = 0;
+        const attendees = [];
+        let title = '';
 
         if (type === 'NONE') {
-            title = "No Response - Attendance Report";
+            title = 'No Response - Attendance Report';
             Object.keys(profiles).forEach(name => {
-                if (name === "FULL CASHIER") return; 
-                
-                if (isPlayerOnLeave(name)) return;
-                
+                if (name === 'FULL CASHIER' || isPlayerOnLeave(name)) return;
                 if (!votes[name]) {
-                    listHTML += `<tr><td style="border: 1px solid #cbd5e1; padding: 10px;">${name}</td><td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right; color: gray;">--:--</td></tr>`;
-                    count++;
+                    attendees.push({ name, time: '--:--' });
                 }
             });
         } else {
-            title = type === 'JOOGE' ? "Jooge (Present) - Attendance Report" : "Maqane (Absent) - Attendance Report";
-            
-            for (let name in votes) {
-                if (name === "FULL CASHIER") continue; 
-                
-                if (isPlayerOnLeave(name)) continue;
-                
+            title = type === 'JOOGE' ? 'Jooge (Present) - Attendance Report' : 'Maqane (Absent) - Attendance Report';
+
+            Object.keys(votes).forEach(name => {
+                if (name === 'FULL CASHIER' || isPlayerOnLeave(name)) return;
+
                 const voteData = typeof votes[name] === 'object' ? votes[name] : { status: votes[name], timestamp: null };
-                
                 if (voteData.status === type) {
                     let timeStr = '--:--';
                     if (voteData.timestamp) {
@@ -1503,36 +1601,64 @@
                         h = h % 12 || 12;
                         timeStr = `${String(h).padStart(2, '0')}:${m} ${ampm}`;
                     }
-                    listHTML += `<tr><td style="border: 1px solid #cbd5e1; padding: 10px;">${name}</td><td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${timeStr}</td></tr>`;
-                    count++;
+                    attendees.push({ name, time: timeStr });
                 }
-            }
+            });
         }
 
-        if (count === 0) {
+        attendees.sort((a, b) => a.name.localeCompare(b.name));
+        if (attendees.length === 0) {
             alert("There is no data to print for this selection.");
             return;
         }
 
+        const count = attendees.length;
+        const rows = attendees.map(({ name, time }, index) => `
+            <tr style="break-inside:avoid; page-break-inside:avoid;">
+                <td style="width:8%; border:1px solid #d7dee8; padding:10px 12px; text-align:center; color:#64748b; font-weight:700;">${index + 1}</td>
+                <td style="width:62%; border:1px solid #d7dee8; padding:10px 14px; text-align:left; font-weight:700; overflow-wrap:anywhere; word-break:normal; white-space:normal;">${escapeGoalEntryText(name)}</td>
+                <td style="width:30%; border:1px solid #d7dee8; padding:10px 14px; text-align:right; font-variant-numeric:tabular-nums;">${time}</td>
+            </tr>`).join('');
+        const reportDate = new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+
         const html = `
-            <div style="text-align:center; margin-bottom: 20px;">
-                <h2 style="font-size:24px; font-weight:bold; text-transform:uppercase;">Golaha Laba Gool Stadium</h2>
-                <h3 style="font-size:18px; color:#555; text-transform:uppercase; border-bottom: 2px solid #000; padding-bottom: 10px;">${title}</h3>
-            </div>
-            <table style="width:100%; border-collapse: collapse; color: black;">
-                <thead>
-                    <tr>
-                        <th style="border: 1px solid #cbd5e1; padding: 12px; background:#f8fafc; text-align:left;">Athlete Name</th>
-                        <th style="border: 1px solid #cbd5e1; padding: 12px; background:#f8fafc; text-align:right;">Time Recorded</th>
-                    </tr>
-                </thead>
-                <tbody>${listHTML}</tbody>
-            </table>
-            <div style="margin-top: 20px; font-weight: bold; text-align: right; font-size: 16px;">Total Athletes: ${count}</div>
+            <style>
+                @media print {
+                    #attendanceReportTable { page-break-inside:auto; }
+                    #attendanceReportTable thead { display:table-header-group; }
+                    #attendanceReportTable tr { break-inside:avoid; page-break-inside:avoid; }
+                }
+            </style>
+            <section style="max-width:900px; margin:0 auto; color:#172033; font-family:Arial,sans-serif;">
+                <header style="display:flex; justify-content:space-between; align-items:flex-end; gap:16px; padding:0 0 18px; margin-bottom:22px; border-bottom:3px solid #172033;">
+                    <div>
+                        <p style="margin:0 0 6px; color:#b7791f; font-size:11px; font-weight:800; letter-spacing:2px; text-transform:uppercase;">Golaha Laba Gool Stadium</p>
+                        <h2 style="margin:0; font-size:25px; line-height:1.15; font-weight:900; text-transform:uppercase;">Attendance Report</h2>
+                        <p style="margin:8px 0 0; color:#526078; font-size:14px; font-weight:700;">${escapeGoalEntryText(title)}</p>
+                    </div>
+                    <div style="flex:0 0 auto; padding:10px 14px; border:1px solid #d7dee8; border-radius:12px; background:#f8fafc; text-align:center;">
+                        <div style="font-size:22px; font-weight:900; line-height:1.1;">${count}</div>
+                        <div style="margin-top:3px; color:#64748b; font-size:9px; font-weight:800; letter-spacing:1px; text-transform:uppercase;">Athletes</div>
+                    </div>
+                </header>
+                <div style="margin-bottom:10px; color:#64748b; font-size:11px; font-weight:700;">Generated ${reportDate}</div>
+                <table id="attendanceReportTable" style="width:100%; table-layout:fixed; border-collapse:collapse; color:#172033; font-size:13px;">
+                    <thead>
+                        <tr>
+                            <th style="width:8%; border:1px solid #cbd5e1; padding:11px 8px; background:#eef2f7; text-align:center; font-size:10px; letter-spacing:1px;">#</th>
+                            <th style="width:62%; border:1px solid #cbd5e1; padding:11px 14px; background:#eef2f7; text-align:left; font-size:10px; letter-spacing:1px; text-transform:uppercase;">Athlete Name</th>
+                            <th style="width:30%; border:1px solid #cbd5e1; padding:11px 14px; background:#eef2f7; text-align:right; font-size:10px; letter-spacing:1px; text-transform:uppercase;">Time Recorded</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rows}</tbody>
+                </table>
+                <footer style="display:flex; justify-content:space-between; gap:12px; margin-top:14px; padding-top:10px; border-top:1px solid #d7dee8; color:#526078; font-size:11px; font-weight:700;">
+                    <span>${count} athlete${count === 1 ? '' : 's'} listed</span>
+                    <span>${escapeGoalEntryText(title)}</span>
+                </footer>
+            </section>
         `;
-        document.getElementById('printPreviewContent').innerHTML = html;
-        document.getElementById('printPreviewModal').classList.remove('hidden');
-        document.getElementById('printPreviewModal').classList.add('flex');
+        openPrintPreview(html);
     }
 
     const firebaseConfig = {
@@ -1603,9 +1729,50 @@
         '#a855f7': 'PURPLE'
     };
     const DEFAULT_MATCH_TEAM_COLORS = { RED: '#ef4444', YELLOW: '#facc15' };
+    const AWARD_COLOR_OPTIONS = Object.entries(MATCH_TEAM_COLOR_NAMES);
     let activeMatchTeamColors = { ...DEFAULT_MATCH_TEAM_COLORS };
     let activeMatchColorKey = '';
     let activeMatchTeamColorsRef = null;
+
+    function normalizeAwardColor(color) {
+        const normalizedColor = typeof color === 'string' ? color.toLowerCase() : '';
+        if (Object.prototype.hasOwnProperty.call(MATCH_TEAM_COLOR_NAMES, normalizedColor)) return normalizedColor;
+        return Object.keys(MATCH_TEAM_COLOR_NAMES).find(hex => MATCH_TEAM_COLOR_NAMES[hex] === normalizedColor.toUpperCase()) || '';
+    }
+
+    function getAwardColorOptions(selectedColor) {
+        const selected = normalizeAwardColor(selectedColor);
+        return AWARD_COLOR_OPTIONS.map(([color, name]) =>
+            `<option value="${color}" style="color:${color}"${color === selected ? ' selected' : ''}>${name}</option>`
+        ).join('');
+    }
+
+    function getDefaultAwardColor(playerName, year, month, week) {
+        const stats = db[year]?.[playerName]?.[month]?.[week];
+        const namedTeam = playerName?.includes('(R)') || playerName?.toLowerCase().includes('red') ? 'RED' : 'YELLOW';
+        const team = String(stats?.team || namedTeam).toUpperCase();
+        return activeMatchTeamColors[team === 'RED' ? 'RED' : 'YELLOW'];
+    }
+
+    function setAwardFrameColor(awardTile, color) {
+        if (!awardTile) return;
+        const selectedColor = normalizeAwardColor(color);
+        if (selectedColor) {
+            awardTile.style.setProperty('--award-frame-color', selectedColor);
+            awardTile.style.setProperty('border-color', selectedColor, 'important');
+            awardTile.style.setProperty('border-width', '2px', 'important');
+            awardTile.style.setProperty('border-style', 'solid', 'important');
+            awardTile.style.setProperty('background-color', '#15171c', 'important');
+            awardTile.style.setProperty('box-shadow', `0 14px 30px rgba(0,0,0,0.25), 0 0 16px ${selectedColor}55`, 'important');
+        } else {
+            awardTile.style.removeProperty('--award-frame-color');
+            awardTile.style.removeProperty('border-color');
+            awardTile.style.removeProperty('border-width');
+            awardTile.style.removeProperty('border-style');
+            awardTile.style.removeProperty('background-color');
+            awardTile.style.removeProperty('box-shadow');
+        }
+    }
 
     function applyMatchTeamColors(colors = {}) {
         const summary = document.getElementById('footballMatchSummary');
@@ -2475,6 +2642,50 @@
         }
     }
 
+    let awardsStripCarouselTimer = null;
+    let awardsStripCarouselStopped = false;
+    let awardsStripCarouselIndex = 0;
+
+    function stopAwardsStripCarousel() {
+        awardsStripCarouselStopped = true;
+        if (awardsStripCarouselTimer !== null) {
+            clearInterval(awardsStripCarouselTimer);
+            awardsStripCarouselTimer = null;
+        }
+    }
+
+    function startAwardsStripCarousel() {
+        const strip = document.getElementById('singleAwardsStrip');
+        if (!strip || awardsStripCarouselStopped || awardsStripCarouselTimer !== null) return;
+
+        strip.classList.add('awards-carousel');
+        if (strip.dataset.carouselListenersAttached !== 'true') {
+            strip.dataset.carouselListenersAttached = 'true';
+            strip.addEventListener('pointerdown', stopAwardsStripCarousel, { passive: true });
+            strip.addEventListener('wheel', stopAwardsStripCarousel, { passive: true });
+            strip.addEventListener('keydown', stopAwardsStripCarousel);
+        }
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+        const cards = Array.from(strip.querySelectorAll('.single-award-strip-item'));
+        if (cards.length < 2) return;
+
+        const focusCard = index => {
+            awardsStripCarouselIndex = index % cards.length;
+            cards.forEach((card, cardIndex) => card.classList.toggle('is-centered', cardIndex === awardsStripCarouselIndex));
+            const card = cards[awardsStripCarouselIndex];
+            const stripRect = strip.getBoundingClientRect();
+            const cardRect = card.getBoundingClientRect();
+            const targetLeft = strip.scrollLeft + cardRect.left - stripRect.left + cardRect.width / 2 - strip.clientWidth / 2;
+            strip.scrollTo({ left: targetLeft, behavior: 'smooth' });
+        };
+
+        focusCard(awardsStripCarouselIndex);
+        awardsStripCarouselTimer = window.setInterval(() => {
+            focusCard((awardsStripCarouselIndex + 1) % cards.length);
+        }, 5000);
+    }
+
     function updateAwardsStripLeaders(year) {
         const awardFields = [
             ['stripMvp', 'manOfMatch'],
@@ -2493,6 +2704,10 @@
             const awardsByMatch = awardsSnapshot.exists() ? awardsSnapshot.val() : {};
             const summariesByMatch = summariesSnapshot.exists() ? summariesSnapshot.val() : {};
             const counts = Object.fromEntries(awardFields.map(([, field]) => [field, {}]));
+            const latestAwardColors = Object.fromEntries(
+                ['bestGoal', 'bestMidfield', 'bestDefender', 'bestAssist', 'bestGoalkeeper', 'topAssisters']
+                    .map(field => [field, {}])
+            );
             const matchKeys = new Set([...Object.keys(awardsByMatch), ...Object.keys(summariesByMatch)]);
 
             matchKeys.forEach(matchKey => {
@@ -2507,7 +2722,19 @@
                     }
                     const winners = [...new Set(Array.isArray(value) ? value : (value ? [value] : []))];
                     winners.forEach(name => {
-                        if (name) counts[field][name] = (counts[field][name] || 0) + 1;
+                        if (!name) return;
+                        counts[field][name] = (counts[field][name] || 0) + 1;
+
+                        if (latestAwardColors[field]) {
+                            if (field === 'topAssisters' && record.bestAssist !== name) return;
+                            const colorField = field === 'topAssisters' ? 'bestAssist' : field;
+                            const color = normalizeAwardColor(record.awardColors?.[colorField]);
+                            const timestamp = Number(record.timestamp) || 0;
+                            const previous = latestAwardColors[field][name];
+                            if (color && (!previous || timestamp >= previous.timestamp)) {
+                                latestAwardColors[field][name] = { color, timestamp };
+                            }
+                        }
                     });
                 });
             });
@@ -2517,6 +2744,14 @@
                 const element = document.getElementById(elementId);
                 const photoElement = document.getElementById(`${elementId}Photo`);
                 if (element) element.innerText = leader ? `${leader[0]} (${leader[1]})` : '---';
+                if (element && latestAwardColors[field]) {
+                    element.style.color = '';
+                    const selectedColor = leader ? latestAwardColors[field][leader[0]]?.color : '';
+                    const stripCard = element.closest('.single-award-strip-item');
+                    const stripFrameColor = MATCH_TEAM_COLOR_NAMES[selectedColor] === 'WHITE' ? '' : selectedColor;
+                    setAwardFrameColor(stripCard, stripFrameColor);
+                    if (photoElement) photoElement.style.borderColor = stripFrameColor || '';
+                }
                 if (photoElement) {
                     const profile = leader ? profiles[leader[0]] : null;
                     const photo = typeof profile === 'string' ? profile : profile?.photo;
@@ -2530,6 +2765,7 @@
                 }
             });
             document.getElementById('singleAwardsStrip')?.classList.remove('hidden');
+            startAwardsStripCarousel();
         }).catch(error => console.error('Error loading award strip leaders:', error));
     }
 
@@ -2821,6 +3057,9 @@
         document.getElementById('bestDefenderName').innerText = '';
         document.getElementById('bestAssistName').innerText = '';
         document.getElementById('topAssistName').innerText = '';
+        document.getElementById('bestGoalkeeperName').innerText = '';
+        ['bestGoalName', 'bestMidfielderName', 'bestDefenderName', 'bestAssistName', 'topAssistName', 'bestGoalkeeperName']
+            .forEach(nameId => setAwardFrameColor(document.getElementById(nameId)?.closest('.award-tile'), ''));
 
         let redGoals = {}, yellowGoals = {}, allAssists = {}, playerStats = {};
         let topMvpPlayer = null;
@@ -3087,7 +3326,7 @@
             element.classList.add(team === 'RED' ? 'team-red' : 'team-yellow');
         };
 
-        const setAwardImage = (imgId, name) => {
+        const setAwardImage = (imgId, name, frameColor = '') => {
             const imgEl = document.getElementById(imgId);
             if (!imgEl) return;
             const wrapper = imgEl.parentElement;
@@ -3100,7 +3339,14 @@
                 }
                 return;
             }
-            applyTeamClass(wrapper, getSummaryTeam(name));
+            const selectedFrameColor = normalizeAwardColor(frameColor);
+            if (selectedFrameColor) {
+                wrapper.classList.remove('team-red', 'team-yellow');
+                wrapper.style.setProperty('border-color', selectedFrameColor, 'important');
+            } else {
+                applyTeamClass(wrapper, getSummaryTeam(name));
+                wrapper.style.removeProperty('border-color');
+            }
             const photo = typeof profiles[name] === 'string' ? profiles[name] : profiles[name]?.photo;
             if (photo) {
                 imgEl.src = photo;
@@ -3119,11 +3365,19 @@
             }
         };
 
+        const setAwardName = (nameId, name, color) => {
+            const nameEl = document.getElementById(nameId);
+            if (!nameEl) return;
+            nameEl.innerText = name;
+            nameEl.style.color = '';
+            setAwardFrameColor(nameEl.closest('.award-tile'), color);
+        };
+
         const setWinnerNames = (names, targetId, count = null) => {
             const container = document.getElementById(targetId);
             if (!container) return;
             if (!names || names.length === 0) {
-                container.innerHTML = '<p class="card-player-name text-sm font-black text-white uppercase">---</p>';
+                container.innerHTML = '<p class="card-player-name text-sm font-black uppercase">---</p>';
                 return;
             }
 
@@ -3137,15 +3391,15 @@
                         </div>
                     </div>
                 `;
-                return;
+            } else {
+                const countText = count ? ` x${count}` : '';
+                container.innerHTML = `
+                    <div class="flex flex-wrap justify-center gap-2">
+                        ${names.map(name => `<p class="card-player-name text-xs text-center max-w-[100px]">${name}${countText}</p>`).join('')}
+                    </div>
+                `;
             }
-
-            const countText = count ? ` x${count}` : '';
-            container.innerHTML = `
-                <div class="flex flex-wrap justify-center gap-2">
-                    ${names.map(name => `<p class="text-xs font-black uppercase text-white text-center max-w-[100px]">${name}${countText}</p>`).join('')}
-                </div>
-            `;
+            container.querySelectorAll('p').forEach(nameElement => nameElement.style.color = '');
         };
 
         const applySavedAwards = (savedAwards = {}) => {
@@ -3160,28 +3414,29 @@
             setAwardImage('topScorer1Img', topScorerNames[0] || '');
 
             if (savedAwards?.bestGoal) {
-                document.getElementById('bestGoalName').innerText = savedAwards.bestGoal;
-                setAwardImage('bestGoalImg', savedAwards.bestGoal);
+                setAwardName('bestGoalName', savedAwards.bestGoal, savedAwards.awardColors?.bestGoal);
+                setAwardImage('bestGoalImg', savedAwards.bestGoal, savedAwards.awardColors?.bestGoal);
             }
             if (savedAwards?.bestMidfield) {
-                document.getElementById('bestMidfielderName').innerText = savedAwards.bestMidfield;
-                setAwardImage('bestMidfielderImg', savedAwards.bestMidfield);
+                setAwardName('bestMidfielderName', savedAwards.bestMidfield, savedAwards.awardColors?.bestMidfield);
+                setAwardImage('bestMidfielderImg', savedAwards.bestMidfield, savedAwards.awardColors?.bestMidfield);
             }
             if (savedAwards?.bestDefender) {
-                document.getElementById('bestDefenderName').innerText = savedAwards.bestDefender;
-                setAwardImage('bestDefenderImg', savedAwards.bestDefender);
+                setAwardName('bestDefenderName', savedAwards.bestDefender, savedAwards.awardColors?.bestDefender);
+                setAwardImage('bestDefenderImg', savedAwards.bestDefender, savedAwards.awardColors?.bestDefender);
             }
             if (savedAwards?.bestAssist) {
-                document.getElementById('bestAssistName').innerText = savedAwards.bestAssist;
-                setAwardImage('bestAssistImg', savedAwards.bestAssist);
+                setAwardName('bestAssistName', savedAwards.bestAssist, savedAwards.awardColors?.bestAssist);
+                setAwardImage('bestAssistImg', savedAwards.bestAssist, savedAwards.awardColors?.bestAssist);
             }
             if (savedAwards?.bestGoalkeeper) {
-                document.getElementById('bestGoalkeeperName').innerText = savedAwards.bestGoalkeeper;
-                setAwardImage('bestGoalkeeperImg', savedAwards.bestGoalkeeper);
+                setAwardName('bestGoalkeeperName', savedAwards.bestGoalkeeper, savedAwards.awardColors?.bestGoalkeeper);
+                setAwardImage('bestGoalkeeperImg', savedAwards.bestGoalkeeper, savedAwards.awardColors?.bestGoalkeeper);
             }
 
             setWinnerNames(topAssistNames, 'topAssistName', topAssistCount > 0 ? topAssistCount : null);
-            setAwardImage('topAssistImg', topAssistNames[0] || '');
+            setAwardFrameColor(document.getElementById('topAssistName')?.closest('.award-tile'), savedAwards?.awardColors?.bestAssist);
+            setAwardImage('topAssistImg', topAssistNames[0] || '', savedAwards?.awardColors?.bestAssist);
         };
 
         Promise.all([awardsRef.once('value'), summaryRef.once('value')])
@@ -3385,40 +3640,48 @@
         });
     }
 
-    function openAwardsEditModal() {
+    async function openAwardsEditModal() {
         const yr = document.getElementById('viewYear').value;
         const vM = document.getElementById('selMonth').value;
         const vW = document.getElementById('selWeek').value;
 
         if (!yr || !vM || !vW) return alert('Please select Year, Month, and Week first');
+        loadMatchTeamColors(`${yr}-${vM}-${vW}`);
 
         // Update modal header
         document.getElementById('editAwardsWeekDisplay').innerText = `WEEK ${vW}`;
 
-        // Populate player dropdowns
-        const selects = [
-            'editAwardsGK',
-            'editAwardsDefender',
-            'editAwardsMidfield',
-            'editAwardsBestGoal',
-            'editAwardsBestAssist'
+        const awardsKey = `${yr}-${vM}-${vW}`;
+        let savedAwards;
+        try {
+            const snapshot = await firebase.database().ref(`golaha_match_awards/${awardsKey}`).once('value');
+            savedAwards = snapshot.val() || {};
+        } catch (error) {
+            console.error('Error loading awards for editing:', error);
+            alert('Could not load awards. Please try again.');
+            return;
+        }
+
+        const awardFields = [
+            { field: 'bestGoalkeeper', playerSelect: 'editAwardsGK', colorSelect: 'editAwardsGKColor', display: 'bestGoalkeeperName' },
+            { field: 'bestDefender', playerSelect: 'editAwardsDefender', colorSelect: 'editAwardsDefenderColor', display: 'bestDefenderName' },
+            { field: 'bestMidfield', playerSelect: 'editAwardsMidfield', colorSelect: 'editAwardsMidfieldColor', display: 'bestMidfielderName' },
+            { field: 'bestGoal', playerSelect: 'editAwardsBestGoal', colorSelect: 'editAwardsBestGoalColor', display: 'bestGoalName' },
+            { field: 'bestAssist', playerSelect: 'editAwardsBestAssist', colorSelect: 'editAwardsBestAssistColor', display: 'bestAssistName' }
         ];
 
         const mainSelHTML = document.getElementById('pNameSelect').innerHTML;
-        
-        selects.forEach(selectId => {
-            const select = document.getElementById(selectId);
-            if (select) {
-                select.innerHTML = '<option value="">-- SELECT PLAYER --</option>' + mainSelHTML;
-            }
-        });
 
-        // Set current values
-        document.getElementById('editAwardsGK').value = document.getElementById('bestGoalkeeperName').innerText || '';
-        document.getElementById('editAwardsDefender').value = document.getElementById('bestDefenderName').innerText || '';
-        document.getElementById('editAwardsMidfield').value = document.getElementById('bestMidfielderName').innerText || '';
-        document.getElementById('editAwardsBestGoal').value = document.getElementById('bestGoalName').innerText || '';
-        document.getElementById('editAwardsBestAssist').value = document.getElementById('bestAssistName').innerText || '';
+        awardFields.forEach(({ field, playerSelect, colorSelect, display }) => {
+            const playerDropdown = document.getElementById(playerSelect);
+            const colorDropdown = document.getElementById(colorSelect);
+            playerDropdown.innerHTML = '<option value="">-- SELECT PLAYER --</option>' + mainSelHTML;
+            playerDropdown.value = savedAwards[field] || document.getElementById(display).innerText || '';
+
+            const savedColor = normalizeAwardColor(savedAwards.awardColors?.[field]);
+            colorDropdown.innerHTML = getAwardColorOptions(savedColor || getDefaultAwardColor(playerDropdown.value, yr, vM, vW));
+            colorDropdown.style.color = colorDropdown.value;
+        });
 
         // Show modal
         const modal = document.getElementById('editAwardsModal');
@@ -3715,17 +3978,38 @@
             bestGoal: document.getElementById('editAwardsBestGoal').value,
             bestAssist: document.getElementById('editAwardsBestAssist').value
         };
+        const awardColors = {
+            bestGoalkeeper: normalizeAwardColor(document.getElementById('editAwardsGKColor').value),
+            bestDefender: normalizeAwardColor(document.getElementById('editAwardsDefenderColor').value),
+            bestMidfield: normalizeAwardColor(document.getElementById('editAwardsMidfieldColor').value),
+            bestGoal: normalizeAwardColor(document.getElementById('editAwardsBestGoalColor').value),
+            bestAssist: normalizeAwardColor(document.getElementById('editAwardsBestAssistColor').value)
+        };
 
         if (!Object.values(awards).every(v => v)) {
             return alert('Please select all awards');
         }
+        if (!Object.values(awardColors).every(Boolean)) {
+            return alert('Please choose a valid color for every award winner');
+        }
 
         // Update display immediately
         document.getElementById('bestGoalkeeperName').innerText = awards.bestGoalkeeper;
+        document.getElementById('bestGoalkeeperName').style.color = '';
+        setAwardFrameColor(document.getElementById('bestGoalkeeperName').closest('.award-tile'), awardColors.bestGoalkeeper);
         document.getElementById('bestDefenderName').innerText = awards.bestDefender;
+        document.getElementById('bestDefenderName').style.color = '';
+        setAwardFrameColor(document.getElementById('bestDefenderName').closest('.award-tile'), awardColors.bestDefender);
         document.getElementById('bestMidfielderName').innerText = awards.bestMidfield;
+        document.getElementById('bestMidfielderName').style.color = '';
+        setAwardFrameColor(document.getElementById('bestMidfielderName').closest('.award-tile'), awardColors.bestMidfield);
         document.getElementById('bestGoalName').innerText = awards.bestGoal;
+        document.getElementById('bestGoalName').style.color = '';
+        setAwardFrameColor(document.getElementById('bestGoalName').closest('.award-tile'), awardColors.bestGoal);
         document.getElementById('bestAssistName').innerText = awards.bestAssist;
+        document.getElementById('bestAssistName').style.color = '';
+        setAwardFrameColor(document.getElementById('bestAssistName').closest('.award-tile'), awardColors.bestAssist);
+        setAwardFrameColor(document.getElementById('topAssistName').closest('.award-tile'), awardColors.bestAssist);
 
         // Save to database
         const awardsKey = `${yr}-${vM}-${vW}`;
@@ -3737,11 +4021,13 @@
             bestMidfield: awards.bestMidfield,
             bestGoal: awards.bestGoal,
             bestAssist: awards.bestAssist,
+            awardColors,
             timestamp: firebase.database.ServerValue.TIMESTAMP
         }).then(() => {
             alert('✅ Awards Updated Successfully!');
             closeAwardsEditModal();
             populateMatchSummary();
+            updateAwardsStripLeaders(yr);
         }).catch(err => {
             console.error('Error saving awards:', err);
             alert('❌ Error saving awards');
@@ -4070,7 +4356,7 @@
             document.getElementById('myAwardsPeriod').innerText = `${year || 'ALL'} SEASON - ${ranking.length} PLAYERS`;
             document.getElementById('myAwardsRankingHeader').classList.remove('hidden');
             document.getElementById('myAwardsList').innerHTML = ranking.length > 0
-                ? ranking.map(([name, wins], index) => `<div class="flex items-center justify-between gap-3 rounded-xl border border-green-500/20 bg-green-500/10 px-4 py-3 text-sm font-black text-green-300"><span>#${index + 1} ${name}</span><span class="rounded-full bg-green-400/20 px-3 py-1 text-white">${wins} WIN${wins === 1 ? '' : 'S'}</span></div>`).join('')
+                ? ranking.map(([name, wins], index) => `<div class="my-awards-ranking-row"><span class="my-awards-rank-number" aria-label="Rank ${index + 1}">${index + 1}</span><span class="my-awards-player-name">${escapeGoalEntryText(name)}</span><span class="my-awards-wins">${wins} WIN${wins === 1 ? '' : 'S'}</span></div>`).join('')
                 : '<p class="text-center text-sm text-gray-400">No winners recorded for this category.</p>';
             document.getElementById('myAwardsList').scrollTop = 0;
             document.getElementById('myAwardsModal').style.display = 'flex';
