@@ -16,6 +16,9 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-functions-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-messaging-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 
     <style>
@@ -259,6 +262,7 @@
         }
 
         #reportModal, #voteListModal, #largeViewModal, #lockoutModal { display: none; position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); padding: 20px; align-items: center; justify-content: center; }
+        #paymentNotificationsModal { display: none; position: fixed; inset: 0; z-index: 220; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); padding: 20px; align-items: center; justify-content: center; }
         .report-content { background: #0f172a; border: 2px solid rgba(251, 191, 36, 0.3); border-radius: 32px; max-width: 500px; width: 100%; padding: 32px; position: relative; }
         #reportModal .report-content { max-width: 900px; max-height: 90vh; overflow-y: auto; }
         .report-chart-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
@@ -307,6 +311,7 @@
         .chat-scroll::-webkit-scrollbar-thumb { background: rgba(251, 191, 36, 0.3); border-radius: 10px; }
         #floatingChatWindow { display: none; width: 420px; max-width: calc(100vw - 40px); height: 600px; max-height: calc(100vh - 120px); z-index: 100; transition: transform 0.3s; }
         #unreadBadge { position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 10px; font-weight: 900; width: 22px; height: 22px; border-radius: 50%; display: none; align-items: center; justify-content: center; border: 2px solid #070707; }
+        #paymentNotificationsBadge { position: absolute; top: -5px; right: -5px; min-width: 22px; height: 22px; padding: 0 5px; background: #ef4444; color: white; font-size: 10px; font-weight: 900; border-radius: 999px; display: none; align-items: center; justify-content: center; border: 2px solid #070707; }
         
         /* Print Styles */
         @media print {
@@ -580,12 +585,18 @@
             <button id="myAwardsTopBtn" onclick="showMyAwards()" class="tab-btn bg-green-600 text-white border-none hover:bg-green-500 flex items-center gap-2">
                 🏅 MY AWARDS
             </button>
+
+            <button id="paymentNotificationsBtn" onclick="showMyPaymentNotifications()" class="tab-btn relative bg-blue-600 text-white border-none hover:bg-blue-500 flex items-center gap-2" type="button">
+                🔔 NOTIFICATIONS
+                <span id="paymentNotificationsBadge" aria-label="Unpaid payment notifications">0</span>
+            </button>
             
             <button onclick="toggleTheme()" id="themeToggleBtn" class="tab-btn bg-transparent border border-white/20 hover:bg-white/10 text-xl transition flex items-center justify-center" title="Toggle Light/Dark Mode">
                 ☀️
             </button>
 
             <button onclick="handleLogout()" class="tab-btn bg-red-950/40 text-red-400 border border-red-500/20 hover:bg-red-900 hover:text-white">🚪 LOGOUT</button>
+            <button id="enablePaymentRemindersBtn" onclick="enablePaymentReminders()" class="hidden tab-btn bg-yellow-500 text-black border-none hover:bg-yellow-400" type="button">🔔 ENABLE PAYMENT REMINDERS</button>
         </div>
     </header>
 
@@ -956,6 +967,18 @@
                     <div class="bg-yellow-500/10 p-3 rounded-xl border border-yellow-500/20">
                         <label class="text-[10px] font-bold text-yellow-500 uppercase">Set Monthly Fee ($)</label>
                         <input type="number" id="monthlyFeeInput" onchange="updateGlobalFee(this.value)" class="w-full bg-transparent text-xl font-black text-white focus:outline-none" placeholder="10">
+                    </div>
+                    <div id="paymentReminderEditor" class="space-y-3 rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-3">
+                        <div>
+                            <label for="monthlyReminderMessage" class="text-[10px] font-bold uppercase text-yellow-400">Monthly payment reminder</label>
+                            <textarea id="monthlyReminderMessage" maxlength="500" rows="3" class="mt-1 w-full rounded-lg border border-white/10 bg-black/40 p-3 text-xs text-white" placeholder="Write the daily reminder for unpaid monthly fees"></textarea>
+                        </div>
+                        <div>
+                            <label for="ganaaxReminderMessage" class="text-[10px] font-bold uppercase text-yellow-400">Ganaax reminder</label>
+                            <textarea id="ganaaxReminderMessage" maxlength="500" rows="3" class="mt-1 w-full rounded-lg border border-white/10 bg-black/40 p-3 text-xs text-white" placeholder="Write the daily reminder for unpaid Ganaax"></textarea>
+                        </div>
+                        <p class="text-[10px] text-gray-400">The Notifications inbox shows each signed-in user's current unpaid monthly fee and Ganaax using these messages. On the free plan it refreshes when opened; daily background reminders require a deployed Firebase scheduler. Tags: {{name}}, {{amount}}, {{count}}.</p>
+                        <button onclick="savePaymentReminderMessages()" class="w-full rounded-lg bg-yellow-500 py-2 text-xs font-black uppercase text-black hover:bg-yellow-400">Save Reminder Messages</button>
                     </div>
                     <select id="payPlayerSelect" class="w-full p-4 rounded-xl bg-black/40 border border-white/10 font-bold text-white"></select>
                     <button onclick="togglePaymentStatus()" class="w-full py-4 rounded-xl bg-green-600 text-white font-black oswald uppercase">Toggle Paid Status</button>
@@ -1460,24 +1483,48 @@
         💬
         <div id="unreadBadge">0</div>
     </button>
+    <div id="privateChatNotifications" class="pointer-events-none fixed bottom-28 right-6 z-[70] flex w-[min(360px,calc(100vw-2rem))] flex-col gap-2"></div>
     <div id="floatingChatWindow" class="fixed bottom-24 right-6 glass-panel border border-yellow-500/20 flex flex-col shadow-2xl overflow-hidden">
         <div class="bg-black/80 border-b border-white/10 p-4 flex justify-between items-center">
             <div>
-                <h3 class="text-lg font-black oswald text-yellow-500 uppercase tracking-wide">💬 Global Locker Room</h3>
-                <button onclick="showOnlineUsers()" class="text-[9px] font-black text-green-400 hover:text-green-300 uppercase tracking-widest animate-pulse transition">
+                <h3 id="chatHeaderTitle" class="text-lg font-black oswald text-yellow-500 uppercase tracking-wide">💬 Global Locker Room</h3>
+                <button id="onlineUsersButton" onclick="showOnlineUsers()" class="text-[9px] font-black text-green-400 hover:text-green-300 uppercase tracking-widest animate-pulse transition">
                     ● Online Users (<span id="onlineCount">0</span>)
                 </button>
             </div>
-            <button onclick="toggleChatWindow()" class="text-gray-400 hover:text-white font-black text-xl px-2">&times;</button>
+            <div class="flex items-center gap-2">
+                <button id="privateChatDeleteAllButton" onclick="deleteAllPrivateMessagesForBoth()" class="hidden rounded-lg border border-red-500/30 px-2 py-1 text-[9px] font-black uppercase text-red-300 hover:bg-red-500/10">Delete all</button>
+                <button onclick="toggleChatWindow()" class="text-gray-400 hover:text-white font-black text-xl px-2">&times;</button>
+            </div>
+        </div>
+        <div class="flex gap-2 border-b border-white/10 bg-black/30 px-3 py-2">
+            <button id="globalChatTab" onclick="showGlobalChat()" class="flex-1 rounded-lg bg-yellow-500 px-3 py-2 text-[10px] font-black uppercase text-black">Group chat</button>
+            <button id="privateChatTab" onclick="showPrivateChatContacts()" class="flex-1 rounded-lg bg-white/5 px-3 py-2 text-[10px] font-black uppercase text-gray-300 hover:bg-white/10">Private messages</button>
+            <button id="privateChatBackButton" onclick="showPrivateChatContacts()" class="hidden rounded-lg bg-white/5 px-3 py-2 text-[10px] font-black uppercase text-gray-300 hover:bg-white/10">Back</button>
+        </div>
+        <div id="chatSearchContainer" class="border-b border-white/10 bg-black/25 px-3 py-2">
+            <label for="chatSearchInput" class="sr-only">Search recent messages</label>
+            <input id="chatSearchInput" type="search" oninput="filterChatMessages()" placeholder="Search recent messages..." class="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-white placeholder:text-gray-500 focus:border-yellow-500/40 focus:outline-none">
         </div>
         <div id="chatMessageStream" class="flex-1 overflow-y-auto p-4 space-y-4 chat-scroll flex flex-col bg-neutral-950/20"></div>
-        <div id="chatUploadLoaderAlert" class="hidden text-[10px] font-black text-yellow-500 uppercase px-4 py-2 animate-pulse">⚡ Uploading...</div>
-        <div class="p-3 bg-black/60 border-t border-white/10 flex items-center gap-2">
-            <input type="text" id="chatTextInput" placeholder="Type a message..." onkeydown="if(event.key==='Enter') sendChatMessage()" class="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-yellow-500/40">
-            <div class="flex items-center gap-1">
-                <label class="cursor-pointer bg-white/5 p-2 rounded-xl border border-white/5"><span class="text-sm">📷</span><input type="file" id="chatImageInput" accept="image/*" onchange="uploadChatMediaFile('IMAGE')" class="hidden"></label>
-                <label class="cursor-pointer bg-white/5 p-2 rounded-xl border border-white/5"><span class="text-sm">🎥</span><input type="file" id="chatVideoInput" accept="video/*" onchange="uploadChatMediaFile('VIDEO')" class="hidden"></label>
-                <button onclick="sendChatMessage()" class="bg-yellow-500 text-black text-xs font-black px-3 py-2 rounded-xl">Send</button>
+        <div id="chatReplyPreview" class="hidden border-t border-yellow-500/20 bg-yellow-500/5 px-3 py-2">
+            <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                    <p class="text-[9px] font-black uppercase tracking-widest text-yellow-400">Replying to <span id="chatReplySender"></span></p>
+                    <p id="chatReplyText" class="mt-1 truncate text-[10px] text-gray-300"></p>
+                </div>
+                <button onclick="clearChatReply()" aria-label="Cancel reply" class="shrink-0 text-lg leading-none text-gray-400 hover:text-white">&times;</button>
+            </div>
+        </div>
+        <div id="chatComposer" class="border-t border-white/10 bg-black/60 p-3">
+            <div class="flex items-end gap-2">
+                <button type="button" onclick="toggleChatEmojiPicker()" aria-label="Insert emoji" class="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-base hover:bg-white/10">😊</button>
+                <textarea id="chatTextInput" rows="1" maxlength="1000" onkeydown="handleChatComposerKeydown(event)" oninput="updateChatComposerState()" placeholder="Write a message..." class="max-h-28 min-h-10 flex-1 resize-y rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-white placeholder:text-gray-500 focus:border-yellow-500/40 focus:outline-none"></textarea>
+                <button id="sendChatMessageBtn" onclick="sendChatMessage()" class="rounded-xl bg-yellow-500 px-4 py-2 text-xs font-black text-black transition hover:bg-yellow-400 disabled:cursor-not-allowed disabled:opacity-40">Send</button>
+            </div>
+            <div id="chatEmojiPicker" class="hidden mt-2 max-h-36 grid grid-cols-8 gap-1 overflow-y-auto chat-scroll" aria-label="Emoji picker"></div>
+            <div class="mt-2 flex justify-end">
+                <span id="chatCharacterCount" class="text-[9px] font-bold text-gray-500">0 / 1000</span>
             </div>
         </div>
     </div>
@@ -1569,6 +1616,15 @@
         </div>
         <div id="myAwardsRankingHeader" class="my-awards-ranking-header hidden mt-5 px-3 text-[9px] font-black uppercase tracking-[0.18em] text-emerald-200/75"><span>Rank</span><span>Player</span><span class="text-right">Wins</span></div>
         <div id="myAwardsList" class="mt-3 max-h-[65vh] overflow-y-auto pr-1 space-y-2"></div>
+    </div>
+</div>
+
+<div id="paymentNotificationsModal" onclick="closeMyPaymentNotifications(event)">
+    <div class="bg-[#0f172a] border border-blue-400/30 rounded-3xl w-full max-w-lg max-h-[85vh] p-6 relative flex flex-col shadow-2xl" onclick="event.stopPropagation()">
+        <button onclick="closeMyPaymentNotifications(null)" aria-label="Close notifications" class="absolute top-4 right-5 grid h-9 w-9 place-items-center rounded-full border border-white/10 bg-white/5 text-xl text-gray-400 transition hover:border-blue-400/40 hover:bg-blue-400/10 hover:text-white">&times;</button>
+        <h2 class="pr-10 text-xl font-black oswald uppercase tracking-wide text-blue-300">My Notifications</h2>
+        <p class="mt-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">Your monthly payment and Ganaax reminders</p>
+        <div id="paymentNotificationsList" class="mt-5 space-y-3 overflow-y-auto pr-1" aria-live="polite"></div>
     </div>
 </div>
 
@@ -1896,6 +1952,7 @@
         databaseURL: "https://labagole-36eef-default-rtdb.firebaseio.com",
         projectId: "labagole-36eef",
         storageBucket: "labagole-36eef.firebasestorage.app",
+        messagingSenderId: "747283642005",
         appId: "1:747283642005:web:c5843eb1ae73e52a980d9c"
     };
     firebase.initializeApp(firebaseConfig);
@@ -1903,6 +1960,7 @@
     const dbRef = firebase.database().ref('golaha_data');
     const profilesRef = firebase.database().ref('golaha_profiles');
     const chatRef = firebase.database().ref('golaha_public_chatroom');
+    const privateChatStore = firebase.firestore();
     const votesRef = firebase.database().ref('golaha_votes');
     const settingsRef = firebase.database().ref('golaha_settings');
     const presenceRef = firebase.database().ref('golaha_presence');
@@ -1924,10 +1982,356 @@
     let fasaxData = {};
     let celebrationShownThisSession = false;
     let celebrationLeaderboardDataReady = { profiles: false, db: false };
+    const DEFAULT_PAYMENT_REMINDER_MESSAGES = {
+        monthly: 'Reminder: please pay your outstanding monthly membership fee.',
+        ganaax: 'Reminder: please pay your outstanding Ganaax.'
+    };
+    let paymentReminderMessages = { ...DEFAULT_PAYMENT_REMINDER_MESSAGES };
+    const FIREBASE_WEB_PUSH_PUBLIC_KEY = '';
+    let paymentPushListenersAdded = false;
+    let webPaymentPushListenerAdded = false;
+
     function getFasaxStatus(playerName) {
         const record = fasaxData[playerName];
         const status = record && typeof record === 'object' ? record.status : record;
         return typeof status === 'string' ? status.trim().toLowerCase() : '';
+    }
+
+    async function savePaymentReminderMessages() {
+        if (!isUserAdmin) return alert('Only an administrator can edit payment reminder messages.');
+
+        const monthly = document.getElementById('monthlyReminderMessage').value.trim();
+        const ganaax = document.getElementById('ganaaxReminderMessage').value.trim();
+        if (!monthly || !ganaax) return alert('Please enter both reminder messages.');
+
+        try {
+            await settingsRef.child('paymentReminderMessages').update({ monthly, ganaax });
+            alert('Payment reminder messages saved.');
+        } catch (error) {
+            console.error('Unable to save payment reminder messages:', error);
+            alert('Could not save the reminder messages. Please try again.');
+        }
+    }
+
+    function getPaymentPushPlugin() {
+        const capacitor = window.Capacitor;
+        if (!capacitor || !capacitor.getPlatform || capacitor.getPlatform() !== 'android') return null;
+        return capacitor.Plugins?.PushNotifications || null;
+    }
+
+    function updatePaymentReminderButton(label, disabled = false) {
+        const button = document.getElementById('enablePaymentRemindersBtn');
+        if (!button) return;
+        button.textContent = label;
+        button.disabled = disabled;
+        button.classList.remove('hidden');
+    }
+
+    async function registerPaymentPushListeners(plugin) {
+        if (!paymentPushListenersAdded) {
+            await plugin.addListener('registration', async token => {
+                const user = auth.currentUser;
+                if (!user || !currentUserProfileUsername || currentUserProfileUsername === 'Anonymous') return;
+
+                try {
+                    await registerPaymentReminderToken(token.value);
+                    updatePaymentReminderButton('🔔 PAYMENT REMINDERS ENABLED', true);
+                } catch (error) {
+                    console.error('Unable to register this device for payment reminders:', error);
+                    updatePaymentReminderButton('🔔 RETRY PAYMENT REMINDERS');
+                }
+            });
+            await plugin.addListener('registrationError', error => {
+                console.error('Android push notification registration failed:', error);
+                updatePaymentReminderButton('🔔 RETRY PAYMENT REMINDERS');
+            });
+            paymentPushListenersAdded = true;
+        }
+
+        await plugin.createChannel({
+            id: 'payment-reminders',
+            name: 'Payment reminders',
+            description: 'Daily reminders about unpaid monthly fees and Ganaax.',
+            importance: 3
+        });
+        await plugin.register();
+    }
+
+    function supportsBrowserPaymentPush() {
+        return window.isSecureContext
+            && 'Notification' in window
+            && 'serviceWorker' in navigator
+            && 'PushManager' in window;
+    }
+
+    async function registerPaymentReminderToken(token) {
+        await firebase.functions().httpsCallable('registerPaymentReminderDevice')({
+            token,
+            username: currentUserProfileUsername
+        });
+    }
+
+    async function registerPaymentReminderUser() {
+        const user = auth.currentUser;
+        if (!user || !user.displayName || !currentUserProfileUsername || currentUserProfileUsername === 'Anonymous') return;
+
+        await firebase.functions().httpsCallable('registerPaymentReminderUser')({
+            username: currentUserProfileUsername
+        });
+    }
+
+    async function showMyPaymentNotifications() {
+        if (!auth.currentUser) {
+            alert('Sign in to view your notifications.');
+            return;
+        }
+
+        const modal = document.getElementById('paymentNotificationsModal');
+        const list = document.getElementById('paymentNotificationsList');
+        modal.style.display = 'flex';
+        list.innerHTML = '<p class="py-6 text-center text-sm text-gray-400">Loading your notifications...</p>';
+
+        try {
+            const result = await firebase.functions().httpsCallable('getMyPaymentNotifications')();
+            const notifications = Array.isArray(result.data?.notifications) ? result.data.notifications : [];
+            renderPaymentNotifications(list, notifications);
+        } catch (error) {
+            console.error('Unable to load saved payment notifications; showing current unpaid balances instead:', error);
+            renderPaymentNotifications(list, buildCurrentPaymentReminderNotifications(), true);
+        }
+    }
+
+    function renderPaymentNotifications(list, notifications, isLiveFallback = false) {
+        list.innerHTML = notifications.length
+            ? notifications.map(notification => {
+                const title = escapeGoalEntryText(notification.title || 'Payment reminder');
+                const body = escapeGoalEntryText(notification.body || '');
+                const date = Number(notification.createdAt);
+                const dateLabel = Number.isFinite(date) && date > 0
+                    ? escapeGoalEntryText(new Date(date).toLocaleString())
+                    : escapeGoalEntryText(notification.date || '');
+                const typeLabel = notification.type === 'ganaax' ? 'Ganaax' : 'Monthly payment';
+                return `<article class="rounded-2xl border border-blue-400/15 bg-blue-400/5 p-4"><div class="flex items-start justify-between gap-3"><h3 class="text-sm font-black text-yellow-300">${title}</h3><span class="shrink-0 rounded-full bg-blue-400/10 px-2 py-1 text-[9px] font-black uppercase tracking-wider text-blue-200">${typeLabel}</span></div><p class="mt-2 whitespace-pre-wrap break-words text-xs leading-relaxed text-gray-200">${body}</p><p class="mt-3 text-[9px] font-bold uppercase tracking-widest text-gray-500">${dateLabel}</p></article>`;
+            }).join('')
+            : '<p class="rounded-2xl border border-white/10 bg-white/5 px-4 py-8 text-center text-sm text-gray-400">You have no current unpaid payment reminders.</p>';
+    }
+
+    function updatePaymentNotificationsBadge() {
+        const badge = document.getElementById('paymentNotificationsBadge');
+        if (!badge) return;
+
+        const count = buildCurrentPaymentReminderNotifications().length;
+        badge.innerText = count > 99 ? '99+' : String(count);
+        badge.style.display = count > 0 ? 'inline-flex' : 'none';
+        badge.setAttribute('aria-label', `${count} unpaid payment notification${count === 1 ? '' : 's'}`);
+    }
+
+    function buildCurrentPaymentReminderNotifications() {
+        const playerName = currentUserProfileUsername.trim();
+        const normalizedName = playerName.toUpperCase();
+        if (!normalizedName) return [];
+
+        const dateParts = new Intl.DateTimeFormat('en-CA', {
+            timeZone: 'Africa/Mogadishu',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        }).formatToParts(new Date());
+        const dateValues = Object.fromEntries(
+            dateParts.filter(part => part.type !== 'literal').map(part => [part.type, part.value])
+        );
+        const year = Number(dateValues.year);
+        const month = Number(dateValues.month) - 1;
+        const date = `${dateValues.year}-${dateValues.month}-${dateValues.day}`;
+        const reminders = [];
+        const unpaidMonths = [];
+        const monthlyFee = Number(currentFee) || 0;
+
+        if (!isPlayerOnLongLeave(playerName) && monthlyFee > 0) {
+            for (let billingYear = 2026, billingMonth = 4;
+                billingYear < year || (billingYear === year && billingMonth <= month);
+                billingMonth++) {
+                if (billingMonth > 11) {
+                    billingYear++;
+                    billingMonth = 0;
+                }
+                const monthRecords = paymentData[`${billingYear}-${billingMonth}`] || {};
+                const paid = Object.entries(monthRecords).some(([name, value]) =>
+                    name.trim().toUpperCase() === normalizedName && value === true
+                );
+                if (!paid) unpaidMonths.push(billingMonth + 1);
+            }
+        }
+
+        if (unpaidMonths.length > 0) {
+            reminders.push({
+                type: 'monthly',
+                title: 'Monthly payment reminder',
+                body: renderPaymentReminderMessage(paymentReminderMessages.monthly, {
+                    name: playerName,
+                    amount: monthlyFee * unpaidMonths.length,
+                    count: unpaidMonths.length
+                }),
+                date,
+                createdAt: Date.now()
+            });
+        }
+
+        const unpaidGanaax = Object.values(ganaaxData || {}).filter(item => {
+            if (!item || typeof item !== 'object') return false;
+            if (String(item.name || '').trim().toUpperCase() !== normalizedName) return false;
+            const status = String(item.status || 'UNPAID').trim().toUpperCase();
+            return status !== 'PAID' && status !== 'APPROVED';
+        });
+        if (unpaidGanaax.length > 0) {
+            reminders.push({
+                type: 'ganaax',
+                title: 'Ganaax payment reminder',
+                body: renderPaymentReminderMessage(paymentReminderMessages.ganaax, {
+                    name: playerName,
+                    amount: unpaidGanaax.reduce((total, item) => total + (Number(item.price) || 0), 0),
+                    count: unpaidGanaax.length
+                }),
+                date,
+                createdAt: Date.now()
+            });
+        }
+
+        return reminders;
+    }
+
+    function renderPaymentReminderMessage(template, { name, amount, count }) {
+        return template
+            .replaceAll('{{name}}', name)
+            .replaceAll('{{amount}}', amount.toFixed(2))
+            .replaceAll('{{count}}', String(count));
+    }
+
+    function closeMyPaymentNotifications(event) {
+        if (!event || event.target.id === 'paymentNotificationsModal') {
+            document.getElementById('paymentNotificationsModal').style.display = 'none';
+        }
+    }
+
+    async function registerBrowserPaymentReminders() {
+        if (!FIREBASE_WEB_PUSH_PUBLIC_KEY) {
+            throw new Error('Set FIREBASE_WEB_PUSH_PUBLIC_KEY in lastversion.html using the Firebase Web Push public key.');
+        }
+        if (typeof firebase.messaging?.isSupported !== 'function' || !(await firebase.messaging.isSupported())) {
+            throw new Error('This browser does not support Firebase push notifications.');
+        }
+
+        const serviceWorkerRegistration = await navigator.serviceWorker.register('./service-worker.js');
+        await navigator.serviceWorker.ready;
+        const messaging = firebase.messaging();
+        const token = await messaging.getToken({
+            vapidKey: FIREBASE_WEB_PUSH_PUBLIC_KEY,
+            serviceWorkerRegistration
+        });
+        if (!token) throw new Error('Firebase did not return a browser notification token.');
+
+        if (!webPaymentPushListenerAdded) {
+            messaging.onMessage(payload => {
+                const notification = payload.notification || {};
+                serviceWorkerRegistration.showNotification(
+                    notification.title || 'Golaha Laba Gole',
+                    {
+                        body: notification.body || '',
+                        icon: './icon-192.png',
+                        data: { url: './lastversion.html' }
+                    }
+                ).catch(error => {
+                    console.error('Could not show the payment reminder notification:', error);
+                });
+            });
+            webPaymentPushListenerAdded = true;
+        }
+
+        await registerPaymentReminderToken(token);
+        updatePaymentReminderButton('🔔 PAYMENT REMINDERS ENABLED', true);
+    }
+
+    async function initializePaymentRemindersPush() {
+        const plugin = getPaymentPushPlugin();
+        if (!plugin) {
+            if (!supportsBrowserPaymentPush()) return;
+            if (Notification.permission === 'denied') {
+                const button = document.getElementById('enablePaymentRemindersBtn');
+                if (button) button.classList.add('hidden');
+                return;
+            }
+            if (Notification.permission === 'granted') {
+                updatePaymentReminderButton('🔔 REGISTERING PAYMENT REMINDERS', true);
+                try {
+                    await registerBrowserPaymentReminders();
+                } catch (error) {
+                    console.error('Unable to initialize browser payment notifications:', error);
+                    updatePaymentReminderButton('🔔 RETRY PAYMENT REMINDERS');
+                }
+                return;
+            }
+            updatePaymentReminderButton('🔔 ENABLE PAYMENT REMINDERS');
+            return;
+        }
+
+        const permission = await plugin.checkPermissions();
+        if (permission.receive !== 'granted') {
+            updatePaymentReminderButton('🔔 ENABLE PAYMENT REMINDERS');
+            return;
+        }
+
+        updatePaymentReminderButton('🔔 REGISTERING PAYMENT REMINDERS', true);
+        await registerPaymentPushListeners(plugin);
+    }
+
+    async function enablePaymentReminders() {
+        const plugin = getPaymentPushPlugin();
+        if (!plugin) {
+            if (!supportsBrowserPaymentPush()) {
+                alert('Payment push notifications require a supported browser on HTTPS, or the Android app.');
+                return;
+            }
+            try {
+                let permission = Notification.permission;
+                if (permission === 'default') permission = await Notification.requestPermission();
+                if (permission !== 'granted') {
+                    const button = document.getElementById('enablePaymentRemindersBtn');
+                    if (button) button.classList.add('hidden');
+                    alert('Allow notifications for Golaha Laba Gole in your browser settings to receive payment reminders.');
+                    return;
+                }
+                updatePaymentReminderButton('🔔 REGISTERING PAYMENT REMINDERS', true);
+                await registerBrowserPaymentReminders();
+            } catch (error) {
+                console.error('Could not enable browser payment notifications:', error);
+                updatePaymentReminderButton('🔔 RETRY PAYMENT REMINDERS');
+                alert(error.message || 'Could not enable payment reminders. Please check your connection and try again.');
+            }
+            return;
+        }
+        if (!auth.currentUser) {
+            alert('Please sign in before enabling payment reminders.');
+            return;
+        }
+
+        try {
+            let permission = await plugin.checkPermissions();
+            if (permission.receive !== 'granted') {
+                permission = await plugin.requestPermissions();
+            }
+            if (permission.receive !== 'granted') {
+                updatePaymentReminderButton('🔔 ENABLE NOTIFICATIONS IN SETTINGS');
+                alert('Allow notifications for Golaha Laba Gole in Android settings to receive payment reminders.');
+                return;
+            }
+
+            updatePaymentReminderButton('🔔 REGISTERING PAYMENT REMINDERS', true);
+            await registerPaymentPushListeners(plugin);
+        } catch (error) {
+            console.error('Could not enable payment push notifications:', error);
+            updatePaymentReminderButton('🔔 RETRY PAYMENT REMINDERS');
+            alert('Could not enable payment reminders. Please check your connection and try again.');
+        }
     }
 
     function isPlayerOnLeave(playerName) {
@@ -2046,6 +2450,7 @@
         document.getElementById('lockoutTotalPaid').innerText = formatMoney(totalPaid);
         document.getElementById('lockoutTotalUnpaid').innerText = formatMoney(totalUnpaid);
         document.getElementById('lockoutUnpaidGanaaxList').innerText = unpaidGanaaxListText;
+        updatePaymentNotificationsBadge();
     }
 
     function getMonthlyPaymentPlayerNames() {
@@ -2056,7 +2461,34 @@
 
     let chatIsOpen = false;
     let unreadCount = 0;
-    let lastSeenMsgTimestamp = parseInt(localStorage.getItem('lastSeenMsg')) || 0;
+    let lastSeenChatMessageKey = '';
+    let latestChatMessageKey = '';
+    let activeChatReply = null;
+    let privateChatView = 'group';
+    let activePrivateChatId = '';
+    let activePrivateChatRecipient = null;
+    let privateChatUsers = [];
+    let unsubscribePrivateChatMessages = null;
+    let unsubscribePrivateChatUsers = null;
+    let unsubscribePrivateChatConversations = null;
+    let privateConversationSubscriptions = new Map();
+    let privateConversationMessageSnapshots = new Map();
+    let privateConversationContactUids = new Map();
+    let privateChatDirectoryUid = '';
+    let privateChatDirectoryReady = false;
+    let privateChatErrorMessage = '';
+    let privateChatUnreadCounts = {};
+    const CHAT_EMOJI_LIST = [
+        '😀','😃','😄','😁','😆','😅','😂','🤣','😊','🙂','🙃','😉','😍','🥰','😘','😎',
+        '🤩','🥳','😇','🤔','🤗','😴','😭','😢','😡','🤯','🤝','🙏','👏','🙌','👍','👎',
+        '💪','🫶','❤️','🧡','💛','💚','💙','💜','🖤','🤍','💔','🔥','✨','🎉','💯','✅',
+        '⚽','🏆','🥇','🥈','🥉','🏅','🎯','🚀','💥','⭐','🌟','☀️','🌧️','🌈','🍀','🌹',
+        '🍎','🍕','🍔','☕','🎂','🎁','🎈','🎵','🎶','📣','📸','💬','👀','🤫','😱','😋',
+        '😜','🤪','🤓','😏','😌','😔','😤','🤦','🤷','🙋','💃','🕺','👑','🐐','🐐','🦁',
+        '🐐','🦅','🐺','🐼','🐸','🦋','🌍','🌙','💤','⚡','☁️','🌊','🏁','🥅','⚽','🏃'
+    ];
+    let renderGlobalChatMessages = null;
+    let latestGlobalChatSnapshot = null;
     let globalPaymentDataRaw = {};
     let currentCalculatedStats = {}; // Tracks stats globally for the modal
     let playerPointsChart = null;
@@ -2215,6 +2647,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+        updateChatComposerState();
         if (localStorage.getItem('golaha_theme') === 'light') {
             document.getElementById('mainBody').classList.add('light-theme');
             const btn = document.getElementById('themeToggleBtn');
@@ -2266,18 +2699,31 @@
         if (user) {
             celebrationShownThisSession = false;
             celebrationLeaderboardDataReady = { profiles: false, db: false };
+            const lastSeenStorageKey = `lastSeenChatMessage_${user.uid}`;
+            lastSeenChatMessageKey = localStorage.getItem(lastSeenStorageKey) || '';
+            latestChatMessageKey = '';
+            unreadCount = 0;
+            updateBadgeUI();
             loginScreen.style.display = 'none';
             dashboardArea.classList.remove('hidden');
             chatSystemWidget.classList.remove('hidden');
             currentUserProfileUsername = user.displayName || user.email.split('@')[0];
             welcomeMessage.innerText = `👋 WELCOME, ${currentUserProfileUsername}`;
+            initializePrivateChatDirectory(user);
             
             await loadAttendancePollFirst();
 
             setupPresence(user);
+            registerPaymentReminderUser().catch(error => {
+                console.error('Unable to register this account for in-app payment reminders:', error);
+            });
+            initializePaymentRemindersPush().catch(error => {
+                console.error('Unable to initialize payment reminder notifications:', error);
+            });
 
             profilesRef.on('value', s => {
                 profiles = s.val() || {};
+                if (privateChatView === 'contacts') renderPrivateChatContacts();
                 celebrationLeaderboardDataReady.profiles = true;
                 const userProfile = profiles[currentUserProfileUsername];
                 const userPhoto = typeof userProfile === 'string' ? userProfile : userProfile?.photo;
@@ -2308,6 +2754,8 @@
             isUserAdmin = admins.includes(user.email.toLowerCase());
             isFinanceUser = financeUsers.includes(user.email.toLowerCase());
             const isLimitedAdmin = limitedAdmins.includes(user.email.toLowerCase());
+            const reminderEditor = document.getElementById('paymentReminderEditor');
+            if (reminderEditor) reminderEditor.style.display = isUserAdmin ? 'block' : 'none';
             document.querySelectorAll('.team-color-control').forEach(control => {
                 control.style.display = isUserAdmin ? 'flex' : 'none';
             });
@@ -2418,6 +2866,21 @@
 
             settingsRef.on('value', s => {
                 const settings = s.val() || {};
+
+                const reminderMessages = settings.paymentReminderMessages || {};
+                paymentReminderMessages = {
+                    monthly: reminderMessages.monthly || DEFAULT_PAYMENT_REMINDER_MESSAGES.monthly,
+                    ganaax: reminderMessages.ganaax || DEFAULT_PAYMENT_REMINDER_MESSAGES.ganaax
+                };
+                updatePaymentNotificationsBadge();
+                const monthlyReminderInput = document.getElementById('monthlyReminderMessage');
+                const ganaaxReminderInput = document.getElementById('ganaaxReminderMessage');
+                if (monthlyReminderInput && document.activeElement !== monthlyReminderInput) {
+                    monthlyReminderInput.value = reminderMessages.monthly || DEFAULT_PAYMENT_REMINDER_MESSAGES.monthly;
+                }
+                if (ganaaxReminderInput && document.activeElement !== ganaaxReminderInput) {
+                    ganaaxReminderInput.value = reminderMessages.ganaax || DEFAULT_PAYMENT_REMINDER_MESSAGES.ganaax;
+                }
                 
                 // Sync Poll Text
                 const pollTextValue = settings.pollText || "Asc dhamaan akhyaarta caawa waa habeenkaan ciyaaraynay hore la loo xaadiro";
@@ -2454,60 +2917,172 @@
 
             // Initialize chat stream
             let seenMessages = new Set();
-            chatRef.limitToLast(50).on('value', snapshot => {
+            let chatSnapshotInitialized = false;
+            renderGlobalChatMessages = snapshot => {
+                latestGlobalChatSnapshot = snapshot;
                 const stream = document.getElementById('chatMessageStream');
                 if (!stream) return;
+                if (privateChatView !== 'group') {
+                    let newestMessageKey = latestChatMessageKey;
+                    let newlyUnreadCount = 0;
+                    snapshot.forEach(childSnap => {
+                        const message = childSnap.val();
+                        const messageId = childSnap.key;
+                        if (!message || typeof message !== 'object') return;
+                        if (messageId > newestMessageKey) newestMessageKey = messageId;
+                        const isMe = message.senderUid
+                            ? message.senderUid === auth.currentUser?.uid
+                            : message.sender === currentUserProfileUsername;
+                        if (!seenMessages.has(messageId)) {
+                            seenMessages.add(messageId);
+                            if (!isMe && messageId > lastSeenChatMessageKey) newlyUnreadCount++;
+                        }
+                    });
+                    latestChatMessageKey = newestMessageKey;
+                    if (newlyUnreadCount) {
+                        unreadCount += newlyUnreadCount;
+                        updateBadgeUI();
+                    }
+                    return;
+                }
                 stream.innerHTML = ''; 
+                let newestMessageKey = latestChatMessageKey;
+                let newlyUnreadCount = 0;
                 
                 snapshot.forEach(childSnap => {
                     const msg = childSnap.val();
                     const msgId = childSnap.key;
+                    if (!msg || typeof msg !== 'object') return;
+                    if (msgId > newestMessageKey) newestMessageKey = msgId;
                     
-                    const isMe = msg.sender === currentUserProfileUsername;
-                    const safeText = encodeURIComponent(msg.text || "");
-                    const editedTag = msg.isEdited ? `<span class="text-[8px] opacity-70 ml-1 italic">(edited)</span>` : "";
-                    
-                    let actionBtns = '';
-                    let editBtn = isMe ? `<button onclick="editMessage('${msgId}', '${safeText}')" class="hover:text-black transition">Edit</button>` : '';
-                    let deleteBtn = (isMe || isUserAdmin) ? `<button onclick="deleteMessage('${msgId}')" class="${isMe ? 'hover:text-red-800' : 'text-red-400 hover:text-red-300'} transition">Delete</button>` : '';
-                    
-                    if (editBtn || deleteBtn) {
-                        actionBtns = `
-                            <div class="flex gap-3 mt-2 justify-end opacity-70 text-[9px] font-bold">
-                                ${editBtn}
-                                ${deleteBtn}
-                            </div>
-                        `;
-                    }
-
+                    const isMe = msg.senderUid
+                        ? msg.senderUid === auth.currentUser?.uid
+                        : msg.sender === currentUserProfileUsername;
                     const wrapperDiv = document.createElement('div');
                     wrapperDiv.className = `w-full flex ${isMe ? 'justify-end' : 'justify-start'} mb-2`;
 
                     const innerDiv = document.createElement('div');
                     innerDiv.className = `p-3 rounded-2xl max-w-[80%] flex flex-col ${isMe ? 'bg-yellow-500 text-black rounded-br-none shadow-md' : 'bg-[#1e293b] text-white border border-white/10 rounded-bl-none shadow-md'}`;
-                    
-                    innerDiv.innerHTML = `
-                        <div class="text-[9px] font-black uppercase mb-1 ${isMe ? 'opacity-60' : 'text-yellow-500 opacity-80'}">${msg.sender}</div>
-                        <div class="text-xs font-semibold break-words">${msg.text} ${editedTag}</div>
-                        ${actionBtns}
-                    `;
+                    const messageHeader = document.createElement('div');
+                    messageHeader.className = `mb-1 flex items-center justify-between gap-4 text-[9px] font-black uppercase ${isMe ? 'opacity-60' : 'text-yellow-500 opacity-80'}`;
+                    const sender = document.createElement('span');
+                    sender.textContent = msg.sender || 'Unknown athlete';
+                    messageHeader.appendChild(sender);
+                    if (Number(msg.timestamp) > 0) {
+                        const messageTime = document.createElement('time');
+                        messageTime.className = 'shrink-0 font-semibold opacity-60';
+                        messageTime.dateTime = new Date(Number(msg.timestamp)).toISOString();
+                        messageTime.textContent = new Date(Number(msg.timestamp)).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        messageHeader.appendChild(messageTime);
+                    }
+                    innerDiv.appendChild(messageHeader);
+
+                    const messageText = document.createElement('div');
+                    messageText.className = 'whitespace-pre-wrap break-words text-xs font-semibold';
+                    messageText.textContent = msg.text || '';
+                    innerDiv.appendChild(messageText);
+
+                    if (msg.isEdited) {
+                        const editedTag = document.createElement('span');
+                        editedTag.className = 'ml-1 text-[8px] italic opacity-70';
+                        editedTag.textContent = '(edited)';
+                        messageText.appendChild(editedTag);
+                    }
+
+                    if (msg.replyTo && typeof msg.replyTo === 'object') {
+                        const replyQuote = document.createElement('div');
+                        replyQuote.className = 'mb-2 rounded-lg border-l-2 border-current bg-black/10 px-2 py-1';
+                        const replySender = document.createElement('p');
+                        replySender.className = 'text-[9px] font-black uppercase opacity-70';
+                        replySender.textContent = msg.replyTo.sender || 'Message';
+                        const replyContent = document.createElement('p');
+                        replyContent.className = 'mt-0.5 truncate text-[10px] opacity-80';
+                        replyContent.textContent = msg.replyTo.text || '';
+                        replyQuote.append(replySender, replyContent);
+                        innerDiv.insertBefore(replyQuote, messageText);
+                    }
+
+                    const actionRow = document.createElement('div');
+                    actionRow.className = 'mt-2 flex justify-end gap-3 text-[9px] font-bold opacity-70';
+                    const replyButton = document.createElement('button');
+                    replyButton.className = 'transition hover:underline';
+                    replyButton.textContent = 'Reply';
+                    replyButton.addEventListener('click', () => setChatReply(msgId, msg.sender || 'Unknown athlete', msg.text || ''));
+                    actionRow.appendChild(replyButton);
+                    if (isMe) {
+                        const editButton = document.createElement('button');
+                        editButton.className = 'transition hover:underline';
+                        editButton.textContent = 'Edit';
+                        editButton.addEventListener('click', () => editMessage(msgId, encodeURIComponent(msg.text || '')));
+                        actionRow.appendChild(editButton);
+                    }
+                    const canDeleteMessage = isMe || isUserAdmin;
+                    if (canDeleteMessage) {
+                        const deleteButton = document.createElement('button');
+                        deleteButton.className = `transition ${isMe ? 'hover:text-red-800' : 'text-red-400 hover:text-red-300'}`;
+                        deleteButton.textContent = 'Delete';
+                        deleteButton.setAttribute('aria-label', `Delete message from ${msg.sender || 'Unknown athlete'}`);
+                        deleteButton.addEventListener('click', () => deleteMessage(msgId, msg));
+                        actionRow.appendChild(deleteButton);
+                    }
+                    innerDiv.appendChild(actionRow);
+                    wrapperDiv.dataset.searchText = `${msg.sender || ''} ${msg.text || ''} ${msg.replyTo?.text || ''}`.toLocaleLowerCase();
                     
                     wrapperDiv.appendChild(innerDiv);
                     stream.appendChild(wrapperDiv);
                     
                     if (!seenMessages.has(msgId)) {
                         seenMessages.add(msgId);
-                        if (!chatIsOpen && !isMe) {
-                            unreadCount++;
-                            updateBadgeUI();
+                        if ((chatSnapshotInitialized || lastSeenChatMessageKey) &&
+                            !(chatIsOpen && privateChatView === 'group') &&
+                            !isMe && msgId > lastSeenChatMessageKey) {
+                            newlyUnreadCount++;
                         }
                     }
                 });
-                
-                stream.scrollTop = stream.scrollHeight;
+                latestChatMessageKey = newestMessageKey;
+                if (!chatSnapshotInitialized) {
+                    chatSnapshotInitialized = true;
+                    if (chatIsOpen && privateChatView === 'group') {
+                        markChatMessagesAsRead();
+                    } else if (!lastSeenChatMessageKey) {
+                        lastSeenChatMessageKey = latestChatMessageKey;
+                        localStorage.setItem(lastSeenStorageKey, lastSeenChatMessageKey);
+                    } else if (newlyUnreadCount > 0) {
+                        unreadCount += newlyUnreadCount;
+                        updateBadgeUI();
+                    }
+                } else if (chatIsOpen && privateChatView === 'group') {
+                    markChatMessagesAsRead();
+                } else if (newlyUnreadCount > 0) {
+                    unreadCount += newlyUnreadCount;
+                    updateBadgeUI();
+                }
+                filterChatMessages();
+                if (!document.getElementById('chatSearchInput')?.value) {
+                    stream.scrollTop = stream.scrollHeight;
+                }
+            };
+            chatRef.limitToLast(50).on('value', renderGlobalChatMessages, error => {
+                console.error('Unable to load group chat messages:', error);
+                alert('Group chat could not be loaded. Please check your connection and try again.');
             });
 
         } else {
+            if (unsubscribePrivateChatMessages) unsubscribePrivateChatMessages();
+            stopPrivateChatNotificationListeners();
+            if (unsubscribePrivateChatUsers) unsubscribePrivateChatUsers();
+            unsubscribePrivateChatMessages = null;
+            unsubscribePrivateChatUsers = null;
+            privateChatDirectoryUid = '';
+            privateChatDirectoryReady = false;
+            privateChatUsers = [];
+            privateChatErrorMessage = '';
+            privateChatUnreadCounts = {};
+            activePrivateChatId = '';
+            activePrivateChatRecipient = null;
+            document.getElementById('privateChatNotifications').replaceChildren();
+            setPrivateChatNavigation('group', '💬 Global Locker Room');
             isUserAdmin = false;
             document.querySelectorAll('.team-color-control').forEach(control => {
                 control.style.display = 'none';
@@ -2661,7 +3236,7 @@
         paymentsRef.update({ globalFee: parseInt(val) || 0 });
     }
 
-    function togglePaymentStatus() {
+    async function togglePaymentStatus() {
         const name = document.getElementById('payPlayerSelect').value,
               yr = document.getElementById('viewYear').value,
               mo = document.getElementById('selMonth').value;
@@ -2669,7 +3244,14 @@
         if (isPlayerOnLongLeave(name)) return alert("Fasax Dheer players are excluded from monthly payments.");
         const monthKey = `${yr}-${mo}`;
         const currentStatus = paymentData[monthKey]?.[name] || false;
-        paymentsRef.child('records').child(monthKey).child(name).set(!currentStatus);
+        const isPaid = !currentStatus;
+        try {
+            await paymentsRef.child('records').child(monthKey).child(name).set(isPaid);
+            if (isPaid) alert(`The athlete ${name} has successfully paid the monthly payment.`);
+        } catch (error) {
+            console.error('Unable to update monthly payment status:', error);
+            alert('Could not update the monthly payment status. Please try again.');
+        }
     }
 
     function updatePaymentReport() {
@@ -5326,24 +5908,587 @@ ${isUserAdmin ? `<button onclick="deleteAttendanceVote('${name}')" class="px-2 p
 
     function closeVoteList(e) { if(!e || e.target.id === 'voteListModal') document.getElementById('voteListModal').style.display = 'none'; }
 
+    function initializePrivateChatDirectory(user) {
+        if (privateChatDirectoryUid === user.uid) return;
+        stopPrivateChatNotificationListeners();
+        if (unsubscribePrivateChatUsers) unsubscribePrivateChatUsers();
+        privateChatDirectoryUid = user.uid;
+        privateChatDirectoryReady = false;
+        privateChatErrorMessage = '';
+        const usersCollection = privateChatStore.collection('privateChatUsers');
+        loadPrivateChatUnreadCounts(user.uid);
+        usersCollection.doc(user.uid).set({
+            name: String(currentUserProfileUsername).slice(0, 80),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true }).catch(error => {
+            console.error('Unable to register private chat profile:', error);
+            privateChatErrorMessage = 'Private messaging needs a Firestore database and deployed security rules.';
+            if (privateChatView === 'contacts') renderPrivateChatContacts();
+        });
+
+        unsubscribePrivateChatUsers = usersCollection.onSnapshot(snapshot => {
+            privateChatDirectoryReady = true;
+            privateChatErrorMessage = '';
+            privateChatUsers = snapshot.docs
+                .map(doc => ({ uid: doc.id, name: String(doc.data().name || 'Athlete') }))
+                .filter(contact => contact.uid !== user.uid)
+                .sort((a, b) => a.name.localeCompare(b.name));
+            watchPrivateChatConversations(user);
+            if (privateChatView === 'contacts') renderPrivateChatContacts();
+        }, error => {
+            console.error('Unable to load private chat contacts:', error);
+            if (privateChatDirectoryUid === user.uid) privateChatDirectoryUid = '';
+            privateChatErrorMessage = 'Private contacts are unavailable. Create the Firestore database and deploy firestore.rules.';
+            if (privateChatView === 'contacts') renderPrivateChatContacts();
+        });
+    }
+
+    function stopPrivateChatNotificationListeners() {
+        if (unsubscribePrivateChatConversations) unsubscribePrivateChatConversations();
+        unsubscribePrivateChatConversations = null;
+        privateConversationSubscriptions.forEach(unsubscribe => unsubscribe());
+        privateConversationSubscriptions.clear();
+        privateConversationMessageSnapshots.clear();
+        privateConversationContactUids.clear();
+    }
+
+    function getPrivateChatStorageKey(kind, uid, conversationId) {
+        return `privateChat_${kind}_${uid}_${conversationId}`;
+    }
+
+    function loadPrivateChatUnreadCounts(uid) {
+        privateChatUnreadCounts = {};
+        Object.keys(localStorage).forEach(key => {
+            const prefix = `privateChat_unread_${uid}_`;
+            if (!key.startsWith(prefix)) return;
+            const conversationId = key.slice(prefix.length);
+            const count = Number(localStorage.getItem(key)) || 0;
+            if (count > 0) privateChatUnreadCounts[conversationId] = count;
+        });
+        updateBadgeUI();
+    }
+
+    function getPrivateChatNotifiedMessageIds(uid, conversationId) {
+        const key = getPrivateChatStorageKey('notified', uid, conversationId);
+        try {
+            const value = JSON.parse(localStorage.getItem(key) || '[]');
+            return Array.isArray(value) ? value.filter(id => typeof id === 'string').slice(-200) : [];
+        } catch (error) {
+            console.error('Unable to read private message notification state:', error);
+            return [];
+        }
+    }
+
+    function watchPrivateChatConversations(user) {
+        if (unsubscribePrivateChatConversations) return;
+        unsubscribePrivateChatConversations = privateChatStore.collection('privateChatUsers')
+            .doc(user.uid)
+            .collection('conversations')
+            .onSnapshot(snapshot => {
+                const currentConversationIds = new Set();
+                snapshot.forEach(indexDoc => {
+                    const index = indexDoc.data();
+                    const otherUid = String(index.otherUid || '');
+                    const conversationId = String(index.conversationId || '');
+                    const expectedId = [user.uid, otherUid].sort().join('__');
+                    if (!otherUid || conversationId !== expectedId || indexDoc.id !== conversationId) return;
+                    currentConversationIds.add(conversationId);
+                    privateConversationContactUids.set(conversationId, otherUid);
+                    if (!privateConversationSubscriptions.has(conversationId)) {
+                        watchPrivateConversationMessages(
+                            privateChatStore.collection('privateChats').doc(conversationId),
+                            user
+                        );
+                    }
+                });
+                privateConversationSubscriptions.forEach((unsubscribe, conversationId) => {
+                    if (!currentConversationIds.has(conversationId)) {
+                        unsubscribe();
+                        privateConversationSubscriptions.delete(conversationId);
+                        privateConversationMessageSnapshots.delete(conversationId);
+                        privateConversationContactUids.delete(conversationId);
+                        delete privateChatUnreadCounts[conversationId];
+                    }
+                });
+                updateBadgeUI();
+                if (privateChatView === 'contacts') renderPrivateChatContacts();
+            }, error => {
+                console.error('Unable to watch private conversations:', error);
+                privateChatErrorMessage = 'Private message alerts could not connect. Check Firestore access.';
+                if (privateChatView === 'contacts') renderPrivateChatContacts();
+            });
+    }
+
+    function watchPrivateConversationMessages(conversationDoc, user) {
+        const conversationId = conversationDoc.id;
+        let initialized = false;
+        const messagesQuery = conversationDoc.collection('messages')
+            .orderBy('createdAt', 'asc')
+            .limitToLast(100);
+        const unsubscribe = messagesQuery.onSnapshot(snapshot => {
+            privateConversationMessageSnapshots.set(conversationId, snapshot.docs);
+            const currentlyReading = chatIsOpen &&
+                privateChatView === 'conversation' &&
+                activePrivateChatId === conversationId;
+            if (snapshot.empty) {
+                markPrivateConversationAsRead(conversationId, [], user.uid);
+                return;
+            }
+
+            if (!initialized) {
+                initialized = true;
+                const readAtKey = getPrivateChatStorageKey('readAt', user.uid, conversationId);
+                const storedReadAt = Number(localStorage.getItem(readAtKey)) || 0;
+                if (!storedReadAt) {
+                    if (currentlyReading) {
+                        markPrivateConversationAsRead(conversationId, snapshot.docs, user.uid);
+                    } else {
+                        snapshot.docs.forEach(messageDoc => {
+                            const message = messageDoc.data();
+                            if (message.senderUid !== user.uid) {
+                                showPrivateMessageNotification(conversationId, messageDoc, message, user);
+                            }
+                        });
+                        if (!snapshot.docs.some(messageDoc => messageDoc.data().senderUid !== user.uid)) {
+                            const latestTimestamp = snapshot.docs.reduce(
+                                (latest, messageDoc) => Math.max(latest, getPrivateMessageTimestamp(messageDoc.data())),
+                                0
+                            );
+                            if (latestTimestamp) localStorage.setItem(readAtKey, String(latestTimestamp));
+                        }
+                    }
+                    return;
+                }
+
+                snapshot.docs.forEach(messageDoc => {
+                    const message = messageDoc.data();
+                    if (message.senderUid !== user.uid &&
+                        getPrivateMessageTimestamp(message) > storedReadAt) {
+                        showPrivateMessageNotification(conversationId, messageDoc, message, user);
+                    }
+                });
+                if (currentlyReading) markPrivateConversationAsRead(conversationId, snapshot.docs, user.uid);
+                return;
+            }
+
+            snapshot.docChanges().forEach(change => {
+                if (change.type !== 'added') return;
+                const message = change.doc.data();
+                if (message.senderUid === user.uid) return;
+                if (currentlyReading) {
+                    markPrivateConversationAsRead(conversationId, snapshot.docs, user.uid);
+                } else {
+                    showPrivateMessageNotification(conversationId, change.doc, message, user);
+                }
+            });
+        }, error => {
+            console.error(`Unable to watch private messages for ${conversationId}:`, error);
+        });
+        privateConversationSubscriptions.set(conversationId, unsubscribe);
+    }
+
+    function getPrivateMessageTimestamp(message) {
+        if (message.createdAt?.toMillis) return message.createdAt.toMillis();
+        if (message.createdAt?.toDate) return message.createdAt.toDate().getTime();
+        return Number(message.createdAt) || 0;
+    }
+
+    function showPrivateMessageNotification(conversationId, messageDoc, message, user) {
+        const notifiedIds = getPrivateChatNotifiedMessageIds(user.uid, conversationId);
+        if (notifiedIds.includes(messageDoc.id)) return;
+        notifiedIds.push(messageDoc.id);
+        localStorage.setItem(
+            getPrivateChatStorageKey('notified', user.uid, conversationId),
+            JSON.stringify(notifiedIds.slice(-200))
+        );
+
+        privateChatUnreadCounts[conversationId] = (privateChatUnreadCounts[conversationId] || 0) + 1;
+        localStorage.setItem(
+            getPrivateChatStorageKey('unread', user.uid, conversationId),
+            String(privateChatUnreadCounts[conversationId])
+        );
+        updateBadgeUI();
+        if (privateChatView === 'contacts') renderPrivateChatContacts();
+
+        const sender = privateChatUsers.find(contact => contact.uid === message.senderUid);
+        const senderName = String(message.senderName || sender?.name || 'New private message');
+        const messageText = String(message.text || 'New private message.');
+        showPrivateMessageToast(conversationId, messageDoc.id, senderName, messageText, sender || {
+            uid: message.senderUid,
+            name: senderName
+        });
+
+        if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+            try {
+                const notification = new Notification(`Private message from ${senderName}`, {
+                    body: messageText.slice(0, 180),
+                    tag: `private-${conversationId}-${messageDoc.id}`,
+                    renotify: true
+                });
+                notification.onclick = () => {
+                    window.focus();
+                    if (!chatIsOpen) toggleChatWindow();
+                    openPrivateConversation(sender || { uid: message.senderUid, name: senderName });
+                    notification.close();
+                };
+            } catch (error) {
+                console.error('Unable to show system notification for private message:', error);
+            }
+        }
+    }
+
+    function showPrivateMessageToast(conversationId, messageId, senderName, messageText, contact) {
+        const container = document.getElementById('privateChatNotifications');
+        if (!container) return;
+        const toast = document.createElement('button');
+        toast.type = 'button';
+        toast.className = 'pointer-events-auto w-full rounded-xl border border-yellow-500/30 bg-[#10151f] p-3 text-left shadow-2xl transition hover:border-yellow-400';
+        toast.dataset.conversationId = conversationId;
+        toast.dataset.messageId = messageId;
+        toast.setAttribute('aria-label', `Private message from ${senderName}: ${messageText}`);
+        const title = document.createElement('span');
+        title.className = 'block text-[10px] font-black uppercase tracking-wide text-yellow-400';
+        title.textContent = `Private message · ${senderName}`;
+        const body = document.createElement('span');
+        body.className = 'mt-1 block break-words text-xs text-white';
+        body.textContent = messageText.slice(0, 180);
+        toast.append(title, body);
+        toast.addEventListener('click', () => {
+            toast.remove();
+            if (!chatIsOpen) toggleChatWindow();
+            openPrivateConversation(contact);
+        });
+        container.appendChild(toast);
+        window.setTimeout(() => toast.remove(), 10000);
+    }
+
+    function markPrivateConversationAsRead(conversationId, messages, uid) {
+        const latestTimestamp = (messages || []).reduce(
+            (latest, messageDoc) => Math.max(latest, getPrivateMessageTimestamp(messageDoc.data())),
+            0
+        );
+        if (latestTimestamp) {
+            localStorage.setItem(
+                getPrivateChatStorageKey('readAt', uid, conversationId),
+                String(latestTimestamp)
+            );
+        }
+        privateChatUnreadCounts[conversationId] = 0;
+        localStorage.setItem(
+            getPrivateChatStorageKey('unread', uid, conversationId),
+            '0'
+        );
+        updateBadgeUI();
+        document.querySelectorAll('#privateChatNotifications [data-conversation-id]').forEach(toast => {
+            if (toast.dataset.conversationId === conversationId) toast.remove();
+        });
+        if (privateChatView === 'contacts') renderPrivateChatContacts();
+    }
+
+    function setPrivateChatNavigation(view, title) {
+        privateChatView = view;
+        const isGroup = view === 'group';
+        const isConversation = view === 'conversation';
+        document.getElementById('chatHeaderTitle').textContent = title;
+        document.getElementById('privateChatDeleteAllButton').classList.toggle('hidden', !isConversation);
+        document.getElementById('onlineUsersButton').classList.toggle('hidden', !isGroup);
+        document.getElementById('globalChatTab').classList.toggle('hidden', isConversation);
+        document.getElementById('privateChatTab').classList.toggle('hidden', isConversation);
+        document.getElementById('privateChatBackButton').classList.toggle('hidden', !isConversation);
+        document.getElementById('globalChatTab').className = `${isConversation ? 'hidden ' : ''}flex-1 rounded-lg px-3 py-2 text-[10px] font-black uppercase ${isGroup ? 'bg-yellow-500 text-black' : 'bg-white/5 text-gray-300 hover:bg-white/10'}`;
+        document.getElementById('privateChatTab').className = `${isConversation ? 'hidden ' : ''}flex-1 rounded-lg px-3 py-2 text-[10px] font-black uppercase ${!isGroup ? 'bg-yellow-500 text-black' : 'bg-white/5 text-gray-300 hover:bg-white/10'}`;
+        document.getElementById('chatComposer').classList.toggle('hidden', view === 'contacts');
+        document.getElementById('chatSearchContainer').classList.toggle('hidden', isConversation);
+        document.getElementById('chatSearchInput').value = '';
+        clearChatReply();
+        document.getElementById('chatEmojiPicker').classList.add('hidden');
+    }
+
+    function showGlobalChat() {
+        if (unsubscribePrivateChatMessages) unsubscribePrivateChatMessages();
+        unsubscribePrivateChatMessages = null;
+        activePrivateChatId = '';
+        activePrivateChatRecipient = null;
+        setPrivateChatNavigation('group', '💬 Global Locker Room');
+        if (latestGlobalChatSnapshot && renderGlobalChatMessages) {
+            renderGlobalChatMessages(latestGlobalChatSnapshot);
+            markChatMessagesAsRead();
+        }
+    }
+
+    function showPrivateChatContacts() {
+        if (unsubscribePrivateChatMessages) unsubscribePrivateChatMessages();
+        unsubscribePrivateChatMessages = null;
+        activePrivateChatId = '';
+        activePrivateChatRecipient = null;
+        setPrivateChatNavigation('contacts', 'Private Messages');
+        if (auth.currentUser) initializePrivateChatDirectory(auth.currentUser);
+        renderPrivateChatContacts();
+    }
+
+    function renderPrivateChatContacts() {
+        const stream = document.getElementById('chatMessageStream');
+        if (!stream || privateChatView !== 'contacts') return;
+        stream.replaceChildren();
+
+        const usersByName = new Map(
+            privateChatUsers.map(contact => [contact.name.trim().toLocaleLowerCase(), contact])
+        );
+        const contactsByName = new Map();
+        Object.keys(profiles || {}).forEach(name => {
+            const trimmedName = String(name).trim();
+            const normalizedName = trimmedName.toLocaleLowerCase();
+            if (!trimmedName || normalizedName === 'full cashier' ||
+                normalizedName === currentUserProfileUsername.trim().toLocaleLowerCase()) return;
+            const registeredContact = usersByName.get(normalizedName);
+            contactsByName.set(normalizedName, {
+                name: trimmedName,
+                uid: registeredContact?.uid || '',
+                available: Boolean(registeredContact?.uid)
+            });
+        });
+        privateChatUsers.forEach(contact => {
+            const normalizedName = contact.name.trim().toLocaleLowerCase();
+            if (!contactsByName.has(normalizedName)) {
+                contactsByName.set(normalizedName, { ...contact, available: true });
+            }
+        });
+        const contacts = [...contactsByName.values()].sort((a, b) => a.name.localeCompare(b.name));
+
+        if (privateChatErrorMessage) {
+            const setupNotice = document.createElement('p');
+            setupNotice.className = 'mb-2 rounded-lg border border-amber-500/20 bg-amber-500/5 p-2 text-[10px] text-amber-300';
+            setupNotice.textContent = privateChatErrorMessage;
+            stream.appendChild(setupNotice);
+        }
+        if (!contacts.length) {
+            stream.textContent = privateChatDirectoryReady && celebrationLeaderboardDataReady.profiles
+                ? 'No other user profiles are available for private messages yet.'
+                : 'Loading user profiles...';
+            return;
+        }
+
+        contacts.forEach(contact => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.disabled = !contact.available;
+            button.className = `flex w-full items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3 text-left ${contact.available ? 'hover:border-yellow-500/40 hover:bg-white/10' : 'cursor-not-allowed opacity-60'}`;
+            button.dataset.searchText = contact.name.toLocaleLowerCase();
+            const avatar = document.createElement('span');
+            avatar.className = 'flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-yellow-500/15 text-lg text-yellow-400';
+            avatar.textContent = contact.name.slice(0, 1).toUpperCase();
+            const details = document.createElement('span');
+            details.className = 'min-w-0 flex-1';
+            const name = document.createElement('span');
+            name.className = 'block truncate text-xs font-black uppercase text-white';
+            name.textContent = contact.name;
+            const hint = document.createElement('span');
+            hint.className = 'mt-1 block text-[9px] font-bold uppercase tracking-wider text-gray-500';
+            hint.textContent = contact.available
+                ? 'Start private conversation'
+                : privateChatErrorMessage
+                    ? 'Private chat setup is required'
+                    : 'User must sign in once to enable private chat';
+            details.append(name, hint);
+            button.append(avatar, details);
+            const conversationId = contact.uid
+                ? [auth.currentUser?.uid, contact.uid].sort().join('__')
+                : '';
+            const unreadMessages = conversationId ? privateChatUnreadCounts[conversationId] || 0 : 0;
+            if (unreadMessages > 0) {
+                const unreadBadge = document.createElement('span');
+                unreadBadge.className = 'flex h-6 min-w-6 shrink-0 items-center justify-center rounded-full bg-red-500 px-2 text-[10px] font-black text-white';
+                unreadBadge.textContent = unreadMessages > 99 ? '99+' : String(unreadMessages);
+                unreadBadge.setAttribute('aria-label', `${unreadMessages} unread private message${unreadMessages === 1 ? '' : 's'}`);
+                button.appendChild(unreadBadge);
+            }
+            if (contact.available) {
+                button.addEventListener('click', () => openPrivateConversation(contact));
+            }
+            stream.appendChild(button);
+        });
+        filterChatMessages();
+    }
+
+    async function openPrivateConversation(contact) {
+        const user = auth.currentUser;
+        if (!user || !contact?.uid || contact.uid === user.uid) return;
+
+        const members = [user.uid, contact.uid].sort();
+        const conversationId = members.join('__');
+        const conversationRef = privateChatStore.collection('privateChats').doc(conversationId);
+        try {
+            await privateChatStore.runTransaction(async transaction => {
+                const conversation = await transaction.get(conversationRef);
+                if (!conversation.exists) {
+                    transaction.set(conversationRef, {
+                        members,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                } else if (!Array.isArray(conversation.data().members) ||
+                    members.some(member => !conversation.data().members.includes(member))) {
+                    throw new Error('This conversation has invalid participants.');
+                }
+            });
+
+            const indexBatch = privateChatStore.batch();
+            members.forEach(memberUid => {
+                const otherUid = memberUid === user.uid ? contact.uid : user.uid;
+                indexBatch.set(
+                    privateChatStore.collection('privateChatUsers')
+                        .doc(memberUid)
+                        .collection('conversations')
+                        .doc(conversationId),
+                    {
+                        conversationId,
+                        otherUid,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    },
+                    { merge: true }
+                );
+            });
+            await indexBatch.commit();
+
+            if (unsubscribePrivateChatMessages) unsubscribePrivateChatMessages();
+            activePrivateChatId = conversationId;
+            activePrivateChatRecipient = contact;
+            setPrivateChatNavigation('conversation', `Private · ${contact.name}`);
+            markPrivateConversationAsRead(
+                conversationId,
+                privateConversationMessageSnapshots.get(conversationId) || [],
+                user.uid
+            );
+            const messagesRef = conversationRef.collection('messages')
+                .orderBy('createdAt', 'asc')
+                .limitToLast(100);
+            unsubscribePrivateChatMessages = messagesRef.onSnapshot(snapshot => {
+                renderPrivateConversationMessages(snapshot, user);
+            }, error => {
+                console.error('Unable to load private messages:', error);
+                alert('Private messages could not be loaded. Check your Firestore security rules.');
+            });
+        } catch (error) {
+            console.error('Unable to open private conversation:', error);
+            alert(`Unable to open private conversation: ${error.message}`);
+        }
+    }
+
+    function renderPrivateConversationMessages(snapshot, user) {
+        if (privateChatView !== 'conversation') return;
+        markPrivateConversationAsRead(activePrivateChatId, snapshot.docs, user.uid);
+        const stream = document.getElementById('chatMessageStream');
+        if (!stream) return;
+        stream.replaceChildren();
+        snapshot.forEach(messageDoc => {
+            const message = messageDoc.data();
+            const isMe = message.senderUid === user.uid;
+            const wrapper = document.createElement('div');
+            wrapper.className = `flex w-full ${isMe ? 'justify-end' : 'justify-start'}`;
+            const bubble = document.createElement('div');
+            bubble.className = `flex max-w-[85%] flex-col rounded-2xl p-3 ${isMe ? 'rounded-br-none bg-yellow-500 text-black' : 'rounded-bl-none border border-white/10 bg-[#1e293b] text-white'}`;
+            const header = document.createElement('div');
+            header.className = 'mb-1 flex items-center justify-between gap-4 text-[9px] font-black uppercase opacity-70';
+            const sender = document.createElement('span');
+            sender.textContent = isMe ? 'You' : activePrivateChatRecipient?.name || message.senderName || 'Athlete';
+            header.appendChild(sender);
+            if (message.createdAt?.toDate) {
+                const time = document.createElement('time');
+                time.dateTime = message.createdAt.toDate().toISOString();
+                time.textContent = message.createdAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                header.appendChild(time);
+            }
+            const text = document.createElement('p');
+            text.className = 'whitespace-pre-wrap break-words text-xs font-semibold';
+            text.textContent = String(message.text || '');
+            bubble.append(header, text);
+            if (isMe) {
+                const removeButton = document.createElement('button');
+                removeButton.className = 'mt-2 self-end text-[9px] font-bold opacity-70 hover:text-red-700';
+                removeButton.textContent = 'Delete';
+                removeButton.addEventListener('click', () => deletePrivateMessage(messageDoc.ref));
+                bubble.appendChild(removeButton);
+            }
+            wrapper.appendChild(bubble);
+            stream.appendChild(wrapper);
+        });
+        if (!document.getElementById('chatSearchInput').value) stream.scrollTop = stream.scrollHeight;
+    }
+
+    async function deletePrivateMessage(messageRef) {
+        if (!confirm('Delete this private message?')) return;
+        try {
+            await messageRef.delete();
+        } catch (error) {
+            console.error('Unable to delete private message:', error);
+            alert(`Unable to delete private message: ${error.message}`);
+        }
+    }
+
+    async function deleteAllPrivateMessagesForBoth() {
+        const user = auth.currentUser;
+        const conversationId = activePrivateChatId;
+        const button = document.getElementById('privateChatDeleteAllButton');
+        if (!user || !conversationId || privateChatView !== 'conversation') return;
+        if (!confirm(`Permanently delete all messages in your conversation with ${activePrivateChatRecipient?.name || 'this user'} for both of you? This cannot be undone.`)) return;
+
+        button.disabled = true;
+        button.textContent = 'Deleting...';
+        try {
+            const messagesRef = privateChatStore.collection('privateChats')
+                .doc(conversationId).collection('messages');
+            const snapshot = await messagesRef.get();
+            for (let offset = 0; offset < snapshot.docs.length; offset += 10) {
+                const batch = privateChatStore.batch();
+                snapshot.docs.slice(offset, offset + 10).forEach(messageDoc => batch.delete(messageDoc.ref));
+                await batch.commit();
+            }
+
+            await privateChatStore.collection('privateChats').doc(conversationId).update({
+                lastMessage: '',
+                lastMessageAt: firebase.firestore.FieldValue.serverTimestamp(),
+                lastSenderUid: user.uid
+            });
+            markPrivateConversationAsRead(conversationId, [], user.uid);
+            alert('All messages were deleted for both participants.');
+        } catch (error) {
+            console.error('Unable to delete all private messages:', error);
+            alert(`Unable to delete all messages: ${error.message}`);
+        } finally {
+            button.disabled = false;
+            button.textContent = 'Delete all';
+        }
+    }
+
     function toggleChatWindow() {
         const windowEl = document.getElementById('floatingChatWindow');
         chatIsOpen = (windowEl.style.display !== 'flex');
         windowEl.style.display = chatIsOpen ? 'flex' : 'none';
         if (chatIsOpen) {
-            unreadCount = 0;
-            updateBadgeUI();
-            lastSeenMsgTimestamp = Date.now();
-            localStorage.setItem('lastSeenMsg', lastSeenMsgTimestamp);
+            markChatMessagesAsRead();
             const container = document.getElementById('chatMessageStream');
             container.scrollTop = container.scrollHeight;
         }
     }
 
+    function markChatMessagesAsRead() {
+        unreadCount = 0;
+        if (latestChatMessageKey) {
+            lastSeenChatMessageKey = latestChatMessageKey;
+            const user = auth.currentUser;
+            if (user) {
+                localStorage.setItem(`lastSeenChatMessage_${user.uid}`, lastSeenChatMessageKey);
+            }
+        }
+        updateBadgeUI();
+    }
+
     function updateBadgeUI() {
         const badge = document.getElementById('unreadBadge');
-        if (unreadCount > 0 && !chatIsOpen) {
-            badge.innerText = unreadCount;
+        const privateUnreadTotal = Object.values(privateChatUnreadCounts)
+            .reduce((total, count) => total + (Number(count) || 0), 0);
+        const totalUnread = unreadCount + privateUnreadTotal;
+        if (totalUnread > 0 && !chatIsOpen) {
+            badge.innerText = totalUnread > 99 ? '99+' : totalUnread;
             badge.style.display = 'flex';
         } else {
             badge.style.display = 'none';
@@ -5401,15 +6546,119 @@ ${isUserAdmin ? `<button onclick="deleteAttendanceVote('${name}')" class="px-2 p
     function sendChatMessage() {
         const input = document.getElementById('chatTextInput');
         const text = input.value.trim();
-        if(!text) return;
-        
-        chatRef.push({
+        if (!text || text.length > 1000) return;
+
+        if (privateChatView === 'conversation' && activePrivateChatId) {
+            sendPrivateChatMessage(text, input);
+            return;
+        }
+
+        const message = {
             sender: currentUserProfileUsername,
+            senderUid: auth.currentUser?.uid || '',
             text: text,
             timestamp: firebase.database.ServerValue.TIMESTAMP,
             type: 'TEXT'
+        };
+        if (activeChatReply) message.replyTo = activeChatReply;
+
+        chatRef.push(message).then(() => {
+            input.value = '';
+            clearChatReply();
+            updateChatComposerState();
+        }).catch(error => {
+            console.error('Unable to send chat message:', error);
+            alert('Your message could not be sent. Please try again.');
         });
-        input.value = '';
+    }
+
+    async function sendPrivateChatMessage(text, input) {
+        const user = auth.currentUser;
+        if (!user || !activePrivateChatId) return;
+        const conversationRef = privateChatStore.collection('privateChats').doc(activePrivateChatId);
+        const messageRef = conversationRef.collection('messages').doc();
+        const batch = privateChatStore.batch();
+        batch.set(messageRef, {
+            senderUid: user.uid,
+            senderName: String(currentUserProfileUsername).slice(0, 80),
+            text,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        batch.update(conversationRef, {
+            lastMessage: text.slice(0, 160),
+            lastMessageAt: firebase.firestore.FieldValue.serverTimestamp(),
+            lastSenderUid: user.uid
+        });
+        try {
+            await batch.commit();
+            input.value = '';
+            updateChatComposerState();
+        } catch (error) {
+            console.error('Unable to send private message:', error);
+            alert(`Your private message could not be sent: ${error.message}`);
+        }
+    }
+
+    function setChatReply(messageId, sender, text) {
+        activeChatReply = { id: messageId, sender, text: String(text).slice(0, 1000) };
+        document.getElementById('chatReplySender').textContent = sender;
+        document.getElementById('chatReplyText').textContent = activeChatReply.text;
+        document.getElementById('chatReplyPreview').classList.remove('hidden');
+        document.getElementById('chatTextInput').focus();
+    }
+
+    function clearChatReply() {
+        activeChatReply = null;
+        document.getElementById('chatReplyPreview').classList.add('hidden');
+        document.getElementById('chatReplySender').textContent = '';
+        document.getElementById('chatReplyText').textContent = '';
+    }
+
+    function filterChatMessages() {
+        const query = document.getElementById('chatSearchInput').value.trim().toLocaleLowerCase();
+        document.querySelectorAll('#chatMessageStream [data-search-text]').forEach(message => {
+            message.classList.toggle('hidden', query !== '' && !message.dataset.searchText.includes(query));
+        });
+    }
+
+    function updateChatComposerState() {
+        const input = document.getElementById('chatTextInput');
+        document.getElementById('chatCharacterCount').textContent = `${input.value.length} / 1000`;
+        document.getElementById('sendChatMessageBtn').disabled = input.value.trim().length === 0;
+    }
+
+    function handleChatComposerKeydown(event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            sendChatMessage();
+        }
+    }
+
+    function toggleChatEmojiPicker() {
+        const picker = document.getElementById('chatEmojiPicker');
+        if (!picker.dataset.initialized) {
+            [...new Set(CHAT_EMOJI_LIST)].forEach(emoji => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'rounded-lg p-1.5 text-lg hover:bg-white/10';
+                button.textContent = emoji;
+                button.setAttribute('aria-label', `Insert ${emoji}`);
+                button.addEventListener('click', () => insertChatEmoji(emoji));
+                picker.appendChild(button);
+            });
+            picker.dataset.initialized = 'true';
+        }
+        picker.classList.toggle('hidden');
+    }
+
+    function insertChatEmoji(emoji) {
+        const input = document.getElementById('chatTextInput');
+        const start = input.selectionStart;
+        const end = input.selectionEnd;
+        input.value = `${input.value.slice(0, start)}${emoji}${input.value.slice(end)}`;
+        input.selectionStart = input.selectionEnd = start + emoji.length;
+        input.focus();
+        updateChatComposerState();
     }
 
     function editMessage(messageId, currentText) {
@@ -5422,15 +6671,20 @@ ${isUserAdmin ? `<button onclick="deleteAttendanceVote('${name}')" class="px-2 p
         }
     }
 
-    function deleteMessage(messageId) {
+    function deleteMessage(messageId, message) {
+        const user = auth.currentUser;
+        const isOwner = message && (
+            (message.senderUid && message.senderUid === user?.uid) ||
+            (!message.senderUid && message.sender === currentUserProfileUsername)
+        );
+        if (!user || (!isOwner && !isUserAdmin)) {
+            alert('You can only delete your own messages.');
+            return;
+        }
         if (confirm("Are you sure you want to delete this message?")) {
             chatRef.child(messageId).remove()
             .catch(err => alert("Error deleting: " + err.message));
         }
-    }
-
-    function uploadChatMediaFile(type) {
-        alert("Media uploads require Firebase Storage configuration. Please use text chat for now.");
     }
 
     // --- CELEBRATION POPUP CORE LOGIC ---
