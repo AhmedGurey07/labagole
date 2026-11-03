@@ -1740,6 +1740,52 @@
         document.getElementById('printPreviewContent').scrollTop = 0;
     }
 
+    async function saveScreenshotBlob(screenshotBlob, downloadName, { title = downloadName, shareOnMobile = false } = {}) {
+        if (window.GolahaDownloads && typeof window.GolahaDownloads.saveScreenshot === 'function') {
+            const imageDataUrl = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    if (typeof reader.result === 'string') resolve(reader.result);
+                    else reject(new Error('The screenshot could not be prepared for saving.'));
+                };
+                reader.onerror = () => reject(reader.error || new Error('The screenshot could not be prepared for saving.'));
+                reader.readAsDataURL(screenshotBlob);
+            });
+            const encodedImage = imageDataUrl.split(',')[1];
+            if (!encodedImage || !window.GolahaDownloads.saveScreenshot(encodedImage, downloadName)) {
+                throw new Error('The app could not save the screenshot to device storage.');
+            }
+            return;
+        }
+
+        const screenshotFile = new File([screenshotBlob], downloadName, { type: 'image/png' });
+        if (shareOnMobile && window.innerWidth <= 640 && typeof navigator.share === 'function' &&
+            typeof navigator.canShare === 'function' && navigator.canShare({ files: [screenshotFile] })) {
+            try {
+                await navigator.share({
+                    files: [screenshotFile],
+                    title,
+                    text: 'Full table screenshot'
+                });
+                return;
+            } catch (error) {
+                if (error.name === 'AbortError') return;
+                console.warn('Mobile sharing is unavailable; trying a direct image download:', error);
+            }
+        }
+
+        const screenshotUrl = URL.createObjectURL(screenshotBlob);
+        const link = document.createElement('a');
+        link.href = screenshotUrl;
+        link.download = downloadName;
+        link.style.position = 'fixed';
+        link.style.left = '-9999px';
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(screenshotUrl), 60000);
+    }
+
     async function takePrintPreviewScreenshot() {
         const previewContent = document.getElementById('printPreviewContent');
         const screenshotBtn = document.getElementById('printPreviewScreenshotBtn');
@@ -1938,33 +1984,7 @@
             const fileName = reportTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'table-report';
             const dateText = new Date().toISOString().slice(0, 10);
             const downloadName = `${fileName}-${dateText}.png`;
-            const screenshotFile = new File([screenshotBlob], downloadName, { type: 'image/png' });
-
-            if (mobileLayout && typeof navigator.share === 'function' && typeof navigator.canShare === 'function' &&
-                navigator.canShare({ files: [screenshotFile] })) {
-                try {
-                    await navigator.share({
-                        files: [screenshotFile],
-                        title: reportTitle,
-                        text: 'Full table screenshot'
-                    });
-                    return;
-                } catch (error) {
-                    if (error.name === 'AbortError') return;
-                    console.warn('Mobile sharing is unavailable; trying a direct image download:', error);
-                }
-            }
-
-            const screenshotUrl = URL.createObjectURL(screenshotBlob);
-            const link = document.createElement('a');
-            link.href = screenshotUrl;
-            link.download = downloadName;
-            link.style.position = 'fixed';
-            link.style.left = '-9999px';
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-            setTimeout(() => URL.revokeObjectURL(screenshotUrl), 60000);
+            await saveScreenshotBlob(screenshotBlob, downloadName, { title: reportTitle, shareOnMobile: true });
         } catch (error) {
             console.error('Error taking table report screenshot:', error);
             alert('Unable to take the screenshot. Please try again.');
@@ -3606,11 +3626,9 @@
                 }
             });
 
-            const link = document.createElement('a');
             const dateText = (document.getElementById('matchSummaryDate')?.innerText || 'match-summary')
                 .trim()
                 .replace(/[^a-z0-9_-]+/gi, '-');
-            link.download = `football-match-summary-${dateText || 'match'}.png`;
             const screenshotBlob = await new Promise((resolve, reject) => {
                 canvas.toBlob(blob => {
                     if (blob) {
@@ -3620,10 +3638,7 @@
                     }
                 }, 'image/png');
             });
-            const screenshotUrl = URL.createObjectURL(screenshotBlob);
-            link.href = screenshotUrl;
-            link.click();
-            setTimeout(() => URL.revokeObjectURL(screenshotUrl), 1000);
+            await saveScreenshotBlob(screenshotBlob, `football-match-summary-${dateText || 'match'}.png`);
         } catch (error) {
             console.error('Error taking football match summary screenshot:', error);
             alert('Unable to take the screenshot. Please try again.');
@@ -3738,13 +3753,8 @@
                     else reject(new Error('The screenshot image could not be encoded.'));
                 }, 'image/png');
             });
-            const link = document.createElement('a');
             const dateText = new Date().toISOString().slice(0, 10);
-            const screenshotUrl = URL.createObjectURL(screenshotBlob);
-            link.download = `football-standings-${dateText}.png`;
-            link.href = screenshotUrl;
-            link.click();
-            setTimeout(() => URL.revokeObjectURL(screenshotUrl), 1000);
+            await saveScreenshotBlob(screenshotBlob, `football-standings-${dateText}.png`);
         } catch (error) {
             console.error('Error taking standings table screenshot:', error);
             alert('Unable to take the screenshot. Please try again.');
